@@ -1,0 +1,54 @@
+﻿[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32mÔ£ô[39m 3279 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mpublic/build/[22m[32mmanifest.json            [39m[1m[2m  0.33 kB[22m[1m[22m[2m Ôöé gzip:   0.17 kB[22m
+[2mpublic/build/[22m[35massets/app-Ckco1Y7h.css  [39m[1m[2m 77.96 kB[22m[1m[22m[2m Ôöé gzip:  13.10 kB[22m
+[2mpublic/build/[22m[36massets/app-C-LTRECk.js   [39m[1m[33m913.88 kB[39m[22m[2m Ôöé gzip: 285.41 kB[22m
+node.exe : [33m
+At C:\nvm4w\nodejs
+\npx.ps1:16 char:5
++     & "$basedir/
+node$exe"  "$based
+ir/node_modules/np
+m/bin/npx-cli.js" 
+...
++     ~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInf 
+   o          :   
+  NotSpecified:   
+  ([33m:Strin    
+g) [], Remote    
+Exception
+    + FullyQualif 
+   iedErrorId :   
+  NativeCommand   
+ Error
+ 
+(!) Some chunks 
+are larger than 
+500 kB after 
+minification. 
+Consider:
+- Using dynamic 
+import() to 
+code-split the 
+application
+- Use build.rollup
+Options.output.man
+ualChunks to 
+improve chunking: 
+https://rollupjs.o
+rg/configuration-o
+ptions/#output-man
+ualchunks
+- Adjust chunk 
+size limit for 
+this warning via b
+uild.chunkSizeWarn
+ingLimit.[39m
+[32mÔ£ô built in 21.39s[39m
