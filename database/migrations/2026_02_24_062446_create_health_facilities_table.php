@@ -13,6 +13,8 @@ return new class extends Migration
             $table->string('kode_kab')->nullable();
             $table->string('kode_instansi')->nullable();
             $table->string('unit_kerja')->nullable();
+            $table->string('email')->nullable();
+            $table->string('telp')->nullable();
             $table->string('type'); // 'rumah_sakit' atau 'puskesmas'
             $table->timestamps();
         });

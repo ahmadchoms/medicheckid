@@ -11,10 +11,10 @@ class HealthFacilitySeeder extends Seeder
     public function run(): void
     {
         // Import Rumah Sakit
-        $this->importData('rumah_sakit.csv', 'rumah_sakit');
+        $this->importData('rumah_sakit_dummy.csv', 'rumah_sakit');
         
         // Import Puskesmas
-        $this->importData('puskesmas.csv', 'puskesmas');
+        $this->importData('puskesmas_dummy.csv', 'puskesmas');
     }
 
     private function importData($filename, $type)
@@ -37,6 +37,8 @@ class HealthFacilitySeeder extends Seeder
                 'kode_kab'      => $row[0] ?? null,
                 'kode_instansi' => $row[1] ?? null,
                 'unit_kerja'    => $row[2] ?? null,
+                'email'         => $row[3] ?? null,
+                'telp'          => $row[4] ?? null,
                 'type'          => $type,
                 'created_at'    => now(),
                 'updated_at'    => now(),

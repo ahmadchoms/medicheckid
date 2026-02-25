@@ -14,6 +14,7 @@ import {
     ChevronRight,
     Building2,
     ChevronDown,
+    Mail, // Tambahan icon email
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PublicLayout from "@/components/layouts/public-layout";
@@ -30,6 +31,7 @@ const FASKES_TYPES = {
 
 // ─── Sub-Komponen: FaskesCard ────────────────────────────────
 function FaskesCard({ item }) {
+    // Menampilkan nama wilayah jika ada relasi (regency), atau fallback ke kode_kab
     const cityName = item.regency?.nama_wilayah || `Kode Kab: ${item.kode_kab}`;
 
     const typeInfo = FASKES_TYPES[item.type] || {
@@ -38,12 +40,13 @@ function FaskesCard({ item }) {
         color: "gray",
     };
 
+    // Format URL Google Maps yang lebih akurat
     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
         item.unit_kerja + " " + cityName,
     )}`;
 
     return (
-        <div className="bg-white border border-clinical-border rounded-clinical-xl p-5 shadow-clinical-xs hover:shadow-clinical-md hover:-translate-y-0.5 transition-all duration-200">
+        <div className="bg-white border border-clinical-border rounded-clinical-xl p-5 shadow-clinical-xs hover:shadow-clinical-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col h-full">
             <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-3">
                     <div
@@ -72,7 +75,7 @@ function FaskesCard({ item }) {
                 )}
             </div>
 
-            <div className="space-y-1.5 mb-4">
+            <div className="space-y-1.5 mb-4 flex-grow">
                 <div className="flex items-start gap-2">
                     <MapPin
                         size={14}
@@ -82,6 +85,33 @@ function FaskesCard({ item }) {
                         Kode Instansi: {item.kode_instansi}
                     </p>
                 </div>
+
+                {/* Menampilkan Email dari Data */}
+                {item.email && (
+                    <div className="flex items-center gap-2">
+                        <Mail
+                            size={14}
+                            className="text-clinical-muted shrink-0"
+                        />
+                        <p className="font-body text-xs text-clinical-muted truncate">
+                            {item.email}
+                        </p>
+                    </div>
+                )}
+
+                {/* Menampilkan Nomor Telepon dari Data */}
+                {item.telp && (
+                    <div className="flex items-center gap-2">
+                        <Phone
+                            size={14}
+                            className="text-clinical-muted shrink-0"
+                        />
+                        <p className="font-body text-xs text-clinical-muted">
+                            {item.telp}
+                        </p>
+                    </div>
+                )}
+
                 <div className="flex items-center gap-2">
                     <Clock size={14} className="text-clinical-muted shrink-0" />
                     <p className="font-body text-xs text-clinical-muted">
@@ -92,9 +122,10 @@ function FaskesCard({ item }) {
                 </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 mt-auto">
                 <a
-                    href="tel:119"
+                    // Menggunakan nomor telepon asli dari data, fallback ke 119 jika tidak ada
+                    href={`tel:${item.telp || "119"}`}
                     className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-clinical-success text-white font-body font-semibold text-xs rounded-clinical-md shadow-clinical-sm hover:shadow-clinical-md transition-all"
                 >
                     <Phone size={14} /> Hubungi
@@ -365,7 +396,10 @@ export default function Faskes({ facilities, filters, cities }) {
                     </div>
                 ) : (
                     facilities.data.map((item) => (
-                        <FaskesCard key={item.id} item={item} />
+                        <FaskesCard
+                            key={item.id || item.kode_instansi}
+                            item={item}
+                        />
                     ))
                 )}
             </div>
