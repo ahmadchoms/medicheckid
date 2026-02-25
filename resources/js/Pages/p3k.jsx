@@ -1,4 +1,3 @@
-// resources/js/Pages/p3k.jsx
 import { Head } from "@inertiajs/react";
 import PublicLayout from "@/components/layouts/public-layout";
 import P3KGuide from "@/features/P3K/p3k-guide";

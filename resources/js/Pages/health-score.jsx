@@ -1,4 +1,3 @@
-// resources/js/Pages/health-score.jsx
 import { Head } from "@inertiajs/react";
 import PublicLayout from "@/components/layouts/public-layout";
 import HealthScoreAssessment from "@/features/healthscore/healtscore-assesment";

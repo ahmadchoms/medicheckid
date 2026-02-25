@@ -17,7 +17,12 @@ import { Button } from "@/components/ui/button";
 const NAV_LINKS = [
     { href: "/", label: "Beranda", icon: Home, emoji: "🏠" },
     { href: "/cek-gejala", label: "Cek Gejala", icon: Activity, emoji: "🩺" },
-    { href: "/health-score", label: "Health Score", icon: BookOpen, emoji: "📊" },
+    {
+        href: "/health-score",
+        label: "Health Score",
+        icon: BookOpen,
+        emoji: "📊",
+    },
     { href: "/p3k", label: "P3K", icon: AlertTriangle, emoji: "🚨" },
     { href: "/faskes", label: "Faskes", icon: MapPin, emoji: "📍" },
 ];
@@ -31,12 +36,9 @@ function EmergencyBanner() {
                 <span className="font-body text-xs text-white font-bold">
                     Darurat? Hubungi
                 </span>
-                <a
-                    href="tel:119"
-                    className="font-display text-sm text-brutal-yellow underline hover:no-underline"
-                >
+                <span className="inline-flex items-center px-2 py-0.5 bg-brutal-yellow/90 border-2 border-brutal-yellow font-display text-sm text-brutal-black rounded-md select-none">
                     119
-                </a>
+                </span>
                 <span className="font-body text-xs text-white/70">
                     (gratis 24 jam)
                 </span>
@@ -64,7 +66,8 @@ function Header() {
                                 MediCheck
                             </span>
                             <span className="font-display text-lg text-brutal-blue leading-none">
-                                {" "}ID
+                                {" "}
+                                ID
                             </span>
                         </div>
                     </Link>
@@ -72,7 +75,10 @@ function Header() {
                     {/* Desktop Nav */}
                     <nav className="hidden lg:flex items-center gap-1">
                         {NAV_LINKS.map((link) => {
-                            const isActive = url === link.href || (link.href !== "/" && url.startsWith(link.href));
+                            const isActive =
+                                url === link.href ||
+                                (link.href !== "/" &&
+                                    url.startsWith(link.href));
                             return (
                                 <Link
                                     key={link.href}
@@ -81,7 +87,8 @@ function Header() {
                                         "px-3 py-2 font-body text-sm font-bold transition-all duration-150",
                                         "border-3 border-transparent hover:border-brutal-black hover:shadow-brutal-sm",
                                         "hover:-translate-x-0.5 hover:-translate-y-0.5",
-                                        isActive && "border-brutal-black bg-brutal-yellow shadow-brutal-sm",
+                                        isActive &&
+                                            "border-brutal-black bg-brutal-yellow shadow-brutal-sm",
                                     )}
                                 >
                                     {link.label}
@@ -91,14 +98,19 @@ function Header() {
                     </nav>
 
                     {/* Emergency + Mobile toggle */}
-                    <div className="flex items-center gap-2">
-                        <a
-                            href="tel:119"
-                            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-brutal-red text-white border-3 border-brutal-black font-body font-bold text-xs shadow-brutal-sm hover:shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
+                    <div className="flex items-center gap-3">
+                        <Link
+                            href="/cek-gejala"
+                            className={cn(
+                                "hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-brutal-yellow text-brutal-black border-3 border-brutal-black",
+                                "font-body font-bold text-xs transition-all duration-150",
+                                "shadow-brutal-sm hover:shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5",
+                            )}
                         >
-                            <Phone size={12} />
-                            119
-                        </a>
+                            <Activity size={14} />
+                            Mulai Cek
+                        </Link>
+
                         <button
                             onClick={() => setMobileOpen(!mobileOpen)}
                             className="lg:hidden w-10 h-10 border-3 border-brutal-black flex items-center justify-center bg-brutal-white shadow-brutal-sm hover:bg-brutal-yellow transition-colors"
@@ -114,7 +126,10 @@ function Header() {
                     <div className="lg:hidden border-t-3 border-brutal-black pb-4 animate-slide-up">
                         <nav className="flex flex-col gap-1 pt-3">
                             {NAV_LINKS.map((link) => {
-                                const isActive = url === link.href || (link.href !== "/" && url.startsWith(link.href));
+                                const isActive =
+                                    url === link.href ||
+                                    (link.href !== "/" &&
+                                        url.startsWith(link.href));
                                 return (
                                     <Link
                                         key={link.href}
@@ -124,22 +139,25 @@ function Header() {
                                             "flex items-center gap-3 px-3 py-3 font-body font-bold text-sm",
                                             "border-3 border-transparent transition-all",
                                             "hover:border-brutal-black hover:bg-brutal-yellow hover:shadow-brutal-sm",
-                                            isActive && "border-brutal-black bg-brutal-yellow shadow-brutal-sm",
+                                            isActive &&
+                                                "border-brutal-black bg-brutal-yellow shadow-brutal-sm",
                                         )}
                                     >
-                                        <span className="text-lg">{link.emoji}</span>
+                                        <span className="text-lg">
+                                            {link.emoji}
+                                        </span>
                                         {link.label}
                                     </Link>
                                 );
                             })}
                         </nav>
-                        <a
-                            href="tel:119"
-                            className="mt-3 flex items-center justify-center gap-2 px-4 py-3 bg-brutal-red text-white border-3 border-brutal-black font-body font-bold text-sm shadow-brutal"
-                        >
+                        <div className="mt-3 flex items-center justify-center gap-2 px-4 py-3 bg-brutal-red text-white border-3 border-brutal-black font-body font-bold text-sm shadow-brutal select-none">
                             <Phone size={16} />
-                            Darurat: 119
-                        </a>
+                            Darurat:
+                            <span className="inline-flex items-center px-2 py-0.5 bg-brutal-yellow/90 border border-brutal-yellow font-display text-sm text-brutal-black rounded-md">
+                                119
+                            </span>
+                        </div>
                     </div>
                 )}
             </div>
@@ -150,21 +168,25 @@ function Header() {
 // ─── Footer ──────────────────────────────────────────────────
 function Footer() {
     return (
-        <footer className="bg-brutal-black border-t-4 border-brutal-black">
+        <footer className="bg-brutal-black border-t-4 border-brutal-black mt-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                     {/* Brand */}
                     <div>
                         <div className="flex items-center gap-2 mb-3">
                             <div className="w-8 h-8 bg-brutal-yellow border-3 border-brutal-white/20 flex items-center justify-center">
-                                <span className="font-display text-xs text-brutal-black">M</span>
+                                <span className="font-display text-xs text-brutal-black">
+                                    M
+                                </span>
                             </div>
                             <span className="font-display text-lg text-brutal-white">
-                                MediCheck <span className="text-brutal-yellow">ID</span>
+                                MediCheck{" "}
+                                <span className="text-brutal-yellow">ID</span>
                             </span>
                         </div>
                         <p className="font-body text-xs text-brutal-white/60 leading-relaxed">
-                            Platform literasi kesehatan interaktif untuk masyarakat Indonesia.
+                            Platform literasi kesehatan interaktif untuk
+                            masyarakat Indonesia.
                         </p>
                     </div>
 
@@ -204,10 +226,14 @@ function Footer() {
                 <div className="border-t-3 border-brutal-white/10 pt-6">
                     <div className="border-3 border-brutal-yellow/30 bg-brutal-yellow/5 p-3 mb-4">
                         <p className="font-body text-xs text-brutal-white/70 leading-relaxed">
-                            ⚠️ <strong className="text-brutal-yellow">Disclaimer:</strong>{" "}
-                            MediCheck ID adalah platform edukasi kesehatan dan BUKAN
-                            pengganti diagnosis dokter. Untuk kondisi darurat, segera
-                            hubungi <strong className="text-brutal-yellow">119</strong>.
+                            ⚠️{" "}
+                            <strong className="text-brutal-yellow">
+                                Disclaimer:
+                            </strong>{" "}
+                            MediCheck ID adalah platform edukasi kesehatan dan
+                            BUKAN pengganti diagnosis dokter. Untuk kondisi
+                            darurat, segera hubungi{" "}
+                            <strong className="text-brutal-yellow">119</strong>.
                         </p>
                     </div>
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
@@ -215,7 +241,7 @@ function Footer() {
                             © 2026 MediCheck ID — SOFTCOMPT TECHSOFT 2026
                         </p>
                         <p className="font-body text-xs text-brutal-white/40">
-                            HIMA-RPL Politeknik Negeri Indramayu
+                            Team MediCheck ID - Politeknik Negeri Semarang
                         </p>
                     </div>
                 </div>
@@ -233,21 +259,27 @@ function BottomNav() {
             <div className="flex items-center justify-around h-16">
                 {NAV_LINKS.map((link) => {
                     const Icon = link.icon;
-                    const isActive = url === link.href || (link.href !== "/" && url.startsWith(link.href));
+                    const isActive =
+                        url === link.href ||
+                        (link.href !== "/" && url.startsWith(link.href));
                     return (
                         <Link
                             key={link.href}
                             href={link.href}
                             className={cn(
                                 "flex flex-col items-center gap-0.5 px-2 py-1 transition-colors",
-                                isActive ? "text-brutal-blue" : "text-brutal-muted",
+                                isActive
+                                    ? "text-brutal-blue"
+                                    : "text-brutal-muted",
                             )}
                         >
                             <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-                            <span className={cn(
-                                "font-body text-[10px] leading-tight",
-                                isActive && "font-bold",
-                            )}>
+                            <span
+                                className={cn(
+                                    "font-body text-[10px] leading-tight",
+                                    isActive && "font-bold",
+                                )}
+                            >
                                 {link.label}
                             </span>
                         </Link>
@@ -268,10 +300,12 @@ export default function PublicLayout({ children, fullWidth = false }) {
             <EmergencyBanner />
             <Header />
 
-            <main className={cn(
-                "flex-1 pb-20 lg:pb-0",
-                !fullWidth && "max-w-7xl mx-auto w-full px-4 sm:px-6 py-8",
-            )}>
+            <main
+                className={cn(
+                    "flex-1 pb-20 lg:pb-0",
+                    !fullWidth && "max-w-7xl mx-auto w-full px-4 sm:px-6 py-8",
+                )}
+            >
                 {children}
             </main>
 

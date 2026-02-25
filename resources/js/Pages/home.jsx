@@ -1,4 +1,3 @@
-// resources/js/pages/Public/Home.jsx
 import { useState, useEffect, useRef } from "react";
 import { Link } from "@inertiajs/react";
 import {
@@ -467,7 +466,7 @@ export default function Home() {
             <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6">
                 <div className="border-4 border-brutal-black bg-brutal-yellow shadow-brutal-xl p-8">
                     <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                        <div className="border-4 border-brutal-black bg-brutal-black p-4 flex-shrink-0">
+                        <div className="border-4 border-brutal-black bg-brutal-black p-4 shrink-0">
                             <Shield size={36} className="text-brutal-yellow" />
                         </div>
                         <div className="flex-1">

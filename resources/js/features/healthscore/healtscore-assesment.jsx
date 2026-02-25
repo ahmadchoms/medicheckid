@@ -1,4 +1,3 @@
-// resources/js/features/healthscore/healtscore-assesment.jsx
 import { useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight, RotateCcw, Share2 } from "lucide-react";
 import {

@@ -1,5 +1,4 @@
-// resources/js/lib/healthScore.js
-// ── Health Score Dimensions & Calculation ────────────────
+// Health Score Dimensions & Calculation
 
 export const DIMENSIONS = [
     {

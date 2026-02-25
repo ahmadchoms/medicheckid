@@ -1,4 +1,4 @@
-// resources/js/features/symptomchecker/symptom-checker.jsx
+
 import { useState, useRef } from "react";
 import {
     ChevronLeft,
@@ -152,22 +152,18 @@ function ResultCard({ result, path, onReset, areaId }) {
                 </div>
             </div>
 
-            {/* Emergency Call - shown prominently if emergency */}
             {isEmergency && (
-                <a
-                    href="tel:119"
-                    className="flex items-center justify-center gap-3 w-full py-4 bg-brutal-red border-4 border-brutal-black shadow-brutal-lg hover:shadow-brutal-xl hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
-                >
+                <div className="flex items-center justify-center gap-3 w-full py-4 bg-brutal-red border-4 border-brutal-black shadow-brutal-lg select-none">
                     <Phone size={24} className="text-brutal-white" />
                     <div className="text-left">
-                        <p className="font-display text-2xl text-brutal-white leading-none">
+                        <span className="inline-flex items-center px-2.5 py-1 bg-brutal-yellow/90 border-2 border-brutal-yellow font-display text-2xl text-brutal-black rounded-md">
                             119
-                        </p>
-                        <p className="font-body text-brutal-white/80 text-xs">
-                            Panggil Ambulans Sekarang
+                        </span>
+                        <p className="font-body text-brutal-white/80 text-xs mt-1">
+                            Hubungi Ambulans Segera
                         </p>
                     </div>
-                </a>
+                </div>
             )}
 
             {/* Possible Conditions */}
@@ -317,34 +313,24 @@ function ResultCard({ result, path, onReset, areaId }) {
                 Bagikan Ringkasan
             </Button>
 
-            {/* Emergency contacts always visible at bottom */}
             {!isEmergency && (
                 <div className="border-3 border-brutal-black bg-brutal-gray p-3">
                     <p className="font-body text-xs font-bold mb-2">
-                        📞 Butuh Bantuan Segera?
+                        📞 Nomor Darurat Penting
                     </p>
                     <div className="grid grid-cols-3 gap-2">
-                        <a
-                            href="tel:119"
-                            className="text-center border-2 border-brutal-black bg-brutal-white p-2 hover:bg-brutal-red hover:text-brutal-white transition-all"
-                        >
-                            <p className="font-display text-sm">119</p>
-                            <p className="text-xs font-body">Ambulans</p>
-                        </a>
-                        <a
-                            href="tel:1500567"
-                            className="text-center border-2 border-brutal-black bg-brutal-white p-2 hover:bg-brutal-blue hover:text-brutal-white transition-all"
-                        >
-                            <p className="font-display text-sm">1500-567</p>
-                            <p className="text-xs font-body">Hotline</p>
-                        </a>
-                        <a
-                            href="tel:119"
-                            className="text-center border-2 border-brutal-black bg-brutal-white p-2 hover:bg-brutal-green hover:text-brutal-white transition-all"
-                        >
-                            <p className="font-display text-sm">ext 8</p>
-                            <p className="text-xs font-body">Mental</p>
-                        </a>
+                        <div className="text-center border-2 border-brutal-black bg-brutal-white p-2 select-none">
+                            <span className="inline-flex items-center px-2 py-0.5 bg-brutal-red/10 border border-brutal-red font-display text-sm text-brutal-red rounded-md">119</span>
+                            <p className="text-xs font-body text-brutal-muted mt-1">Ambulans</p>
+                        </div>
+                        <div className="text-center border-2 border-brutal-black bg-brutal-white p-2 select-none">
+                            <span className="inline-flex items-center px-2 py-0.5 bg-brutal-blue/10 border border-brutal-blue font-display text-sm text-brutal-blue rounded-md">1500-567</span>
+                            <p className="text-xs font-body text-brutal-muted mt-1">Hotline</p>
+                        </div>
+                        <div className="text-center border-2 border-brutal-black bg-brutal-white p-2 select-none">
+                            <span className="inline-flex items-center px-2 py-0.5 bg-brutal-green/10 border border-brutal-green font-display text-sm text-brutal-green rounded-md">ext 8</span>
+                            <p className="text-xs font-body text-brutal-muted mt-1">Mental</p>
+                        </div>
                     </div>
                 </div>
             )}

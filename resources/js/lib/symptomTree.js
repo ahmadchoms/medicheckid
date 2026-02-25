@@ -1,4 +1,3 @@
-// resources/js/lib/symptomTree.js
 // Decision tree untuk 12 kondisi kesehatan umum Indonesia
 // Max depth: 5 levels | Medical content reviewed against WHO/Kemenkes guidelines
 

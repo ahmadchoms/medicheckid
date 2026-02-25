@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Head } from "@inertiajs/react";
 import {
     MapPin,
@@ -11,22 +11,32 @@ import {
     Stethoscope,
     RefreshCcw,
     X,
+    Copy,
+    Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PublicLayout from "@/components/layouts/public-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/feedback";
 import { useFaskes } from "@/features/faskes/use-faskes";
 import { FASKES_TYPES, CITIES } from "@/features/faskes/faskes-data";
 
-// ─── FaskesCard ──────────────────────────────────────────────
 function FaskesCard({ faskes }) {
+    const [copied, setCopied] = useState(false);
     const typeInfo = FASKES_TYPES[faskes.type];
-    const cityLabel = CITIES.find((c) => c.value === faskes.city)?.label ?? faskes.city;
+    const cityLabel =
+        CITIES.find((c) => c.value === faskes.city)?.label ?? faskes.city;
+
+    const handleCopyPhone = useCallback(() => {
+        const raw = faskes.phone.replace(/[^0-9]/g, "");
+        navigator.clipboard.writeText(raw).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+        });
+    }, [faskes.phone]);
 
     const typeColorMap = {
         green: "bg-brutal-green text-white",
@@ -74,14 +84,19 @@ function FaskesCard({ faskes }) {
             {/* Info */}
             <div className="space-y-2 mb-4">
                 <div className="flex items-start gap-2">
-                    <MapPin size={14} className="text-brutal-muted shrink-0 mt-0.5" />
+                    <MapPin
+                        size={14}
+                        className="text-brutal-muted shrink-0 mt-0.5"
+                    />
                     <p className="font-body text-xs text-brutal-muted leading-relaxed">
                         {faskes.address}
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
                     <Clock size={14} className="text-brutal-muted shrink-0" />
-                    <p className="font-body text-xs text-brutal-muted">{faskes.hours}</p>
+                    <p className="font-body text-xs text-brutal-muted">
+                        {faskes.hours}
+                    </p>
                 </div>
             </div>
 
@@ -104,20 +119,31 @@ function FaskesCard({ faskes }) {
 
             {/* Actions */}
             <div className="flex gap-2">
-                <a
-                    href={`tel:${faskes.phone.replace(/[^0-9]/g, "")}`}
+                <button
+                    onClick={handleCopyPhone}
                     className={cn(
-                        "flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5",
-                        "bg-brutal-green text-white border-3 border-brutal-black",
+                        "flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 cursor-pointer",
+                        copied
+                            ? "bg-brutal-green/80 text-white border-3 border-brutal-green"
+                            : "bg-brutal-green text-white border-3 border-brutal-black",
                         "font-body font-bold text-xs shadow-brutal-sm",
                         "hover:shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5",
                         "active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
                         "transition-all duration-150",
                     )}
                 >
-                    <Phone size={14} />
-                    {faskes.phone}
-                </a>
+                    {copied ? (
+                        <>
+                            <Check size={14} />
+                            Disalin!
+                        </>
+                    ) : (
+                        <>
+                            <Copy size={14} />
+                            {faskes.phone}
+                        </>
+                    )}
+                </button>
                 <a
                     href={faskes.mapsUrl}
                     target="_blank"
@@ -221,13 +247,19 @@ export default function Faskes() {
             <div className="mb-8 border-b-3 border-brutal-black pb-6">
                 <div className="flex items-center gap-2 mb-2">
                     <div className="w-10 h-10 bg-brutal-yellow border-3 border-brutal-black shadow-brutal flex items-center justify-center">
-                        <MapPin size={20} className="text-brutal-black" strokeWidth={2.5} />
+                        <MapPin
+                            size={20}
+                            className="text-brutal-black"
+                            strokeWidth={2.5}
+                        />
                     </div>
-                    <h1 className="font-display text-3xl md:text-4xl">Cari Faskes</h1>
+                    <h1 className="font-display text-3xl md:text-4xl">
+                        Cari Faskes
+                    </h1>
                 </div>
                 <p className="font-body text-brutal-muted max-w-xl">
-                    Temukan puskesmas, klinik, dan rumah sakit di sekitarmu. Filter
-                    berdasarkan kota, jenis, atau ketersediaan IGD.
+                    Temukan puskesmas, klinik, dan rumah sakit di sekitarmu.
+                    Filter berdasarkan kota, jenis, atau ketersediaan IGD.
                 </p>
             </div>
 
@@ -337,13 +369,20 @@ export default function Faskes() {
                 <div className="mb-4 flex items-center justify-between">
                     <p className="font-body text-sm text-brutal-muted">
                         Menampilkan{" "}
-                        <span className="font-bold text-brutal-black">{data.length}</span>{" "}
+                        <span className="font-bold text-brutal-black">
+                            {data.length}
+                        </span>{" "}
                         dari{" "}
-                        <span className="font-bold text-brutal-black">{totalCount}</span>{" "}
+                        <span className="font-bold text-brutal-black">
+                            {totalCount}
+                        </span>{" "}
                         faskes
                     </p>
                     {hasActiveFilter && (
-                        <Badge variant="secondary" className="border-2 border-brutal-black rounded-none">
+                        <Badge
+                            variant="secondary"
+                            className="border-2 border-brutal-black rounded-none"
+                        >
                             {data.length} hasil filter
                         </Badge>
                     )}
@@ -369,7 +408,9 @@ export default function Faskes() {
                             : "Data fasilitas kesehatan belum tersedia."
                     }
                     action={hasActiveFilter ? clearFilters : undefined}
-                    actionLabel={hasActiveFilter ? "Reset Semua Filter" : undefined}
+                    actionLabel={
+                        hasActiveFilter ? "Reset Semua Filter" : undefined
+                    }
                 />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -382,12 +423,16 @@ export default function Faskes() {
             {/* Disclaimer */}
             <div className="mt-8 border-3 border-brutal-yellow bg-brutal-yellow/10 p-4">
                 <div className="flex items-start gap-2">
-                    <Stethoscope size={16} className="text-brutal-orange shrink-0 mt-0.5" />
+                    <Stethoscope
+                        size={16}
+                        className="text-brutal-orange shrink-0 mt-0.5"
+                    />
                     <div>
                         <p className="font-body text-xs text-brutal-black">
-                            <strong>Info:</strong> Data faskes bersifat statis dan mungkin
-                            tidak mencakup semua fasilitas terbaru. Untuk informasi
-                            terkini, hubungi faskes secara langsung atau kunjungi{" "}
+                            <strong>Info:</strong> Data faskes bersifat statis
+                            dan mungkin tidak mencakup semua fasilitas terbaru.
+                            Untuk informasi terkini, hubungi faskes secara
+                            langsung atau kunjungi{" "}
                             <a
                                 href="https://yankes.kemkes.go.id/"
                                 target="_blank"
@@ -398,11 +443,11 @@ export default function Faskes() {
                             </a>
                             .
                         </p>
-                        <p className="font-body text-xs text-brutal-muted mt-1">
-                            Untuk kondisi darurat, segera hubungi{" "}
-                            <a href="tel:119" className="font-bold text-brutal-red">
+                        <p className="font-body text-xs text-brutal-muted mt-1 flex items-center gap-1 flex-wrap">
+                            Untuk kondisi darurat, segera hubungi
+                            <span className="inline-flex items-center px-1.5 py-0.5 bg-brutal-red/10 border-2 border-brutal-red font-display text-xs text-brutal-red rounded-md select-none">
                                 119
-                            </a>
+                            </span>
                             .
                         </p>
                     </div>

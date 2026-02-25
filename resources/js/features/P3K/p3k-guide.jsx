@@ -1,4 +1,4 @@
-// resources/js/features/P3K/p3k-guide.jsx
+
 import { useState, useEffect, useRef } from "react";
 import {
     Play,
@@ -439,20 +439,17 @@ function GuideViewer({ guide, onBack }) {
             </div>
 
             {guide.callFirst && (
-                <a
-                    href="tel:119"
-                    className="flex items-center justify-center gap-3 w-full py-3 mb-4 bg-brutal-red border-4 border-brutal-black shadow-brutal hover:shadow-brutal-lg hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
-                >
+                <div className="flex items-center justify-center gap-3 w-full py-3 mb-4 bg-brutal-red border-4 border-brutal-black shadow-brutal select-none">
                     <Phone size={20} className="text-brutal-white" />
                     <div className="text-center">
-                        <span className="font-display text-2xl text-brutal-white leading-none block">
+                        <span className="inline-flex items-center px-2.5 py-1 bg-brutal-yellow/90 border-2 border-brutal-yellow font-display text-2xl text-brutal-black rounded-md">
                             119
                         </span>
-                        <span className="font-body text-brutal-white/80 text-xs">
-                            Panggil Ambulans
+                        <span className="font-body text-brutal-white/80 text-xs block mt-1">
+                            Hubungi Ambulans
                         </span>
                     </div>
-                </a>
+                </div>
             )}
 
             {/* Step counter */}
@@ -501,13 +498,13 @@ function GuideViewer({ guide, onBack }) {
                     )}
 
                     {step.action?.type === "call" && (
-                        <a
-                            href={`tel:${step.action.number}`}
-                            className="mt-3 flex items-center gap-2 border-3 border-brutal-black bg-brutal-red text-brutal-white px-4 py-3 font-body font-bold shadow-brutal hover:shadow-brutal-lg transition-all"
-                        >
+                        <div className="mt-3 flex items-center gap-2 border-3 border-brutal-black bg-brutal-red text-brutal-white px-4 py-3 font-body font-bold shadow-brutal select-none">
                             <Phone size={18} />
-                            Hubungi {step.action.number} Sekarang
-                        </a>
+                            Hubungi
+                            <span className="inline-flex items-center px-2 py-0.5 bg-brutal-yellow/90 border border-brutal-yellow font-display text-sm text-brutal-black rounded-md">
+                                {step.action.number}
+                            </span>
+                        </div>
                     )}
                 </CardContent>
             </Card>
@@ -568,19 +565,15 @@ export default function P3KGuide() {
                     <p className="font-display text-brutal-white">
                         Dalam Keadaan Darurat?
                     </p>
-                    <div className="flex gap-4 mt-1">
-                        <a
-                            href="tel:119"
-                            className="font-body text-brutal-yellow font-bold text-sm hover:underline"
-                        >
-                            📞 119 — Ambulans
-                        </a>
-                        <a
-                            href="tel:1500567"
-                            className="font-body text-brutal-yellow font-bold text-sm hover:underline"
-                        >
-                            📞 1500-567 — Hotline
-                        </a>
+                    <div className="flex flex-wrap gap-3 mt-1.5">
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-brutal-yellow/90 border border-brutal-yellow font-display text-sm text-brutal-black rounded-md select-none">
+                            📞 119
+                        </span>
+                        <span className="font-body text-brutal-white/70 text-xs self-center">Ambulans</span>
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-brutal-yellow/90 border border-brutal-yellow font-display text-sm text-brutal-black rounded-md select-none">
+                            📞 1500-567
+                        </span>
+                        <span className="font-body text-brutal-white/70 text-xs self-center">Hotline</span>
                     </div>
                 </div>
             </div>
