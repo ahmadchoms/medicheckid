@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import { Head } from "@inertiajs/react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Head, router } from "@inertiajs/react";
 import {
     MapPin,
     Phone,
@@ -9,8 +9,11 @@ import {
     AlertTriangle,
     ExternalLink,
     Stethoscope,
-    RefreshCcw,
     X,
+    ChevronLeft,
+    ChevronRight,
+    Building2,
+    ChevronDown,
     Copy,
     Check,
 } from "lucide-react";
@@ -21,28 +24,27 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/feedback";
-import { useFaskes } from "@/features/faskes/use-faskes";
-import { FASKES_TYPES, CITIES } from "@/features/faskes/faskes-data";
 
-function FaskesCard({ faskes }) {
-    const [copied, setCopied] = useState(false);
-    const typeInfo = FASKES_TYPES[faskes.type];
-    const cityLabel =
-        CITIES.find((c) => c.value === faskes.city)?.label ?? faskes.city;
+// ─── Data Konstanta ──────────────────────────────────────────
+const FASKES_TYPES = {
+    rumah_sakit: { label: "Rumah Sakit", emoji: "🏥", color: "blue" },
+    puskesmas: { label: "Puskesmas", emoji: "🩺", color: "green" },
+};
 
-    const handleCopyPhone = useCallback(() => {
-        const raw = faskes.phone.replace(/[^0-9]/g, "");
-        navigator.clipboard.writeText(raw).then(() => {
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1500);
-        });
-    }, [faskes.phone]);
+// ─── Sub-Komponen: FaskesCard ────────────────────────────────
+function FaskesCard({ item }) {
+    // Mengambil nama wilayah dari relasi 'regency' yang dikirim Backend
+    const cityName = item.regency?.nama_wilayah || `Kode Kab: ${item.kode_kab}`;
 
-    const typeColorMap = {
-        green: "bg-brutal-green text-white",
-        blue: "bg-brutal-blue text-white",
-        red: "bg-brutal-red text-white",
+    const typeInfo = FASKES_TYPES[item.type] || {
+        label: "Faskes",
+        emoji: "🏥",
+        color: "gray",
     };
+
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        item.unit_kerja + " " + cityName,
+    )}`;
 
     return (
         <div
@@ -50,74 +52,56 @@ function FaskesCard({ faskes }) {
                 "border-4 border-brutal-black bg-brutal-white p-5",
                 "shadow-brutal transition-all duration-150",
                 "hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lg",
-                "active:translate-x-0.5 active:translate-y-0.5 active:shadow-brutal-sm",
             )}
         >
-            {/* Header */}
             <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-2">
                     <div
                         className={cn(
                             "w-10 h-10 border-3 border-brutal-black flex items-center justify-center text-lg shrink-0",
-                            typeColorMap[typeInfo.color],
+                            item.type === "rumah_sakit"
+                                ? "bg-brutal-blue text-white"
+                                : "bg-brutal-green text-white",
                         )}
                     >
                         {typeInfo.emoji}
                     </div>
                     <div>
-                        <h3 className="font-display text-lg leading-tight">
-                            {faskes.name}
+                        <h3 className="font-display text-lg leading-tight line-clamp-2 uppercase font-black">
+                            {item.unit_kerja}
                         </h3>
                         <p className="font-body text-xs text-brutal-muted mt-0.5">
-                            {cityLabel}
+                            {cityName}
                         </p>
                     </div>
                 </div>
-                {faskes.hasIGD && (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-brutal-red text-white border-3 border-brutal-black font-display text-[10px] uppercase tracking-wider shrink-0">
-                        <AlertTriangle size={10} />
-                        IGD
+                {item.type === "rumah_sakit" && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-brutal-red text-white border-3 border-brutal-black font-display text-[10px] uppercase tracking-wider shrink-0 font-bold">
+                        <AlertTriangle size={10} /> IGD
                     </span>
                 )}
             </div>
 
-            {/* Info */}
             <div className="space-y-2 mb-4">
                 <div className="flex items-start gap-2">
                     <MapPin
                         size={14}
                         className="text-brutal-muted shrink-0 mt-0.5"
                     />
-                    <p className="font-body text-xs text-brutal-muted leading-relaxed">
-                        {faskes.address}
+                    <p className="font-body text-xs text-brutal-muted leading-relaxed line-clamp-1">
+                        Kode Instansi: {item.kode_instansi}
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
                     <Clock size={14} className="text-brutal-muted shrink-0" />
                     <p className="font-body text-xs text-brutal-muted">
-                        {faskes.hours}
+                        {item.type === "rumah_sakit"
+                            ? "Buka 24 Jam"
+                            : "Senin-Sabtu, 08:00 - 14:00"}
                     </p>
                 </div>
             </div>
 
-            {/* Services */}
-            <div className="flex flex-wrap gap-1 mb-4">
-                {faskes.services.slice(0, 4).map((s) => (
-                    <span
-                        key={s}
-                        className="font-body text-[10px] font-bold px-2 py-0.5 bg-brutal-gray border-2 border-brutal-black"
-                    >
-                        {s}
-                    </span>
-                ))}
-                {faskes.services.length > 4 && (
-                    <span className="font-body text-[10px] text-brutal-muted py-0.5">
-                        +{faskes.services.length - 4} lainnya
-                    </span>
-                )}
-            </div>
-
-            {/* Actions */}
             <div className="flex gap-2">
                 <button
                     onClick={handleCopyPhone}
@@ -131,6 +115,9 @@ function FaskesCard({ faskes }) {
                         "active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
                         "transition-all duration-150",
                     )}
+                <a
+                    href="tel:119"
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-brutal-green text-white border-3 border-brutal-black font-body font-bold text-xs shadow-brutal-sm hover:shadow-brutal transition-all"
                 >
                     {copied ? (
                         <>
@@ -144,104 +131,88 @@ function FaskesCard({ faskes }) {
                         </>
                     )}
                 </button>
+                    <Phone size={14} /> Hubungi
+                </a>
                 <a
-                    href={faskes.mapsUrl}
+                    href={mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={cn(
-                        "inline-flex items-center justify-center gap-1.5 px-3 py-2.5",
-                        "bg-brutal-blue text-white border-3 border-brutal-black",
-                        "font-body font-bold text-xs shadow-brutal-sm",
-                        "hover:shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5",
-                        "active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
-                        "transition-all duration-150",
-                    )}
+                    className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-brutal-blue text-white border-3 border-brutal-black font-body font-bold text-xs shadow-brutal-sm hover:shadow-brutal transition-all"
                 >
-                    <ExternalLink size={14} />
-                    Maps
+                    <ExternalLink size={14} /> Maps
                 </a>
             </div>
         </div>
     );
 }
 
-// ─── Loading Skeleton ────────────────────────────────────────
-function FaskesSkeleton() {
-    return (
-        <div className="border-4 border-brutal-black bg-brutal-white p-5 shadow-brutal">
-            <div className="flex items-start gap-3 mb-4">
-                <Skeleton className="w-10 h-10 border-3 border-brutal-black rounded-none" />
-                <div className="flex-1 space-y-2">
-                    <Skeleton className="h-5 w-3/4 rounded-none" />
-                    <Skeleton className="h-3 w-1/2 rounded-none" />
-                </div>
-            </div>
-            <div className="space-y-2 mb-4">
-                <Skeleton className="h-3 w-full rounded-none" />
-                <Skeleton className="h-3 w-2/3 rounded-none" />
-            </div>
-            <div className="flex gap-1 mb-4">
-                <Skeleton className="h-5 w-16 rounded-none" />
-                <Skeleton className="h-5 w-20 rounded-none" />
-                <Skeleton className="h-5 w-14 rounded-none" />
-            </div>
-            <div className="flex gap-2">
-                <Skeleton className="flex-1 h-10 rounded-none" />
-                <Skeleton className="h-10 w-20 rounded-none" />
-            </div>
-        </div>
+// ─── Main Page Component ─────────────────────────────────────
+export default function Faskes({ facilities, filters, cities }) {
+    // State Filter Dasar
+    const [search, setSearch] = useState(filters?.search || "");
+    const [city, setCity] = useState(filters?.city || "");
+    const [type, setType] = useState(filters?.type || "");
+
+    // State untuk Searchable Select (Combobox)
+    const [isCityOpen, setIsCityOpen] = useState(false);
+    const [citySearch, setCitySearch] = useState("");
+    const dropdownRef = useRef(null);
+
+    const hasActiveFilter = city || type || search;
+
+    // Menutup dropdown wilayah jika klik di luar area
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target)
+            ) {
+                setIsCityOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () =>
+            document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // Filter list kota berdasarkan input user di dalam dropdown
+    const filteredCities = cities.filter((c) =>
+        c.label.toLowerCase().includes(citySearch.toLowerCase()),
     );
-}
 
-// ─── Error State ─────────────────────────────────────────────
-function FaskesError({ onRetry }) {
-    return (
-        <div className="border-4 border-brutal-red bg-brutal-red/5 p-8 text-center">
-            <div className="w-14 h-14 bg-brutal-red border-3 border-brutal-black mx-auto mb-4 flex items-center justify-center">
-                <AlertTriangle size={24} className="text-white" />
-            </div>
-            <h3 className="font-display text-xl mb-2">Gagal Memuat Data</h3>
-            <p className="font-body text-brutal-muted text-sm mb-6">
-                Terjadi kesalahan saat memuat data fasilitas kesehatan.
-            </p>
-            <Button
-                variant="default"
-                onClick={onRetry}
-                className="border-3 border-brutal-black shadow-brutal"
-            >
-                <RefreshCcw size={14} />
-                Coba Lagi
-            </Button>
-        </div>
-    );
-}
-
-// ─── Faskes Page ─────────────────────────────────────────────
-export default function Faskes() {
-    const [search, setSearch] = useState("");
-    const [city, setCity] = useState("");
-    const [type, setType] = useState("");
-    const [igdOnly, setIgdOnly] = useState(false);
-
-    const { data, isLoading, isError, refetch, totalCount } = useFaskes({
-        search,
-        city,
-        type,
-        igdOnly,
-    });
-
-    const hasActiveFilter = city || type || igdOnly || search;
+    const fetchFilteredData = (newFilters) => {
+        router.get("/fasilitas-kesehatan", newFilters, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    };
 
     const clearFilters = () => {
         setSearch("");
         setCity("");
         setType("");
-        setIgdOnly(false);
+        fetchFilteredData({});
     };
+
+    // Debounce Logic untuk hit API
+    useEffect(() => {
+        const delaySearch = setTimeout(() => {
+            if (
+                search !== (filters?.search || "") ||
+                city !== (filters?.city || "") ||
+                type !== (filters?.type || "")
+            ) {
+                fetchFilteredData({ search, city, type });
+            }
+        }, 400);
+
+        return () => clearTimeout(delaySearch);
+    }, [search, city, type]);
 
     return (
         <PublicLayout>
-            <Head title="Cari Faskes" />
+            <Head title="Cari Fasilitas Kesehatan" />
 
             {/* Page Header */}
             <div className="mb-8 border-b-3 border-brutal-black pb-6">
@@ -252,205 +223,254 @@ export default function Faskes() {
                             className="text-brutal-black"
                             strokeWidth={2.5}
                         />
+                        <Building2
+                            size={20}
+                            className="text-brutal-black"
+                            strokeWidth={2.5}
+                        />
                     </div>
                     <h1 className="font-display text-3xl md:text-4xl">
                         Cari Faskes
+                    </h1>
+                    <h1 className="font-display text-3xl md:text-4xl font-black">
+                        CARI FASKES
                     </h1>
                 </div>
                 <p className="font-body text-brutal-muted max-w-xl">
                     Temukan puskesmas, klinik, dan rumah sakit di sekitarmu.
                     Filter berdasarkan kota, jenis, atau ketersediaan IGD.
+                    Cari dan temukan informasi RS atau Puskesmas di seluruh
+                    Indonesia dengan mudah.
                 </p>
             </div>
 
             {/* Search & Filters */}
             <div className="mb-6 space-y-3">
-                {/* Search Bar */}
+                {/* Search Bar Nama */}
                 <div className="relative">
                     <Search
                         size={18}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-brutal-muted pointer-events-none"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-brutal-muted"
                     />
                     <Input
                         type="text"
-                        placeholder="Cari nama atau alamat faskes..."
+                        placeholder="Cari nama faskes (Contoh: RSUD...)"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="pl-10 h-12 border-3 border-brutal-black font-body shadow-brutal-sm focus:shadow-brutal transition-shadow rounded-none"
+                        className="pl-12 h-14 border-4 border-brutal-black font-body text-sm shadow-brutal focus:shadow-brutal-lg transition-all rounded-none uppercase font-bold"
                     />
-                    {search && (
-                        <button
-                            onClick={() => setSearch("")}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-brutal-muted hover:text-brutal-black"
-                        >
-                            <X size={16} />
-                        </button>
-                    )}
                 </div>
 
-                {/* Filter Row */}
-                <div className="flex flex-wrap gap-2 items-center">
-                    <div className="flex items-center gap-1 mr-1">
+                <div className="flex flex-wrap gap-3 items-center">
+                    <div className="flex items-center gap-1">
                         <Filter size={14} className="text-brutal-muted" />
-                        <span className="font-body text-xs font-bold text-brutal-muted uppercase tracking-wider">
+                        <span className="font-body text-xs font-bold text-brutal-muted uppercase">
                             Filter:
                         </span>
                     </div>
 
-                    {/* City filter */}
-                    <select
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className={cn(
-                            "px-3 py-2 border-3 border-brutal-black font-body text-xs font-bold",
-                            "bg-brutal-white shadow-brutal-sm cursor-pointer appearance-none",
-                            "hover:shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5",
-                            "transition-all duration-150 rounded-none",
-                            city && "bg-brutal-yellow",
-                        )}
-                    >
-                        <option value="">Semua Kota</option>
-                        {CITIES.map((c) => (
-                            <option key={c.value} value={c.value}>
-                                {c.label}
-                            </option>
-                        ))}
-                    </select>
+                    {/* Searchable Wilayah Filter */}
+                    <div className="relative" ref={dropdownRef}>
+                        <button
+                            type="button"
+                            onClick={() => setIsCityOpen(!isCityOpen)}
+                            className={cn(
+                                "w-64 px-4 py-2.5 border-3 border-brutal-black font-body text-xs font-bold bg-brutal-white shadow-brutal-sm flex justify-between items-center transition-all",
+                                city && "bg-brutal-yellow",
+                                isCityOpen &&
+                                    "translate-x-0.5 translate-y-0.5 shadow-none",
+                            )}
+                        >
+                            <span className="truncate">
+                                {city
+                                    ? cities.find((c) => c.value === city)
+                                          ?.label
+                                    : "SEMUA WILAYAH"}
+                            </span>
+                            <ChevronDown
+                                size={14}
+                                className={cn(
+                                    "transition-transform duration-200",
+                                    isCityOpen && "rotate-180",
+                                )}
+                            />
+                        </button>
 
-                    {/* Type filter */}
+                        {isCityOpen && (
+                            <div className="absolute top-full left-0 mt-2 w-72 bg-brutal-white border-4 border-brutal-black shadow-brutal z-[50]">
+                                {/* Input Pencarian di dalam Dropdown */}
+                                <div className="p-2 border-b-2 border-brutal-black bg-brutal-gray">
+                                    <div className="relative">
+                                        <Search
+                                            size={12}
+                                            className="absolute left-2 top-1/2 -translate-y-1/2 text-brutal-muted"
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Ketik nama kota..."
+                                            value={citySearch}
+                                            onChange={(e) =>
+                                                setCitySearch(e.target.value)
+                                            }
+                                            className="w-full pl-7 pr-2 py-1.5 text-xs border-2 border-brutal-black focus:outline-none font-body font-bold"
+                                            autoFocus
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* List Wilayah */}
+                                <div className="max-h-60 overflow-y-auto custom-scrollbar">
+                                    <button
+                                        onClick={() => {
+                                            setCity("");
+                                            setIsCityOpen(false);
+                                            setCitySearch("");
+                                        }}
+                                        className="w-full text-left px-4 py-2.5 text-xs font-bold hover:bg-brutal-yellow border-b border-brutal-black/10 transition-colors"
+                                    >
+                                        TAMPILKAN SEMUA
+                                    </button>
+
+                                    {filteredCities.length > 0 ? (
+                                        filteredCities.map((c) => (
+                                            <button
+                                                key={c.value}
+                                                onClick={() => {
+                                                    setCity(c.value);
+                                                    setIsCityOpen(false);
+                                                    setCitySearch("");
+                                                }}
+                                                className={cn(
+                                                    "w-full text-left px-4 py-2.5 text-xs font-bold hover:bg-brutal-blue hover:text-white transition-colors",
+                                                    city === c.value &&
+                                                        "bg-brutal-blue text-white",
+                                                )}
+                                            >
+                                                {c.label}
+                                            </button>
+                                        ))
+                                    ) : (
+                                        <div className="px-4 py-6 text-center text-[10px] text-brutal-muted font-bold italic">
+                                            Wilayah tidak ditemukan...
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Filter Jenis */}
                     <select
                         value={type}
                         onChange={(e) => setType(e.target.value)}
                         className={cn(
-                            "px-3 py-2 border-3 border-brutal-black font-body text-xs font-bold",
-                            "bg-brutal-white shadow-brutal-sm cursor-pointer appearance-none",
-                            "hover:shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5",
-                            "transition-all duration-150 rounded-none",
+                            "px-4 py-2.5 border-3 border-brutal-black font-body text-xs font-bold bg-brutal-white shadow-brutal-sm appearance-none cursor-pointer",
                             type && "bg-brutal-blue text-white",
                         )}
                     >
-                        <option value="">Semua Jenis</option>
-                        {Object.entries(FASKES_TYPES).map(([key, val]) => (
-                            <option key={key} value={key}>
-                                {val.emoji} {val.label}
-                            </option>
-                        ))}
+                        <option value="">SEMUA JENIS</option>
+                        <option value="rumah_sakit">🏥 RUMAH SAKIT</option>
+                        <option value="puskesmas">🩺 PUSKESMAS</option>
                     </select>
 
-                    {/* IGD Toggle */}
-                    <button
-                        onClick={() => setIgdOnly(!igdOnly)}
-                        className={cn(
-                            "px-3 py-2 border-3 border-brutal-black font-body text-xs font-bold",
-                            "shadow-brutal-sm transition-all duration-150 rounded-none",
-                            "hover:shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5",
-                            igdOnly
-                                ? "bg-brutal-red text-white"
-                                : "bg-brutal-white text-brutal-black",
-                        )}
-                    >
-                        🚨 IGD Saja
-                    </button>
-
-                    {/* Clear filters */}
                     {hasActiveFilter && (
                         <button
                             onClick={clearFilters}
-                            className="px-2 py-2 font-body text-xs text-brutal-muted hover:text-brutal-red transition-colors underline"
+                            className="px-2 py-2 font-body text-xs font-bold text-brutal-red hover:underline uppercase tracking-tighter"
                         >
-                            Reset filter
+                            [ Reset Filter ]
                         </button>
                     )}
                 </div>
             </div>
 
-            {/* Result count */}
-            {!isLoading && !isError && (
-                <div className="mb-4 flex items-center justify-between">
-                    <p className="font-body text-sm text-brutal-muted">
-                        Menampilkan{" "}
-                        <span className="font-bold text-brutal-black">
-                            {data.length}
-                        </span>{" "}
-                        dari{" "}
-                        <span className="font-bold text-brutal-black">
-                            {totalCount}
-                        </span>{" "}
-                        faskes
-                    </p>
-                    {hasActiveFilter && (
-                        <Badge
-                            variant="secondary"
-                            className="border-2 border-brutal-black rounded-none"
-                        >
-                            {data.length} hasil filter
-                        </Badge>
-                    )}
-                </div>
-            )}
+            {/* Status Information */}
+            <div className="mb-4 flex items-center justify-between border-l-4 border-brutal-black pl-3">
+                <p className="font-body text-sm text-brutal-muted">
+                    Ditemukan{" "}
+                    <span className="font-black text-brutal-black">
+                        {facilities.total}
+                    </span>{" "}
+                    data fasilitas kesehatan.
+                </p>
+                {city && (
+                    <Badge className="bg-brutal-yellow text-brutal-black border-2 border-brutal-black rounded-none font-bold">
+                        Wilayah Aktif
+                    </Badge>
+                )}
+            </div>
 
-            {/* Content */}
-            {isLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {[...Array(4)].map((_, i) => (
-                        <FaskesSkeleton key={i} />
-                    ))}
-                </div>
-            ) : isError ? (
-                <FaskesError onRetry={refetch} />
-            ) : data.length === 0 ? (
-                <EmptyState
-                    emoji="🔍"
-                    title="Tidak Ada Faskes Ditemukan"
-                    description={
-                        hasActiveFilter
-                            ? "Coba ubah kata kunci atau filter pencarian untuk hasil yang berbeda."
-                            : "Data fasilitas kesehatan belum tersedia."
-                    }
-                    action={hasActiveFilter ? clearFilters : undefined}
-                    actionLabel={
-                        hasActiveFilter ? "Reset Semua Filter" : undefined
-                    }
-                />
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {data.map((faskes) => (
-                        <FaskesCard key={faskes.id} faskes={faskes} />
-                    ))}
-                </div>
-            )}
-
-            {/* Disclaimer */}
-            <div className="mt-8 border-3 border-brutal-yellow bg-brutal-yellow/10 p-4">
-                <div className="flex items-start gap-2">
-                    <Stethoscope
-                        size={16}
-                        className="text-brutal-orange shrink-0 mt-0.5"
-                    />
-                    <div>
-                        <p className="font-body text-xs text-brutal-black">
-                            <strong>Info:</strong> Data faskes bersifat statis
-                            dan mungkin tidak mencakup semua fasilitas terbaru.
-                            Untuk informasi terkini, hubungi faskes secara
-                            langsung atau kunjungi{" "}
-                            <a
-                                href="https://yankes.kemkes.go.id/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-bold underline text-brutal-blue"
-                            >
-                                yankes.kemkes.go.id
-                            </a>
-                            .
-                        </p>
-                        <p className="font-body text-xs text-brutal-muted mt-1 flex items-center gap-1 flex-wrap">
-                            Untuk kondisi darurat, segera hubungi
-                            <span className="inline-flex items-center px-1.5 py-0.5 bg-brutal-red/10 border-2 border-brutal-red font-display text-xs text-brutal-red rounded-md select-none">
-                                119
-                            </span>
-                            .
-                        </p>
+            {/* Results Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {facilities.data.length === 0 ? (
+                    <div className="col-span-full">
+                        <EmptyState
+                            emoji="🕵️‍♂️"
+                            title="TIDAK ADA HASIL"
+                            description="Nothy tidak menemukan faskes dengan kriteria tersebut. Coba cari kata kunci lain."
+                            action={hasActiveFilter ? clearFilters : undefined}
+                            actionLabel="Hapus Semua Filter"
+                        />
                     </div>
+                ) : (
+                    facilities.data.map((item) => (
+                        <FaskesCard key={item.id} item={item} />
+                    ))
+                )}
+            </div>
+
+            {/* Pagination */}
+            {facilities.last_page > 1 && (
+                <div className="mt-12 flex justify-center items-center gap-4">
+                    <Button
+                        variant="outline"
+                        disabled={!facilities.prev_page_url}
+                        onClick={() =>
+                            router.get(
+                                facilities.prev_page_url,
+                                {},
+                                { preserveScroll: true },
+                            )
+                        }
+                        className="border-4 border-brutal-black font-black shadow-brutal-sm hover:translate-y-0.5 hover:shadow-none transition-all rounded-none"
+                    >
+                        <ChevronLeft size={18} className="mr-1" /> PREV
+                    </Button>
+                    <div className="font-display text-sm font-black border-4 border-brutal-black px-6 py-2 bg-brutal-white shadow-brutal-sm">
+                        {facilities.current_page} / {facilities.last_page}
+                    </div>
+                    <Button
+                        variant="outline"
+                        disabled={!facilities.next_page_url}
+                        onClick={() =>
+                            router.get(
+                                facilities.next_page_url,
+                                {},
+                                { preserveScroll: true },
+                            )
+                        }
+                        className="border-4 border-brutal-black font-black shadow-brutal-sm hover:translate-y-0.5 hover:shadow-none transition-all rounded-none"
+                    >
+                        NEXT <ChevronRight size={18} className="ml-1" />
+                    </Button>
+                </div>
+            )}
+
+            {/* Disclaimer Footer */}
+            <div className="mt-12 border-4 border-brutal-yellow bg-brutal-yellow/5 p-5 flex items-start gap-4 shadow-brutal-sm">
+                <div className="w-12 h-12 bg-brutal-yellow border-3 border-brutal-black flex items-center justify-center shrink-0">
+                    <Stethoscope size={24} className="text-brutal-black" />
+                </div>
+                <div>
+                    <h4 className="font-display font-black text-sm uppercase">
+                        Informasi Penting
+                    </h4>
+                    <p className="font-body text-xs text-brutal-black leading-relaxed mt-1">
+                        Data ini bersifat statis dan merupakan pemetaan resmi
+                        Kemenkes. Jam operasional dan ketersediaan layanan IGD
+                        dapat berubah sewaktu-waktu sesuai kebijakan instansi
+                        terkait.
+                    </p>
                 </div>
             </div>
         </PublicLayout>
