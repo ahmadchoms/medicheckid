@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\AiSymptomCheckerController;
 use App\Http\Controllers\Api\HealthFacilityController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -21,9 +20,4 @@ Route::get('/p3k', function () {
     return Inertia::render('p3k');
 });
 
-// Route::get('/faskes', function () {
-//     return Inertia::render('faskes');
-// });
-
-Route::post('/ai/symptom-check', [AiSymptomCheckerController::class, 'analyze']);
 Route::get('/fasilitas-kesehatan', [HealthFacilityController::class, 'index'])->name('faskes.index');

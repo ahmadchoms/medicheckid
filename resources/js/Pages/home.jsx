@@ -1,501 +1,375 @@
-import { useState, useEffect, useRef } from "react";
-import { Link } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
+import PublicLayout from "@/components/layouts/public-layout";
+import { motion } from "framer-motion";
 import {
     Activity,
     BookOpen,
     MapPin,
     AlertTriangle,
-    Heart,
     ArrowRight,
-    ChevronRight,
-    TrendingUp,
-    Users,
+    Heart,
     Shield,
-    Zap,
+    Sparkles,
+    Stethoscope,
+    ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import PublicLayout from "@/components/layouts/public-layout";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
-// ── Animated counter ─────────────────────────────────────
-function AnimatedCounter({
-    target,
-    suffix = "",
-    prefix = "",
-    duration = 2000,
-}) {
-    const [count, setCount] = useState(0);
-    const ref = useRef(null);
-    const hasRun = useRef(false);
-
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting && !hasRun.current) {
-                    hasRun.current = true;
-                    const startTime = performance.now();
-                    const step = (now) => {
-                        const elapsed = now - startTime;
-                        const progress = Math.min(elapsed / duration, 1);
-                        const eased = 1 - Math.pow(1 - progress, 3);
-                        setCount(Math.floor(eased * target));
-                        if (progress < 1) requestAnimationFrame(step);
-                        else setCount(target);
-                    };
-                    requestAnimationFrame(step);
-                }
-            },
-            { threshold: 0.3 },
-        );
-        if (ref.current) observer.observe(ref.current);
-        return () => observer.disconnect();
-    }, [target, duration]);
-
-    return (
-        <span ref={ref} className="tabular-nums">
-            {prefix}
-            {count.toLocaleString("id-ID")}
-            {suffix}
-        </span>
-    );
-}
-
-// ── Stats Section ─────────────────────────────────────────
-const STATS = [
-    {
-        value: 21,
-        suffix: "%",
-        label: "Balita Indonesia alami stunting",
-        source: "SSGI 2022",
-        color: "red",
-        emoji: "📊",
+// ─── Animation Variants ──────────────────────────────────────
+const fadeUp = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.6, ease: "easeOut" },
     },
-    {
-        value: 64,
-        suffix: "JT",
-        label: "Kasus ISPA per tahun di Indonesia",
-        source: "Kemenkes 2023",
-        color: "blue",
-        emoji: "😷",
-    },
-    {
-        value: 9.8,
-        suffix: "%",
-        label: "Penduduk alami gangguan mental",
-        source: "Riskesdas 2018",
-        color: "orange",
-        emoji: "🧠",
-    },
-    {
-        value: 62,
-        suffix: "%",
-        label: "Tidak tahu kapan harus ke IGD",
-        source: "Kemenkes 2023",
-        color: "yellow",
-        emoji: "🏥",
-    },
-];
+};
 
-// ── Features ──────────────────────────────────────────────
+const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.15 },
+    },
+};
+
+// ─── Feature Cards Data ──────────────────────────────────────
 const FEATURES = [
     {
         href: "/cek-gejala",
         icon: Activity,
         emoji: "🩺",
-        title: "Cek Gejala Interaktif",
-        desc: "Body map anatomis + decision tree 12 kondisi. Cari tahu kemungkinan penyebab gejalamu dan apa yang harus dilakukan.",
-        color: "blue",
-        badge: "Fitur Utama",
+        title: "Cek Gejala AI",
+        description:
+            "Analisis keluhan kesehatanmu dengan kecerdasan buatan untuk mendapatkan rekomendasi penanganan awal yang komprehensif.",
+        color: "primary",
+        tag: "Populer",
     },
     {
         href: "/health-score",
         icon: BookOpen,
         emoji: "📊",
-        title: "Health Score Check",
-        desc: "Evaluasi gaya hidup dari 6 dimensi kesehatan. Dapatkan skor personal dan rekomendasi prioritas.",
-        color: "green",
-        badge: "Popular",
+        title: "Kalkulator Health Score",
+        description:
+            "Ukur dan pantau skor kesehatan harianmu berdasarkan 6 dimensi gaya hidup utama secara real-time.",
+        color: "accent",
+        tag: "Holistik",
     },
     {
         href: "/p3k",
         icon: AlertTriangle,
-        emoji: "🚨",
-        title: "Panduan P3K",
-        desc: "Panduan step-by-step CPR, tersedak, luka bakar, kejang dan lebih banyak lagi. Dengan timer built-in.",
-        color: "red",
-        badge: "Life-saving",
+        emoji: "🚑",
+        title: "Panduan P3K Interaktif",
+        description:
+            "Instruksi pertolongan pertama selangkah demi selangkah yang dilengkapi timer darurat berstandar PMI & WHO.",
+        color: "warning",
+        tag: "Darurat",
     },
     {
-        href: "/faskes",
+        href: "/fasilitas-kesehatan",
         icon: MapPin,
         emoji: "📍",
-        title: "Cari Faskes Terdekat",
-        desc: "Filter puskesmas, klinik, dan RS di kotamu. Lihat jam operasional dan kontak langsung.",
-        color: "yellow",
-        badge: "Lokasi",
+        title: "Direktori Faskes",
+        description:
+            "Temukan Rumah Sakit, Klinik, dan Puskesmas terdekat di seluruh Indonesia lengkap dengan informasi IGD.",
+        color: "success",
+        tag: "Nasional",
     },
 ];
 
-// ── How It Works ──────────────────────────────────────────
-const HOW_IT_WORKS = [
-    {
-        step: "01",
-        title: "Pilih Area",
-        desc: "Klik area tubuh yang tidak nyaman di body map interaktif kami.",
+const colorMap = {
+    primary: {
+        bg: "bg-clinical-primary-light/50",
+        icon: "text-clinical-primary",
+        border: "border-clinical-primary/20",
+        tag: "bg-clinical-primary-light text-clinical-primary",
     },
-    {
-        step: "02",
-        title: "Jawab Pertanyaan",
-        desc: "Sistem memandu kamu melalui pertanyaan terstruktur untuk memahami gejala.",
+    accent: {
+        bg: "bg-clinical-accent-light/50",
+        icon: "text-clinical-accent",
+        border: "border-clinical-accent/20",
+        tag: "bg-clinical-accent-light text-clinical-accent",
     },
-    {
-        step: "03",
-        title: "Terima Panduan",
-        desc: "Dapatkan kemungkinan kondisi, home care, dan tanda darurat dalam hitungan detik.",
+    warning: {
+        bg: "bg-clinical-warning-light/50",
+        icon: "text-clinical-warning",
+        border: "border-clinical-warning/20",
+        tag: "bg-clinical-warning-light text-amber-700",
     },
+    success: {
+        bg: "bg-clinical-success-light/50",
+        icon: "text-clinical-success",
+        border: "border-clinical-success/20",
+        tag: "bg-clinical-success-light text-clinical-success",
+    },
+};
+
+// ─── Stats ───────────────────────────────────────────────────
+const STATS = [
+    { emoji: "🩺", value: "15+", label: "Kondisi Medis" },
+    { emoji: "📊", value: "6", label: "Dimensi Gaya Hidup" },
+    { emoji: "🏥", value: "30K+", label: "Faskes Terdata" },
+    { emoji: "🤖", value: "AI", label: "Triage Pintar" },
 ];
 
+// ─── Main Component ──────────────────────────────────────────
 export default function Home() {
     return (
-        <PublicLayout fullWidth>
-            {/* ── Hero ──────────────────────────────────────────── */}
-            <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-brutal-white">
-                {/* Grid background */}
-                <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                        backgroundImage:
-                            "linear-gradient(rgba(10,10,10,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(10,10,10,0.06) 1px, transparent 1px)",
-                        backgroundSize: "40px 40px",
-                    }}
-                />
-                {/* Yellow accent block */}
-                <div className="absolute top-0 right-0 w-1/2 h-full bg-brutal-yellow border-l-4 border-brutal-black hidden lg:block" />
+        <PublicLayout>
+            <Head title="MediCheck ID — Platform Kesehatan Digital Modern" />
 
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 w-full py-16 md:py-24">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                        {/* Left: Content */}
-                        <div className="animate-slide-up">
-                            <Badge variant="blue" size="lg" className="mb-4">
-                                🏥 Platform Kesehatan Interaktif #1 Indonesia
-                            </Badge>
+            {/* ── Hero Section ── */}
+            <motion.section
+                initial="hidden"
+                animate="visible"
+                variants={staggerContainer}
+                className="relative overflow-hidden rounded-clinical-2xl bg-gradient-to-br from-white via-clinical-primary-light/20 to-clinical-accent-light/30 border border-clinical-border mb-16 shadow-clinical-sm"
+            >
+                {/* Decorative Blobs */}
+                <div className="absolute -top-24 -right-24 w-96 h-96 bg-clinical-primary/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-clinical-success/10 rounded-full blur-3xl pointer-events-none" />
 
-                            <h1 className="font-display text-5xl sm:text-6xl md:text-7xl leading-none mb-6">
-                                Pahami
-                                <br />
-                                <span className="inline-block bg-brutal-black text-brutal-yellow px-3 py-1 mt-1">
-                                    Tubuhmu.
-                                </span>
-                                <br />
-                                Ambil
-                                <br />
-                                Langkah
-                                <br />
-                                <span className="inline-block border-4 border-brutal-black px-3 py-1 mt-1">
-                                    Tepat.
-                                </span>
-                            </h1>
+                <div className="relative px-6 py-20 md:py-28 lg:py-32 text-center max-w-4xl mx-auto z-10">
+                    <motion.div
+                        variants={fadeUp}
+                        className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/80 backdrop-blur-md border border-clinical-border rounded-full mb-6 shadow-clinical-xs"
+                    >
+                        <Sparkles
+                            size={14}
+                            className="text-clinical-primary animate-pulse"
+                        />
+                        <span className="font-body text-xs font-bold text-clinical-primary tracking-wide uppercase">
+                            Platform Kesehatan Generasi Baru
+                        </span>
+                    </motion.div>
 
-                            <p className="font-body text-lg text-brutal-muted max-w-md mb-8 leading-relaxed">
-                                Cek gejala interaktif, health score personal,
-                                panduan P3K, dan cari faskes terdekat — semua
-                                dalam satu platform yang dirancang untuk
-                                masyarakat Indonesia.
-                            </p>
+                    <motion.h1
+                        variants={fadeUp}
+                        className="font-display text-4xl md:text-5xl lg:text-7xl font-extrabold text-clinical-text leading-[1.15] mb-6 tracking-tight"
+                    >
+                        Literasi Kesehatan Anda,{" "}
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-clinical-primary to-clinical-success">
+                            Dalam Genggaman
+                        </span>
+                    </motion.h1>
 
-                            <div className="flex flex-col sm:flex-row gap-3">
-                                <Button
-                                    variant="primary"
-                                    size="xl"
-                                    onClick={() =>
-                                        (window.location.href = "/cek-gejala")
-                                    }
-                                >
-                                    Cek Gejala Sekarang
-                                    <ArrowRight size={20} />
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="xl"
-                                    onClick={() =>
-                                        (window.location.href = "/health-score")
-                                    }
-                                >
-                                    Cek Health Score
-                                </Button>
-                            </div>
+                    <motion.p
+                        variants={fadeUp}
+                        className="font-body text-clinical-text-secondary text-base md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
+                    >
+                        Periksa gejala secara mandiri dengan bantuan kecerdasan
+                        buatan, pantau gaya hidup, dan akses panduan pertolongan
+                        pertama terpercaya dalam hitungan detik.
+                    </motion.p>
 
-                            <p className="mt-4 text-xs font-body text-brutal-muted">
-                                ⚠️ Platform edukasi — bukan pengganti diagnosis
-                                dokter
-                            </p>
-                        </div>
-
-                        {/* Right: Hero visual */}
-                        <div className="hidden lg:flex justify-center items-center">
-                            <div className="relative">
-                                {/* Big stat cards floating */}
-                                <div className="border-4 border-brutal-black bg-brutal-white shadow-brutal-xl p-6 w-72 animate-float">
-                                    <p className="font-body text-sm font-bold text-brutal-muted mb-1">
-                                        INDONESIA BUTUH PLATFORM INI
-                                    </p>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="font-display text-6xl text-brutal-red">
-                                            62%
-                                        </span>
-                                        <span className="font-body text-sm text-brutal-black font-bold leading-tight">
-                                            masyarakat tidak tahu kapan harus ke
-                                            IGD
-                                        </span>
-                                    </div>
-                                    <div className="mt-3 border-t-3 border-brutal-black pt-2 flex items-center gap-1 text-xs font-body text-brutal-muted">
-                                        <TrendingUp size={12} />
-                                        <span>Kemenkes RI 2023</span>
-                                    </div>
-                                </div>
-
-                                {/* Badge cards */}
-                                <div className="absolute -bottom-6 -right-6 border-4 border-brutal-black bg-brutal-blue p-4 shadow-brutal-lg">
-                                    <div className="text-center">
-                                        <p className="font-display text-4xl text-brutal-white">
-                                            12
-                                        </p>
-                                        <p className="font-body text-xs text-brutal-white/80 font-bold">
-                                            Kondisi tercakup
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="absolute -top-6 -left-6 border-4 border-brutal-black bg-brutal-yellow p-3 shadow-brutal">
-                                    <div className="flex items-center gap-2">
-                                        <Shield
-                                            size={20}
-                                            className="text-brutal-black"
-                                        />
-                                        <span className="font-display text-sm">
-                                            Data Valid WHO
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <motion.div
+                        variants={fadeUp}
+                        className="flex flex-col sm:flex-row items-center justify-center gap-4"
+                    >
+                        <Link
+                            href="/cek-gejala"
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-clinical-primary text-white font-body font-bold text-base rounded-clinical-xl shadow-clinical-md hover:shadow-clinical-lg hover:bg-clinical-primary-hover hover:-translate-y-1 transition-all duration-300"
+                        >
+                            <Activity size={18} />
+                            Mulai Pemeriksaan AI
+                            <ArrowRight size={16} />
+                        </Link>
+                        <Link
+                            href="/health-score"
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-white text-clinical-text font-body font-bold text-base rounded-clinical-xl border-2 border-clinical-border shadow-clinical-xs hover:border-clinical-primary/30 hover:bg-clinical-bg hover:-translate-y-1 transition-all duration-300"
+                        >
+                            <Heart size={18} className="text-clinical-danger" />
+                            Kalkulator Health Score
+                        </Link>
+                    </motion.div>
                 </div>
-            </section>
+            </motion.section>
 
-            {/* ── Stats ─────────────────────────────────────────── */}
-            <section className="bg-brutal-black border-y-4 border-brutal-black py-12">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                    <p className="font-display text-brutal-yellow text-center mb-8 text-sm uppercase tracking-widest">
-                        Mengapa Platform Ini Penting untuk Indonesia
-                    </p>
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                        {STATS.map((stat, i) => (
-                            <div
-                                key={i}
-                                className="border-3 border-brutal-white/20 p-5 text-center"
-                            >
-                                <p className="text-3xl mb-2">{stat.emoji}</p>
-                                <p className="font-display text-4xl sm:text-5xl text-brutal-yellow leading-none mb-1">
-                                    <AnimatedCounter
-                                        target={parseFloat(stat.value)}
-                                        suffix={stat.suffix}
-                                    />
-                                </p>
-                                <p className="font-body text-brutal-white/80 text-xs leading-snug mb-2">
-                                    {stat.label}
-                                </p>
-                                <p className="font-mono text-brutal-white/40 text-xs">
-                                    {stat.source}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+            {/* ── Stats Bar ── */}
+            <motion.section
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-50px" }}
+                variants={staggerContainer}
+                className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-20"
+            >
+                {STATS.map((stat, i) => (
+                    <motion.div
+                        variants={fadeUp}
+                        key={i}
+                        className="bg-white border border-clinical-border rounded-clinical-xl p-6 text-center shadow-clinical-xs hover:shadow-clinical-md hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-clinical-bg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <span className="text-3xl block mb-2 relative z-10">
+                            {stat.emoji}
+                        </span>
+                        <span className="font-display text-3xl font-extrabold text-clinical-text relative z-10">
+                            {stat.value}
+                        </span>
+                        <p className="font-body text-sm text-clinical-muted mt-1 font-medium relative z-10">
+                            {stat.label}
+                        </p>
+                    </motion.div>
+                ))}
+            </motion.section>
 
-            {/* ── Features ──────────────────────────────────────── */}
-            <section className="py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6">
-                <div className="mb-12 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                    <div>
-                        <Badge variant="outline" size="md" className="mb-3">
-                            Fitur Platform
-                        </Badge>
-                        <h2 className="font-display text-4xl md:text-5xl leading-none">
-                            Satu Platform,
-                            <br />
-                            <span className="bg-brutal-yellow px-2">
-                                Semua Kebutuhan
-                            </span>
-                        </h2>
-                    </div>
-                    <p className="font-body text-brutal-muted max-w-sm">
-                        Dari cek gejala hingga cari faskes, semua tersedia tanpa
-                        perlu install aplikasi.
-                    </p>
+            {/* ── Features Grid ── */}
+            <motion.section
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                variants={staggerContainer}
+                className="mb-20"
+            >
+                <div className="text-center mb-12">
+                    <motion.h2
+                        variants={fadeUp}
+                        className="font-display text-3xl md:text-4xl font-extrabold text-clinical-text mb-4"
+                    >
+                        Fitur Unggulan Kami
+                    </motion.h2>
+                    <motion.p
+                        variants={fadeUp}
+                        className="font-body text-clinical-text-secondary text-base max-w-xl mx-auto"
+                    >
+                        Dirancang secara khusus dengan pendekatan medis modern
+                        untuk membantu Anda membuat keputusan kesehatan yang
+                        lebih baik.
+                    </motion.p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {FEATURES.map((feature, i) => {
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {FEATURES.map((feature, idx) => {
+                        const colors = colorMap[feature.color];
                         const Icon = feature.icon;
-                        const colorMap = {
-                            blue: {
-                                bg: "bg-brutal-blue",
-                                icon: "text-brutal-white",
-                                accent: "border-brutal-blue",
-                            },
-                            green: {
-                                bg: "bg-brutal-green",
-                                icon: "text-brutal-white",
-                                accent: "border-brutal-green",
-                            },
-                            red: {
-                                bg: "bg-brutal-red",
-                                icon: "text-brutal-white",
-                                accent: "border-brutal-red",
-                            },
-                            yellow: {
-                                bg: "bg-brutal-yellow",
-                                icon: "text-brutal-black",
-                                accent: "border-brutal-yellow",
-                            },
-                        };
-                        const c = colorMap[feature.color];
-
                         return (
-                            <Link
-                                key={feature.href}
-                                href={feature.href}
-                                className={cn(
-                                    "group border-4 border-brutal-black bg-brutal-white p-6",
-                                    "shadow-brutal hover:shadow-brutal-xl transition-all duration-150",
-                                    "hover:-translate-x-1 hover:-translate-y-1",
-                                    "active:translate-x-0.5 active:translate-y-0.5 active:shadow-brutal-sm",
-                                    "block",
-                                )}
-                            >
-                                <div className="flex items-start justify-between mb-4">
+                            <motion.div variants={fadeUp} key={idx}>
+                                <Link
+                                    href={feature.href}
+                                    className="group block bg-white border border-clinical-border rounded-clinical-2xl p-6 md:p-8 shadow-clinical-xs hover:shadow-clinical-lg hover:-translate-y-1.5 transition-all duration-300 relative overflow-hidden"
+                                >
                                     <div
-                                        className={cn(
-                                            "w-12 h-12 border-3 border-brutal-black flex items-center justify-center",
-                                            c.bg,
-                                        )}
-                                    >
-                                        <Icon
-                                            size={22}
-                                            className={c.icon}
-                                            strokeWidth={2.5}
-                                        />
+                                        className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-transparent to-${feature.color}-500/5 rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}
+                                    />
+
+                                    <div className="flex flex-col sm:flex-row items-start gap-5 relative z-10">
+                                        <div
+                                            className={cn(
+                                                "w-14 h-14 rounded-clinical-xl flex items-center justify-center shrink-0 border",
+                                                colors.bg,
+                                                colors.border,
+                                            )}
+                                        >
+                                            <Icon
+                                                size={26}
+                                                className={colors.icon}
+                                                strokeWidth={2}
+                                            />
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <h3 className="font-display text-xl font-bold text-clinical-text group-hover:text-clinical-primary transition-colors">
+                                                    {feature.title}
+                                                </h3>
+                                                <span
+                                                    className={cn(
+                                                        "text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider",
+                                                        colors.tag,
+                                                    )}
+                                                >
+                                                    {feature.tag}
+                                                </span>
+                                            </div>
+                                            <p className="font-body text-sm text-clinical-text-secondary leading-relaxed mb-4">
+                                                {feature.description}
+                                            </p>
+                                            <div className="flex items-center gap-1.5 text-clinical-primary font-body font-bold text-sm opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                                                <span>Eksplorasi Fitur</span>
+                                                <ArrowRight size={16} />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <Badge variant="outline" size="sm">
-                                        {feature.badge}
-                                    </Badge>
-                                </div>
-                                <h3 className="font-display text-2xl mb-2">
-                                    {feature.title}
-                                </h3>
-                                <p className="font-body text-brutal-muted text-sm leading-relaxed mb-4">
-                                    {feature.desc}
-                                </p>
-                                <div className="flex items-center gap-1.5 font-body font-bold text-sm text-brutal-blue group-hover:gap-3 transition-all">
-                                    <span>Buka Fitur</span>
-                                    <ChevronRight size={16} />
-                                </div>
-                            </Link>
+                                </Link>
+                            </motion.div>
                         );
                     })}
                 </div>
-            </section>
+            </motion.section>
 
-            {/* ── How It Works ──────────────────────────────────── */}
-            <section className="py-16 bg-brutal-gray border-y-4 border-brutal-black">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                    <div className="text-center mb-12">
-                        <Badge variant="default" size="md" className="mb-3">
-                            Cara Kerja
-                        </Badge>
-                        <h2 className="font-display text-4xl md:text-5xl">
-                            Mudah. Cepat. Tepat.
-                        </h2>
+            {/* ── Trust Indicators ── */}
+            <motion.section
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                className="mb-20"
+            >
+                <div className="bg-clinical-bg border border-clinical-border rounded-clinical-2xl p-8 md:p-10 text-center shadow-inner">
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-clinical-xs mb-4">
+                        <Shield size={24} className="text-clinical-accent" />
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-                        {HOW_IT_WORKS.map((step, i) => (
-                            <div key={i} className="relative">
-                                {/* Connector line */}
-                                {i < HOW_IT_WORKS.length - 1 && (
-                                    <div className="hidden md:block absolute top-8 left-[calc(100%-1rem)] w-8 h-1 bg-brutal-black z-10" />
-                                )}
-                                <Card className="p-6 border-3 border-brutal-black shadow-brutal">
-                                    <CardContent className="p-0">
-                                        <div className="border-3 border-brutal-black bg-brutal-black w-16 h-16 flex items-center justify-center mb-4 shadow-brutal-sm">
-                                            <span className="font-display text-2xl text-brutal-yellow">
-                                                {step.step}
-                                            </span>
-                                        </div>
-                                        <h3 className="font-display text-2xl mb-2">
-                                            {step.title}
-                                        </h3>
-                                        <p className="font-body text-brutal-muted text-sm">
-                                            {step.desc}
-                                        </p>
-                                    </CardContent>
-                                </Card>
+                    <h3 className="font-display text-2xl font-bold text-clinical-text mb-6">
+                        Berbasis Sains & Referensi Terpercaya
+                    </h3>
+                    <div className="flex flex-wrap justify-center gap-4">
+                        {[
+                            { emoji: "🌐", label: "WHO Guidelines" },
+                            { emoji: "🏥", label: "Kemenkes RI" },
+                            { emoji: "🚑", label: "Standar PMI" },
+                            { emoji: "📚", label: "Jurnal Medis Terkini" },
+                        ].map((source, i) => (
+                            <div
+                                key={i}
+                                className="flex items-center gap-2.5 px-5 py-2.5 bg-white border border-clinical-border shadow-clinical-xs rounded-full"
+                            >
+                                <span className="text-xl">{source.emoji}</span>
+                                <span className="font-body font-semibold text-sm text-clinical-text">
+                                    {source.label}
+                                </span>
                             </div>
                         ))}
                     </div>
+                </div>
+            </motion.section>
 
-                    <div className="text-center mt-10">
-                        <Button
-                            variant="primary"
-                            size="xl"
-                            onClick={() =>
-                                (window.location.href = "/cek-gejala")
-                            }
+            {/* ── CTA Section ── */}
+            <motion.section
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                className="mb-8"
+            >
+                <div className="bg-gradient-to-r from-clinical-primary to-clinical-primary-hover rounded-clinical-2xl p-10 md:p-14 text-center shadow-clinical-lg relative overflow-hidden">
+                    {/* Abstract shapes for CTA */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-clinical-accent/20 rounded-full blur-2xl translate-y-1/3 -translate-x-1/4" />
+
+                    <div className="relative z-10">
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl mb-6">
+                            <Stethoscope size={32} className="text-white" />
+                        </div>
+                        <h2 className="font-display text-3xl md:text-4xl font-extrabold text-white mb-4">
+                            Satu Langkah Menuju Hidup Lebih Sehat
+                        </h2>
+                        <p className="font-body text-white/90 text-lg max-w-xl mx-auto mb-8 font-medium">
+                            Bergabunglah dengan platform kesehatan digital yang
+                            memberdayakan Anda dengan pengetahuan dan
+                            rekomendasi taktis.
+                        </p>
+                        <Link
+                            href="/cek-gejala"
+                            className="inline-flex items-center gap-3 px-8 py-4 bg-white text-clinical-primary font-display font-bold text-base rounded-clinical-xl shadow-clinical-md hover:shadow-clinical-lg hover:scale-105 transition-all duration-300 group"
                         >
-                            <Zap size={20} />
-                            Coba Cek Gejala Sekarang
-                        </Button>
+                            Mulai Cek Gejala Sekarang
+                            <ArrowRight
+                                size={18}
+                                className="group-hover:translate-x-1 transition-transform"
+                            />
+                        </Link>
                     </div>
                 </div>
-            </section>
-
-            {/* ── Trust / Disclaimer ───────────────────────────── */}
-            <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6">
-                <div className="border-4 border-brutal-black bg-brutal-yellow shadow-brutal-xl p-8">
-                    <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                        <div className="border-4 border-brutal-black bg-brutal-black p-4 shrink-0">
-                            <Shield size={36} className="text-brutal-yellow" />
-                        </div>
-                        <div className="flex-1">
-                            <h3 className="font-display text-2xl mb-2">
-                                Platform yang Jujur dan Transparan
-                            </h3>
-                            <p className="font-body text-brutal-black/80 text-sm leading-relaxed">
-                                MediCheck ID adalah alat edukasi kesehatan,{" "}
-                                <strong>bukan pengganti dokter</strong>. Semua
-                                informasi didasarkan pada panduan WHO, Kemenkes
-                                RI, dan IDAI. Data yang kamu masukkan{" "}
-                                <strong>tidak pernah dikirim ke server</strong>{" "}
-                                — tersimpan hanya di perangkatmu.
-                            </p>
-                            <div className="flex flex-wrap gap-3 mt-3">
-                                <Badge variant="default" size="md">
-                                    🏥 Berbasis Panduan WHO
-                                </Badge>
-                                <Badge variant="default" size="md">
-                                    🔒 Data Tersimpan Lokal
-                                </Badge>
-                                <Badge variant="default" size="md">
-                                    📚 Referensi Kemenkes RI
-                                </Badge>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            </motion.section>
         </PublicLayout>
     );
 }

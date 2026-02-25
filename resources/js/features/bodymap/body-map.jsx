@@ -2,233 +2,117 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { SYMPTOM_AREAS } from "@/lib/symptomTree";
 
-const AREA_COLOR_MAP = {
-    blue: { fill: "#0047FF", hover: "#0035CC", light: "#E8F0FF" },
-    red: { fill: "#FF2D20", hover: "#CC1F14", light: "#FFECEB" },
-    yellow: { fill: "#FFE500", hover: "#CDB800", light: "#FFFDE0" },
-    orange: { fill: "#FF6B00", hover: "#CC5500", light: "#FFF3E8" },
-    green: { fill: "#00C851", hover: "#009940", light: "#E0F9EA" },
-    gray: { fill: "#6B6B6B", hover: "#4A4A4A", light: "#F0F0F0" },
-};
-
-// Menggunakan koordinat path yang lebih realistis dan proporsional (menggantikan ellipse/rect)
-const BODY_PARTS = [
-    {
-        id: "head",
-        label: "Kepala & Wajah",
-        cx: 100,
-        cy: 35,
-        // Path kepala, leher, dan bahu atas
-        d: "M85 25 C85 10, 115 10, 115 25 C115 45, 108 55, 100 60 C92 55, 85 45, 85 25 Z M92 60 L92 75 L108 75 L108 60 Z",
+const BODY_PATHS = {
+    head: {
+        d: "M150,50 C180,45 205,65 205,95 C205,130 180,145 150,145 C120,145 95,130 95,95 C95,65 120,45 150,50 Z",
+        label: "Kepala",
     },
-    {
-        id: "chest",
-        label: "Dada & Paru",
-        cx: 100,
-        cy: 110,
-        // Path bahu bawah dan area dada
-        d: "M60 90 C75 75, 125 75, 140 90 L135 150 C120 160, 80 160, 65 150 Z",
+    chest: {
+        d: "M105,160 L195,160 L200,250 L100,250 Z",
+        label: "Dada",
     },
-    {
-        id: "abdomen",
+    stomach: {
+        d: "M100,255 L200,255 L195,330 L105,330 Z",
         label: "Perut",
-        cx: 100,
-        cy: 200,
-        // Path area perut dan pinggul
-        d: "M65 155 C80 165, 120 165, 135 155 L138 240 C115 255, 85 255, 62 240 Z",
     },
-    {
-        id: "limbs", // Lengan (Kiri & Kanan digabung dalam satu id)
-        label: "Lengan & Tangan",
-        cx: 35,
-        cy: 150,
-        // Path kedua lengan
-        d: "M55 95 C40 100, 30 140, 35 190 L25 250 C20 265, 40 265, 45 250 L50 180 Z M145 95 C160 100, 170 140, 165 190 L175 250 C180 265, 160 265, 155 250 L150 180 Z",
+    leftArm: {
+        d: "M95,165 L65,250 L55,250 L50,310 L60,312 L70,260 L90,190 Z",
+        label: "Tangan Kiri",
     },
-    {
-        id: "limbs", // Kaki (Kiri & Kanan)
-        label: "Kaki & Telapak",
-        cx: 75,
-        cy: 330,
-        // Path kedua kaki
-        d: "M63 245 L50 360 C45 385, 75 385, 70 360 L85 255 Z M137 245 L150 360 C155 385, 125 385, 130 360 L115 255 Z",
+    rightArm: {
+        d: "M205,165 L235,250 L245,250 L250,310 L240,312 L230,260 L210,190 Z",
+        label: "Tangan Kanan",
     },
-];
+    leftLeg: {
+        d: "M105,335 L120,335 L130,430 L135,480 L110,480 L105,430 Z",
+        label: "Kaki Kiri",
+    },
+    rightLeg: {
+        d: "M180,335 L195,335 L195,430 L190,480 L165,480 L170,430 Z",
+        label: "Kaki Kanan",
+    },
+};
 
 export default function BodyMap({ onAreaSelect, selectedArea }) {
     const [hoveredArea, setHoveredArea] = useState(null);
 
-    const handleAreaClick = (areaId) => {
-        onAreaSelect?.(areaId);
-    };
-
-    // Ekstrak ID unik untuk tombol di bawah
-    const uniqueAreas = [...new Set(BODY_PARTS.map((p) => p.id))].concat([
-        "general",
-    ]);
-
     return (
         <div className="flex flex-col items-center gap-6">
-            {/* SVG Body Silhouette */}
-            <div className="relative select-none drop-shadow-md">
+            {/* SVG Body Map */}
+            <div className="relative w-full max-w-[280px]">
                 <svg
-                    viewBox="0 0 200 400"
-                    className="w-[180px] sm:w-[240px] h-auto overflow-visible"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-label="Peta tubuh interaktif"
+                    viewBox="0 0 300 520"
+                    className="w-full h-auto"
+                    role="img"
+                    aria-label="Pilih area tubuh"
                 >
-                    {/* ── Body Paths ── */}
-                    <g
-                        stroke="#0A0A0A"
-                        strokeWidth="2.5"
-                        strokeLinejoin="round"
-                    >
-                        {BODY_PARTS.map((part, i) => {
-                            const area = SYMPTOM_AREAS[part.id];
-                            // Fallback warna abu-abu jika area tidak ditemukan
-                            const colors = area
-                                ? AREA_COLOR_MAP[area.color]
-                                : AREA_COLOR_MAP.gray;
-                            const isActive =
-                                selectedArea === part.id ||
-                                hoveredArea === part.id;
-                            const isSelected = selectedArea === part.id;
+                    {/* Background silhouette */}
+                    <defs>
+                        <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="var(--color-clinical-primary-light)" />
+                            <stop offset="100%" stopColor="var(--color-clinical-accent-light)" />
+                        </linearGradient>
+                    </defs>
 
-                            return (
-                                <path
-                                    key={`${part.id}-${i}`}
-                                    d={part.d}
-                                    style={{
-                                        fill: isSelected
-                                            ? colors.fill
-                                            : hoveredArea === part.id
-                                                ? colors.light
-                                                : "#F0F0F0",
-                                        stroke: isActive
-                                            ? colors.fill
-                                            : "#0A0A0A",
-                                        strokeWidth: isActive ? 3 : 2.5,
-                                        transition:
-                                            "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-                                        cursor: "pointer",
-                                    }}
-                                    className="hover:-translate-y-0.5"
-                                    onMouseEnter={() => setHoveredArea(part.id)}
-                                    onMouseLeave={() => setHoveredArea(null)}
-                                    onClick={() => handleAreaClick(part.id)}
-                                    aria-label={`Pilih area: ${part.label}`}
-                                    role="button"
-                                    tabIndex={0}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter" || e.key === " ")
-                                            handleAreaClick(part.id);
-                                    }}
-                                />
-                            );
-                        })}
-                    </g>
+                    {Object.entries(BODY_PATHS).map(([key, body]) => {
+                        const isHovered = hoveredArea === key;
+                        const isSelected = selectedArea === key;
 
-                    {/* ── Active Area Label (Floating) ── */}
-                    {(selectedArea || hoveredArea) &&
-                        (() => {
-                            const activeId = selectedArea || hoveredArea;
-                            const area = SYMPTOM_AREAS[activeId];
-                            const partInfo = BODY_PARTS.find(
-                                (p) => p.id === activeId,
-                            );
-
-                            if (!area || !partInfo) return null;
-                            const colors = AREA_COLOR_MAP[area.color];
-
-                            return (
-                                <g className="animate-in fade-in zoom-in duration-200">
-                                    <rect
-                                        x="50"
-                                        y={partInfo.cy - 12}
-                                        width="100"
-                                        height="24"
-                                        rx="12"
-                                        fill={colors.fill}
-                                        stroke="#0A0A0A"
-                                        strokeWidth="2"
-                                        className="shadow-brutal-sm"
-                                    />
-                                    <text
-                                        x="100"
-                                        y={partInfo.cy + 4}
-                                        textAnchor="middle"
-                                        fontSize="10"
-                                        fontFamily="DM Sans, sans-serif"
-                                        fontWeight="bold"
-                                        fill="#FAFAFA"
-                                    >
-                                        {area.label || partInfo.label}
-                                    </text>
-                                </g>
-                            );
-                        })()}
-
-                    {/* ── Hint text ── */}
-                    {!selectedArea && !hoveredArea && (
-                        <text
-                            x="100"
-                            y="390"
-                            textAnchor="middle"
-                            fontSize="9"
-                            fontFamily="DM Sans, sans-serif"
-                            fontWeight="600"
-                            fill="#6B6B6B"
-                        >
-                            Ketuk area tubuh yang sakit
-                        </text>
-                    )}
+                        return (
+                            <path
+                                key={key}
+                                d={body.d}
+                                className={cn(
+                                    "cursor-pointer transition-all duration-200",
+                                    isSelected
+                                        ? "fill-clinical-primary stroke-clinical-primary-dark"
+                                        : isHovered
+                                            ? "fill-clinical-primary-light stroke-clinical-primary"
+                                            : "fill-clinical-bg stroke-clinical-border-strong",
+                                )}
+                                style={{
+                                    strokeWidth: isSelected ? 2.5 : 1.5,
+                                }}
+                                onMouseEnter={() => setHoveredArea(key)}
+                                onMouseLeave={() => setHoveredArea(null)}
+                                onClick={() => onAreaSelect(key)}
+                            />
+                        );
+                    })}
                 </svg>
 
-                {/* Pulse indicator */}
-                {selectedArea && (
-                    <div className="absolute top-0 right-0">
-                        <div className="w-3 h-3 bg-yellow-400 border-2 border-black rounded-full animate-pulse" />
+                {/* Hover tooltip */}
+                {hoveredArea && (
+                    <div className="absolute top-2 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-clinical-text text-white font-body text-xs font-semibold rounded-full shadow-clinical-md animate-fade-in pointer-events-none">
+                        {BODY_PATHS[hoveredArea]?.label}
                     </div>
                 )}
             </div>
 
             {/* Area Buttons Grid */}
-            <div className="w-full grid grid-cols-2 gap-3">
-                {uniqueAreas.map((areaId) => {
-                    const area = SYMPTOM_AREAS[areaId];
-                    if (!area) return null;
-                    const isSelected = selectedArea === areaId;
-                    const colors =
-                        AREA_COLOR_MAP[area.color] || AREA_COLOR_MAP.gray;
-
+            <div className="w-full grid grid-cols-2 gap-2">
+                {Object.entries(BODY_PATHS).map(([key, body]) => {
+                    const areaInfo = SYMPTOM_AREAS[key];
+                    const isSelected = selectedArea === key;
                     return (
                         <button
-                            key={areaId}
-                            onClick={() => handleAreaClick(areaId)}
+                            key={key}
+                            onClick={() => onAreaSelect(key)}
+                            onMouseEnter={() => setHoveredArea(key)}
+                            onMouseLeave={() => setHoveredArea(null)}
                             className={cn(
-                                "flex items-center gap-2 px-3 py-3 border-2 border-black rounded-md",
-                                "font-bold text-sm transition-all duration-150",
-                                "shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5",
-                                "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+                                "flex items-center gap-2 px-3 py-2.5 rounded-clinical-md border transition-all duration-200 text-left",
                                 isSelected
-                                    ? "text-white"
-                                    : "bg-white text-black hover:bg-gray-50",
+                                    ? "bg-clinical-primary text-white border-clinical-primary shadow-clinical-sm"
+                                    : "bg-white border-clinical-border hover:border-clinical-primary hover:bg-clinical-primary-light hover:shadow-clinical-xs",
                             )}
-                            style={
-                                isSelected
-                                    ? { backgroundColor: colors.fill }
-                                    : {}
-                            }
                         >
-                            <span className="text-lg leading-none">
-                                {area.emoji}
+                            <span className="text-lg">
+                                {areaInfo?.emoji || "🔵"}
                             </span>
-                            <span className="leading-tight text-left">
-                                {area.label}
+                            <span className="font-body text-xs font-semibold leading-tight">
+                                {body.label}
                             </span>
-                            {isSelected && (
-                                <span className="ml-auto text-sm">✓</span>
-                            )}
                         </button>
                     );
                 })}

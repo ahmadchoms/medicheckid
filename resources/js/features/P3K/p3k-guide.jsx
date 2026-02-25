@@ -271,7 +271,7 @@ const P3K_DATA = [
     },
 ];
 
-// ── Timer Component ──────────────────────────────────────
+// ── Timer Component ──────────────────────────────────────────
 function StepTimer({ duration, onComplete }) {
     const [timeLeft, setTimeLeft] = useState(duration);
     const [running, setRunning] = useState(false);
@@ -306,7 +306,7 @@ function StepTimer({ duration, onComplete }) {
     const secs = timeLeft % 60;
 
     return (
-        <div className="border-3 border-brutal-black bg-brutal-black p-4 mt-3">
+        <div className="bg-clinical-text rounded-clinical-xl p-4 mt-3">
             {/* Circular timer display */}
             <div className="relative w-24 h-24 mx-auto mb-3">
                 <svg
@@ -318,23 +318,23 @@ function StepTimer({ duration, onComplete }) {
                         cy="50"
                         r="44"
                         fill="none"
-                        stroke="#2a2a2a"
-                        strokeWidth="8"
+                        stroke="#334155"
+                        strokeWidth="6"
                     />
                     <circle
                         cx="50"
                         cy="50"
                         r="44"
                         fill="none"
-                        stroke={timeLeft === 0 ? "#00C851" : "#FFE500"}
-                        strokeWidth="8"
+                        stroke={timeLeft === 0 ? "#16A34A" : "#2563EB"}
+                        strokeWidth="6"
                         strokeDasharray={`${(276 * pct) / 100} 276`}
-                        strokeLinecap="square"
+                        strokeLinecap="round"
                         style={{ transition: "stroke-dasharray 1s linear" }}
                     />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="font-display text-brutal-white text-xl leading-none">
+                    <span className="font-display text-white text-xl font-bold leading-none">
                         {timeLeft === 0
                             ? "✓"
                             : `${mins}:${String(secs).padStart(2, "0")}`}
@@ -348,7 +348,6 @@ function StepTimer({ duration, onComplete }) {
                         size="sm"
                         variant="default"
                         onClick={start}
-                        className="border-2 border-brutal-yellow bg-brutal-yellow text-brutal-black hover:bg-brutal-yellow/80"
                     >
                         <Play size={14} />
                         Mulai Timer
@@ -359,7 +358,7 @@ function StepTimer({ duration, onComplete }) {
                         size="sm"
                         variant="outline"
                         onClick={pause}
-                        className="border-2 border-brutal-white text-brutal-white hover:bg-brutal-white/10"
+                        className="border-white/30 text-white hover:bg-white/10"
                     >
                         <Pause size={14} />
                         Pause
@@ -371,7 +370,6 @@ function StepTimer({ duration, onComplete }) {
                             size="sm"
                             variant="default"
                             onClick={start}
-                            className="border-2 border-brutal-yellow bg-brutal-yellow text-brutal-black hover:bg-brutal-yellow/80"
                         >
                             <Play size={14} />
                             Lanjut
@@ -380,7 +378,7 @@ function StepTimer({ duration, onComplete }) {
                             size="sm"
                             variant="outline"
                             onClick={reset}
-                            className="border-2 border-brutal-white text-brutal-white hover:bg-brutal-white/10"
+                            className="border-white/30 text-white hover:bg-white/10"
                         >
                             <RotateCcw size={14} />
                             Reset
@@ -390,9 +388,8 @@ function StepTimer({ duration, onComplete }) {
                 {timeLeft === 0 && (
                     <Button
                         size="sm"
-                        variant="default"
                         onClick={reset}
-                        className="border-2 border-brutal-green bg-brutal-green text-brutal-white hover:bg-brutal-green/80"
+                        className="bg-clinical-success hover:bg-clinical-success/90 text-white"
                     >
                         ✓ Selesai — Lanjut
                     </Button>
@@ -402,7 +399,7 @@ function StepTimer({ duration, onComplete }) {
     );
 }
 
-// ── Guide Viewer ─────────────────────────────────────────
+// ── Guide Viewer ─────────────────────────────────────────────
 function GuideViewer({ guide, onBack }) {
     const [currentStep, setCurrentStep] = useState(0);
 
@@ -411,9 +408,9 @@ function GuideViewer({ guide, onBack }) {
     const isFirst = currentStep === 0;
 
     const urgencyBg = {
-        emergency: "bg-brutal-red text-brutal-white",
-        high: "bg-brutal-orange text-brutal-white",
-        moderate: "bg-brutal-yellow text-brutal-black",
+        emergency: "bg-clinical-danger text-white",
+        high: "bg-clinical-warning text-white",
+        moderate: "bg-clinical-warning-light text-clinical-text",
     }[guide.urgency];
 
     return (
@@ -421,17 +418,17 @@ function GuideViewer({ guide, onBack }) {
             {/* Header */}
             <div
                 className={cn(
-                    "border-4 border-brutal-black p-4 mb-4 shadow-brutal-lg flex items-center gap-3",
+                    "rounded-clinical-xl p-4 mb-4 shadow-clinical-md flex items-center gap-3",
                     urgencyBg,
                 )}
             >
                 <span className="text-3xl">{guide.emoji}</span>
                 <div>
-                    <h2 className="font-display text-xl leading-tight">
+                    <h2 className="font-display text-xl font-bold leading-tight">
                         {guide.title}
                     </h2>
                     {guide.callFirst && (
-                        <p className="text-xs font-body font-bold opacity-80 mt-0.5">
+                        <p className="text-xs font-body font-semibold opacity-80 mt-0.5">
                             ⚠️ Hubungi 119 sebelum atau sambil melakukan ini
                         </p>
                     )}
@@ -439,13 +436,13 @@ function GuideViewer({ guide, onBack }) {
             </div>
 
             {guide.callFirst && (
-                <div className="flex items-center justify-center gap-3 w-full py-3 mb-4 bg-brutal-red border-4 border-brutal-black shadow-brutal select-none">
-                    <Phone size={20} className="text-brutal-white" />
+                <div className="flex items-center justify-center gap-3 w-full py-3 mb-4 bg-clinical-danger rounded-clinical-xl shadow-clinical-md">
+                    <Phone size={20} className="text-white" />
                     <div className="text-center">
-                        <span className="inline-flex items-center px-2.5 py-1 bg-brutal-yellow/90 border-2 border-brutal-yellow font-display text-2xl text-brutal-black rounded-md">
+                        <span className="inline-flex items-center px-3 py-1 bg-white/20 backdrop-blur-sm font-display text-2xl text-white font-bold rounded-full">
                             119
                         </span>
-                        <span className="font-body text-brutal-white/80 text-xs block mt-1">
+                        <span className="font-body text-white/80 text-xs block mt-1">
                             Hubungi Ambulans
                         </span>
                     </div>
@@ -459,31 +456,31 @@ function GuideViewer({ guide, onBack }) {
                         key={i}
                         onClick={() => setCurrentStep(i)}
                         className={cn(
-                            "h-2 flex-1 border-2 border-brutal-black cursor-pointer transition-all",
+                            "h-1.5 flex-1 rounded-full cursor-pointer transition-all",
                             i < currentStep
-                                ? "bg-brutal-black"
+                                ? "bg-clinical-primary"
                                 : i === currentStep
-                                    ? "bg-brutal-yellow"
-                                    : "bg-brutal-gray",
+                                    ? "bg-clinical-primary"
+                                    : "bg-clinical-border",
                         )}
                     />
                 ))}
             </div>
 
             {/* Step Content */}
-            <Card className="mb-4 border-3 border-brutal-black shadow-brutal-lg">
-                <CardHeader className="bg-brutal-black">
+            <Card className="mb-4 border border-clinical-border rounded-clinical-xl shadow-clinical-md">
+                <CardHeader className="bg-clinical-primary text-white">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-brutal-yellow border-2 border-brutal-yellow flex items-center justify-center font-display text-xl text-brutal-black">
+                        <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center font-display text-xl text-white font-bold">
                             {currentStep + 1}
                         </div>
-                        <h3 className="font-display text-xl text-brutal-white">
+                        <h3 className="font-display text-xl font-bold text-white">
                             {step.title}
                         </h3>
                     </div>
                 </CardHeader>
                 <CardContent className="p-5">
-                    <p className="font-body text-base leading-relaxed text-brutal-black">
+                    <p className="font-body text-base leading-relaxed text-clinical-text">
                         {step.instruction}
                     </p>
 
@@ -498,10 +495,10 @@ function GuideViewer({ guide, onBack }) {
                     )}
 
                     {step.action?.type === "call" && (
-                        <div className="mt-3 flex items-center gap-2 border-3 border-brutal-black bg-brutal-red text-brutal-white px-4 py-3 font-body font-bold shadow-brutal select-none">
+                        <div className="mt-3 flex items-center gap-2 bg-clinical-danger text-white px-4 py-3 rounded-clinical-lg font-body font-semibold shadow-clinical-sm">
                             <Phone size={18} />
                             Hubungi
-                            <span className="inline-flex items-center px-2 py-0.5 bg-brutal-yellow/90 border border-brutal-yellow font-display text-sm text-brutal-black rounded-md">
+                            <span className="inline-flex items-center px-2.5 py-0.5 bg-white/20 backdrop-blur-sm font-display text-sm text-white font-bold rounded-full">
                                 {step.action.number}
                             </span>
                         </div>
@@ -515,7 +512,6 @@ function GuideViewer({ guide, onBack }) {
                     variant="outline"
                     disabled={isFirst}
                     onClick={() => setCurrentStep((s) => s - 1)}
-                    className="border-3 border-brutal-black"
                 >
                     ← Kembali
                 </Button>
@@ -523,16 +519,15 @@ function GuideViewer({ guide, onBack }) {
                     <Button
                         variant="default"
                         onClick={() => setCurrentStep((s) => s + 1)}
-                        className="flex-1 border-3 border-brutal-black shadow-brutal-sm"
+                        className="flex-1"
                     >
                         Langkah Berikutnya
                         <ChevronRight size={14} />
                     </Button>
                 ) : (
                     <Button
-                        variant="default"
                         onClick={onBack}
-                        className="flex-1 border-3 border-brutal-black bg-brutal-green hover:bg-brutal-green/90 shadow-brutal-sm"
+                        className="flex-1 bg-clinical-success hover:bg-clinical-success/90 text-white"
                     >
                         ✓ Selesai
                     </Button>
@@ -542,7 +537,7 @@ function GuideViewer({ guide, onBack }) {
     );
 }
 
-// ── Main P3K Guide ───────────────────────────────────────
+// ── Main P3K Guide ───────────────────────────────────────────
 export default function P3KGuide() {
     const [selected, setSelected] = useState(null);
 
@@ -555,35 +550,35 @@ export default function P3KGuide() {
     return (
         <div className="animate-fade-in">
             {/* Emergency Banner */}
-            <div className="bg-brutal-red border-4 border-brutal-black shadow-brutal-lg p-4 mb-6 flex items-center gap-3">
+            <div className="bg-clinical-danger rounded-clinical-xl shadow-clinical-md p-4 mb-6 flex items-center gap-3">
                 <AlertTriangle
                     size={24}
-                    className="text-brutal-white shrink-0"
+                    className="text-white shrink-0"
                     strokeWidth={2.5}
                 />
                 <div>
-                    <p className="font-display text-brutal-white">
+                    <p className="font-display text-white font-bold">
                         Dalam Keadaan Darurat?
                     </p>
                     <div className="flex flex-wrap gap-3 mt-1.5">
-                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-brutal-yellow/90 border border-brutal-yellow font-display text-sm text-brutal-black rounded-md select-none">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-white/20 backdrop-blur-sm font-display text-sm text-white font-bold rounded-full">
                             📞 119
                         </span>
-                        <span className="font-body text-brutal-white/70 text-xs self-center">Ambulans</span>
-                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-brutal-yellow/90 border border-brutal-yellow font-display text-sm text-brutal-black rounded-md select-none">
+                        <span className="font-body text-white/70 text-xs self-center">Ambulans</span>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-white/20 backdrop-blur-sm font-display text-sm text-white font-bold rounded-full">
                             📞 1500-567
                         </span>
-                        <span className="font-body text-brutal-white/70 text-xs self-center">Hotline</span>
+                        <span className="font-body text-white/70 text-xs self-center">Hotline</span>
                     </div>
                 </div>
             </div>
 
             {/* Title */}
-            <div className="border-b-3 border-brutal-black pb-4 mb-6">
-                <h2 className="font-display text-3xl">
+            <div className="border-b border-clinical-border pb-4 mb-6">
+                <h2 className="font-display text-3xl font-bold text-clinical-text">
                     Panduan Pertolongan Pertama
                 </h2>
-                <p className="font-body text-brutal-muted text-sm mt-1">
+                <p className="font-body text-clinical-muted text-sm mt-1">
                     Pilih kondisi darurat untuk panduan step-by-step
                 </p>
             </div>
@@ -593,18 +588,18 @@ export default function P3KGuide() {
                 {P3K_DATA.map((guide) => {
                     const urgencyConfig = {
                         emergency: {
-                            border: "border-brutal-red",
-                            badgeVariant: "destructive",
+                            border: "border-clinical-danger/30",
+                            badgeClass: "bg-clinical-danger-light text-clinical-danger",
                             label: "DARURAT",
                         },
                         high: {
-                            border: "border-brutal-orange",
-                            badgeVariant: "default",
+                            border: "border-clinical-warning/30",
+                            badgeClass: "bg-clinical-warning-light text-amber-700",
                             label: "SEGERA",
                         },
                         moderate: {
-                            border: "border-brutal-black",
-                            badgeVariant: "secondary",
+                            border: "border-clinical-border",
+                            badgeClass: "bg-clinical-bg text-clinical-text-secondary",
                             label: "PENTING",
                         },
                     }[guide.urgency];
@@ -614,30 +609,26 @@ export default function P3KGuide() {
                             key={guide.id}
                             onClick={() => setSelected(guide)}
                             className={cn(
-                                "text-left border-4 p-4 bg-brutal-white",
-                                "shadow-brutal hover:shadow-brutal-lg transition-all duration-150",
-                                "hover:-translate-x-1 hover:-translate-y-1",
-                                "active:translate-x-0.5 active:translate-y-0.5 active:shadow-brutal-sm",
+                                "text-left border rounded-clinical-xl p-5 bg-white",
+                                "shadow-clinical-xs hover:shadow-clinical-lg transition-all duration-200",
+                                "hover:-translate-y-1",
                                 urgencyConfig.border,
                             )}
                         >
                             <div className="flex items-start justify-between gap-2 mb-2">
                                 <span className="text-4xl">{guide.emoji}</span>
-                                <Badge
-                                    variant={urgencyConfig.badgeVariant}
-                                    className="border-2 border-brutal-black rounded-none text-xs"
-                                >
+                                <span className={cn("text-[10px] font-bold px-2 py-1 rounded-full", urgencyConfig.badgeClass)}>
                                     {urgencyConfig.label}
-                                </Badge>
+                                </span>
                             </div>
-                            <h3 className="font-display text-lg leading-tight mb-1">
+                            <h3 className="font-display text-lg font-bold leading-tight text-clinical-text mb-1">
                                 {guide.title}
                             </h3>
-                            <p className="font-body text-xs text-brutal-muted">
+                            <p className="font-body text-xs text-clinical-muted">
                                 {guide.steps.length} langkah
                                 {guide.callFirst && " • Hubungi 119 dulu"}
                             </p>
-                            <div className="flex items-center gap-1 mt-2 text-brutal-blue font-body font-bold text-sm">
+                            <div className="flex items-center gap-1 mt-2 text-clinical-primary font-body font-semibold text-sm">
                                 <span>Lihat Panduan</span>
                                 <ChevronRight size={14} />
                             </div>
@@ -646,7 +637,7 @@ export default function P3KGuide() {
                 })}
             </div>
 
-            <p className="text-center text-xs text-brutal-muted font-body mt-6">
+            <p className="text-center text-xs text-clinical-muted font-body mt-6">
                 Panduan ini bersifat informatif berdasarkan standar PMI dan WHO.
                 Ikuti pelatihan P3K resmi untuk penanganan yang lebih tepat.
             </p>

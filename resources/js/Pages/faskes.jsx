@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Head, router } from "@inertiajs/react";
 import {
     MapPin,
@@ -14,15 +14,12 @@ import {
     ChevronRight,
     Building2,
     ChevronDown,
-    Copy,
-    Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PublicLayout from "@/components/layouts/public-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/feedback";
 
 // ─── Data Konstanta ──────────────────────────────────────────
@@ -33,7 +30,6 @@ const FASKES_TYPES = {
 
 // ─── Sub-Komponen: FaskesCard ────────────────────────────────
 function FaskesCard({ item }) {
-    // Mengambil nama wilayah dari relasi 'regency' yang dikirim Backend
     const cityName = item.regency?.nama_wilayah || `Kode Kab: ${item.kode_kab}`;
 
     const typeInfo = FASKES_TYPES[item.type] || {
@@ -47,54 +43,48 @@ function FaskesCard({ item }) {
     )}`;
 
     return (
-        <div
-            className={cn(
-                "border-4 border-brutal-black bg-brutal-white p-5",
-                "shadow-brutal transition-all duration-150",
-                "hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lg",
-            )}
-        >
+        <div className="bg-white border border-clinical-border rounded-clinical-xl p-5 shadow-clinical-xs hover:shadow-clinical-md hover:-translate-y-0.5 transition-all duration-200">
             <div className="flex items-start justify-between gap-3 mb-3">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                     <div
                         className={cn(
-                            "w-10 h-10 border-3 border-brutal-black flex items-center justify-center text-lg shrink-0",
+                            "w-10 h-10 rounded-clinical-lg flex items-center justify-center text-lg shrink-0",
                             item.type === "rumah_sakit"
-                                ? "bg-brutal-blue text-white"
-                                : "bg-brutal-green text-white",
+                                ? "bg-clinical-primary-light"
+                                : "bg-clinical-success-light",
                         )}
                     >
                         {typeInfo.emoji}
                     </div>
                     <div>
-                        <h3 className="font-display text-lg leading-tight line-clamp-2 uppercase font-black">
+                        <h3 className="font-display text-base font-bold leading-tight line-clamp-2 text-clinical-text">
                             {item.unit_kerja}
                         </h3>
-                        <p className="font-body text-xs text-brutal-muted mt-0.5">
+                        <p className="font-body text-xs text-clinical-muted mt-0.5">
                             {cityName}
                         </p>
                     </div>
                 </div>
                 {item.type === "rumah_sakit" && (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-brutal-red text-white border-3 border-brutal-black font-display text-[10px] uppercase tracking-wider shrink-0 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-clinical-danger-light text-clinical-danger font-body text-[10px] font-semibold rounded-full shrink-0">
                         <AlertTriangle size={10} /> IGD
                     </span>
                 )}
             </div>
 
-            <div className="space-y-2 mb-4">
+            <div className="space-y-1.5 mb-4">
                 <div className="flex items-start gap-2">
                     <MapPin
                         size={14}
-                        className="text-brutal-muted shrink-0 mt-0.5"
+                        className="text-clinical-muted shrink-0 mt-0.5"
                     />
-                    <p className="font-body text-xs text-brutal-muted leading-relaxed line-clamp-1">
+                    <p className="font-body text-xs text-clinical-muted leading-relaxed line-clamp-1">
                         Kode Instansi: {item.kode_instansi}
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Clock size={14} className="text-brutal-muted shrink-0" />
-                    <p className="font-body text-xs text-brutal-muted">
+                    <Clock size={14} className="text-clinical-muted shrink-0" />
+                    <p className="font-body text-xs text-clinical-muted">
                         {item.type === "rumah_sakit"
                             ? "Buka 24 Jam"
                             : "Senin-Sabtu, 08:00 - 14:00"}
@@ -103,41 +93,17 @@ function FaskesCard({ item }) {
             </div>
 
             <div className="flex gap-2">
-                <button
-                    onClick={handleCopyPhone}
-                    className={cn(
-                        "flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 cursor-pointer",
-                        copied
-                            ? "bg-brutal-green/80 text-white border-3 border-brutal-green"
-                            : "bg-brutal-green text-white border-3 border-brutal-black",
-                        "font-body font-bold text-xs shadow-brutal-sm",
-                        "hover:shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5",
-                        "active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
-                        "transition-all duration-150",
-                    )}
                 <a
                     href="tel:119"
-                    className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-brutal-green text-white border-3 border-brutal-black font-body font-bold text-xs shadow-brutal-sm hover:shadow-brutal transition-all"
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-clinical-success text-white font-body font-semibold text-xs rounded-clinical-md shadow-clinical-sm hover:shadow-clinical-md transition-all"
                 >
-                    {copied ? (
-                        <>
-                            <Check size={14} />
-                            Disalin!
-                        </>
-                    ) : (
-                        <>
-                            <Copy size={14} />
-                            {faskes.phone}
-                        </>
-                    )}
-                </button>
                     <Phone size={14} /> Hubungi
                 </a>
                 <a
                     href={mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-brutal-blue text-white border-3 border-brutal-black font-body font-bold text-xs shadow-brutal-sm hover:shadow-brutal transition-all"
+                    className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-clinical-primary text-white font-body font-semibold text-xs rounded-clinical-md shadow-clinical-sm hover:shadow-clinical-md transition-all"
                 >
                     <ExternalLink size={14} /> Maps
                 </a>
@@ -148,19 +114,16 @@ function FaskesCard({ item }) {
 
 // ─── Main Page Component ─────────────────────────────────────
 export default function Faskes({ facilities, filters, cities }) {
-    // State Filter Dasar
     const [search, setSearch] = useState(filters?.search || "");
     const [city, setCity] = useState(filters?.city || "");
     const [type, setType] = useState(filters?.type || "");
 
-    // State untuk Searchable Select (Combobox)
     const [isCityOpen, setIsCityOpen] = useState(false);
     const [citySearch, setCitySearch] = useState("");
     const dropdownRef = useRef(null);
 
     const hasActiveFilter = city || type || search;
 
-    // Menutup dropdown wilayah jika klik di luar area
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -175,7 +138,6 @@ export default function Faskes({ facilities, filters, cities }) {
             document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Filter list kota berdasarkan input user di dalam dropdown
     const filteredCities = cities.filter((c) =>
         c.label.toLowerCase().includes(citySearch.toLowerCase()),
     );
@@ -195,7 +157,6 @@ export default function Faskes({ facilities, filters, cities }) {
         fetchFilteredData({});
     };
 
-    // Debounce Logic untuk hit API
     useEffect(() => {
         const delaySearch = setTimeout(() => {
             if (
@@ -215,56 +176,46 @@ export default function Faskes({ facilities, filters, cities }) {
             <Head title="Cari Fasilitas Kesehatan" />
 
             {/* Page Header */}
-            <div className="mb-8 border-b-3 border-brutal-black pb-6">
-                <div className="flex items-center gap-2 mb-2">
-                    <div className="w-10 h-10 bg-brutal-yellow border-3 border-brutal-black shadow-brutal flex items-center justify-center">
-                        <MapPin
-                            size={20}
-                            className="text-brutal-black"
-                            strokeWidth={2.5}
-                        />
+            <div className="mb-8">
+                <div className="flex items-center gap-3 mb-3">
+                    <div className="w-11 h-11 bg-clinical-warning-light rounded-clinical-lg flex items-center justify-center">
                         <Building2
-                            size={20}
-                            className="text-brutal-black"
-                            strokeWidth={2.5}
+                            size={22}
+                            className="text-clinical-warning"
+                            strokeWidth={2}
                         />
                     </div>
-                    <h1 className="font-display text-3xl md:text-4xl">
-                        Cari Faskes
-                    </h1>
-                    <h1 className="font-display text-3xl md:text-4xl font-black">
-                        CARI FASKES
-                    </h1>
+                    <div>
+                        <h1 className="font-display text-2xl md:text-3xl font-bold text-clinical-text">
+                            Cari Faskes
+                        </h1>
+                        <p className="font-body text-sm text-clinical-muted">
+                            Temukan RS atau Puskesmas di seluruh Indonesia
+                        </p>
+                    </div>
                 </div>
-                <p className="font-body text-brutal-muted max-w-xl">
-                    Temukan puskesmas, klinik, dan rumah sakit di sekitarmu.
-                    Filter berdasarkan kota, jenis, atau ketersediaan IGD.
-                    Cari dan temukan informasi RS atau Puskesmas di seluruh
-                    Indonesia dengan mudah.
-                </p>
             </div>
 
             {/* Search & Filters */}
             <div className="mb-6 space-y-3">
-                {/* Search Bar Nama */}
                 <div className="relative">
                     <Search
                         size={18}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 text-brutal-muted"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-clinical-muted"
                     />
                     <Input
                         type="text"
                         placeholder="Cari nama faskes (Contoh: RSUD...)"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="pl-12 h-14 border-4 border-brutal-black font-body text-sm shadow-brutal focus:shadow-brutal-lg transition-all rounded-none uppercase font-bold"
+                        className="pl-12 h-12 border border-clinical-border rounded-clinical-lg font-body text-sm shadow-clinical-xs focus:border-clinical-primary focus:ring-2 focus:ring-clinical-primary/20 transition-all"
                     />
                 </div>
 
                 <div className="flex flex-wrap gap-3 items-center">
                     <div className="flex items-center gap-1">
-                        <Filter size={14} className="text-brutal-muted" />
-                        <span className="font-body text-xs font-bold text-brutal-muted uppercase">
+                        <Filter size={14} className="text-clinical-muted" />
+                        <span className="font-body text-xs font-semibold text-clinical-muted">
                             Filter:
                         </span>
                     </div>
@@ -275,17 +226,16 @@ export default function Faskes({ facilities, filters, cities }) {
                             type="button"
                             onClick={() => setIsCityOpen(!isCityOpen)}
                             className={cn(
-                                "w-64 px-4 py-2.5 border-3 border-brutal-black font-body text-xs font-bold bg-brutal-white shadow-brutal-sm flex justify-between items-center transition-all",
-                                city && "bg-brutal-yellow",
-                                isCityOpen &&
-                                    "translate-x-0.5 translate-y-0.5 shadow-none",
+                                "w-64 px-4 py-2.5 border border-clinical-border rounded-clinical-md font-body text-xs font-semibold bg-white shadow-clinical-xs flex justify-between items-center transition-all",
+                                city && "bg-clinical-primary-light border-clinical-primary text-clinical-primary",
+                                isCityOpen && "border-clinical-primary ring-2 ring-clinical-primary/20",
                             )}
                         >
                             <span className="truncate">
                                 {city
                                     ? cities.find((c) => c.value === city)
-                                          ?.label
-                                    : "SEMUA WILAYAH"}
+                                        ?.label
+                                    : "Semua Wilayah"}
                             </span>
                             <ChevronDown
                                 size={14}
@@ -297,13 +247,12 @@ export default function Faskes({ facilities, filters, cities }) {
                         </button>
 
                         {isCityOpen && (
-                            <div className="absolute top-full left-0 mt-2 w-72 bg-brutal-white border-4 border-brutal-black shadow-brutal z-[50]">
-                                {/* Input Pencarian di dalam Dropdown */}
-                                <div className="p-2 border-b-2 border-brutal-black bg-brutal-gray">
+                            <div className="absolute top-full left-0 mt-2 w-72 bg-white border border-clinical-border rounded-clinical-lg shadow-clinical-lg z-[50]">
+                                <div className="p-2 border-b border-clinical-border">
                                     <div className="relative">
                                         <Search
                                             size={12}
-                                            className="absolute left-2 top-1/2 -translate-y-1/2 text-brutal-muted"
+                                            className="absolute left-2 top-1/2 -translate-y-1/2 text-clinical-muted"
                                         />
                                         <input
                                             type="text"
@@ -312,13 +261,12 @@ export default function Faskes({ facilities, filters, cities }) {
                                             onChange={(e) =>
                                                 setCitySearch(e.target.value)
                                             }
-                                            className="w-full pl-7 pr-2 py-1.5 text-xs border-2 border-brutal-black focus:outline-none font-body font-bold"
+                                            className="w-full pl-7 pr-2 py-1.5 text-xs border border-clinical-border rounded-clinical-sm focus:outline-none focus:border-clinical-primary font-body"
                                             autoFocus
                                         />
                                     </div>
                                 </div>
 
-                                {/* List Wilayah */}
                                 <div className="max-h-60 overflow-y-auto custom-scrollbar">
                                     <button
                                         onClick={() => {
@@ -326,9 +274,9 @@ export default function Faskes({ facilities, filters, cities }) {
                                             setIsCityOpen(false);
                                             setCitySearch("");
                                         }}
-                                        className="w-full text-left px-4 py-2.5 text-xs font-bold hover:bg-brutal-yellow border-b border-brutal-black/10 transition-colors"
+                                        className="w-full text-left px-4 py-2.5 text-xs font-semibold hover:bg-clinical-bg border-b border-clinical-border/50 transition-colors"
                                     >
-                                        TAMPILKAN SEMUA
+                                        Tampilkan Semua
                                     </button>
 
                                     {filteredCities.length > 0 ? (
@@ -341,16 +289,16 @@ export default function Faskes({ facilities, filters, cities }) {
                                                     setCitySearch("");
                                                 }}
                                                 className={cn(
-                                                    "w-full text-left px-4 py-2.5 text-xs font-bold hover:bg-brutal-blue hover:text-white transition-colors",
+                                                    "w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-clinical-primary-light hover:text-clinical-primary transition-colors",
                                                     city === c.value &&
-                                                        "bg-brutal-blue text-white",
+                                                    "bg-clinical-primary text-white",
                                                 )}
                                             >
                                                 {c.label}
                                             </button>
                                         ))
                                     ) : (
-                                        <div className="px-4 py-6 text-center text-[10px] text-brutal-muted font-bold italic">
+                                        <div className="px-4 py-6 text-center text-[10px] text-clinical-muted font-medium italic">
                                             Wilayah tidak ditemukan...
                                         </div>
                                     )}
@@ -364,50 +312,50 @@ export default function Faskes({ facilities, filters, cities }) {
                         value={type}
                         onChange={(e) => setType(e.target.value)}
                         className={cn(
-                            "px-4 py-2.5 border-3 border-brutal-black font-body text-xs font-bold bg-brutal-white shadow-brutal-sm appearance-none cursor-pointer",
-                            type && "bg-brutal-blue text-white",
+                            "px-4 py-2.5 border border-clinical-border rounded-clinical-md font-body text-xs font-semibold bg-white shadow-clinical-xs appearance-none cursor-pointer",
+                            type && "bg-clinical-primary-light border-clinical-primary text-clinical-primary",
                         )}
                     >
-                        <option value="">SEMUA JENIS</option>
-                        <option value="rumah_sakit">🏥 RUMAH SAKIT</option>
-                        <option value="puskesmas">🩺 PUSKESMAS</option>
+                        <option value="">Semua Jenis</option>
+                        <option value="rumah_sakit">🏥 Rumah Sakit</option>
+                        <option value="puskesmas">🩺 Puskesmas</option>
                     </select>
 
                     {hasActiveFilter && (
                         <button
                             onClick={clearFilters}
-                            className="px-2 py-2 font-body text-xs font-bold text-brutal-red hover:underline uppercase tracking-tighter"
+                            className="px-2 py-2 font-body text-xs font-semibold text-clinical-danger hover:underline"
                         >
-                            [ Reset Filter ]
+                            Reset Filter
                         </button>
                     )}
                 </div>
             </div>
 
             {/* Status Information */}
-            <div className="mb-4 flex items-center justify-between border-l-4 border-brutal-black pl-3">
-                <p className="font-body text-sm text-brutal-muted">
+            <div className="mb-4 flex items-center justify-between pl-3 border-l-2 border-clinical-primary">
+                <p className="font-body text-sm text-clinical-text-secondary">
                     Ditemukan{" "}
-                    <span className="font-black text-brutal-black">
+                    <span className="font-bold text-clinical-text">
                         {facilities.total}
                     </span>{" "}
                     data fasilitas kesehatan.
                 </p>
                 {city && (
-                    <Badge className="bg-brutal-yellow text-brutal-black border-2 border-brutal-black rounded-none font-bold">
+                    <Badge className="bg-clinical-primary-light text-clinical-primary text-xs font-semibold rounded-full">
                         Wilayah Aktif
                     </Badge>
                 )}
             </div>
 
             {/* Results Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {facilities.data.length === 0 ? (
                     <div className="col-span-full">
                         <EmptyState
                             emoji="🕵️‍♂️"
-                            title="TIDAK ADA HASIL"
-                            description="Nothy tidak menemukan faskes dengan kriteria tersebut. Coba cari kata kunci lain."
+                            title="Tidak Ada Hasil"
+                            description="Tidak menemukan faskes dengan kriteria tersebut. Coba cari kata kunci lain."
                             action={hasActiveFilter ? clearFilters : undefined}
                             actionLabel="Hapus Semua Filter"
                         />
@@ -432,11 +380,10 @@ export default function Faskes({ facilities, filters, cities }) {
                                 { preserveScroll: true },
                             )
                         }
-                        className="border-4 border-brutal-black font-black shadow-brutal-sm hover:translate-y-0.5 hover:shadow-none transition-all rounded-none"
                     >
-                        <ChevronLeft size={18} className="mr-1" /> PREV
+                        <ChevronLeft size={18} className="mr-1" /> Prev
                     </Button>
-                    <div className="font-display text-sm font-black border-4 border-brutal-black px-6 py-2 bg-brutal-white shadow-brutal-sm">
+                    <div className="font-body text-sm font-semibold text-clinical-text bg-clinical-bg border border-clinical-border rounded-clinical-md px-5 py-2">
                         {facilities.current_page} / {facilities.last_page}
                     </div>
                     <Button
@@ -449,23 +396,22 @@ export default function Faskes({ facilities, filters, cities }) {
                                 { preserveScroll: true },
                             )
                         }
-                        className="border-4 border-brutal-black font-black shadow-brutal-sm hover:translate-y-0.5 hover:shadow-none transition-all rounded-none"
                     >
-                        NEXT <ChevronRight size={18} className="ml-1" />
+                        Next <ChevronRight size={18} className="ml-1" />
                     </Button>
                 </div>
             )}
 
             {/* Disclaimer Footer */}
-            <div className="mt-12 border-4 border-brutal-yellow bg-brutal-yellow/5 p-5 flex items-start gap-4 shadow-brutal-sm">
-                <div className="w-12 h-12 bg-brutal-yellow border-3 border-brutal-black flex items-center justify-center shrink-0">
-                    <Stethoscope size={24} className="text-brutal-black" />
+            <div className="mt-12 bg-clinical-warning-light/50 border border-clinical-warning/20 rounded-clinical-xl p-5 flex items-start gap-4">
+                <div className="w-11 h-11 bg-clinical-warning-light rounded-clinical-lg flex items-center justify-center shrink-0">
+                    <Stethoscope size={22} className="text-clinical-warning" />
                 </div>
                 <div>
-                    <h4 className="font-display font-black text-sm uppercase">
+                    <h4 className="font-display font-bold text-sm text-clinical-text">
                         Informasi Penting
                     </h4>
-                    <p className="font-body text-xs text-brutal-black leading-relaxed mt-1">
+                    <p className="font-body text-xs text-clinical-text-secondary leading-relaxed mt-1">
                         Data ini bersifat statis dan merupakan pemetaan resmi
                         Kemenkes. Jam operasional dan ketersediaan layanan IGD
                         dapat berubah sewaktu-waktu sesuai kebijakan instansi

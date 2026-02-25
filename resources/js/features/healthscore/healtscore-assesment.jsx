@@ -22,41 +22,32 @@ import { Badge } from "@/components/ui/badge";
 import { StepProgress } from "@/components/ui/feedback";
 import { toast } from "sonner";
 
-const COLOR_MAP = {
-    blue: "#0047FF",
-    green: "#00C851",
-    yellow: "#FFE500",
-    orange: "#FF6B00",
-    red: "#FF2D20",
-    gray: "#6B6B6B",
-};
-
-// ── Progress Bar (inline) ────────────────────────────────
+// ── Progress Bar ────────────────────────────────────────────
 function ProgressBar({ label, value, max = 100, color = "blue", showValue = true, className }) {
     const pct = Math.min((value / max) * 100, 100);
     const colorMap = {
-        blue: "bg-brutal-blue",
-        green: "bg-brutal-green",
-        yellow: "bg-brutal-yellow",
-        orange: "bg-brutal-orange",
-        red: "bg-brutal-red",
-        gray: "bg-brutal-gray",
+        blue: "bg-clinical-primary",
+        green: "bg-clinical-success",
+        yellow: "bg-clinical-warning",
+        orange: "bg-clinical-warning",
+        red: "bg-clinical-danger",
+        gray: "bg-clinical-muted",
     };
     return (
         <div className={className}>
             {label && (
                 <div className="flex items-center justify-between mb-1">
-                    <span className="font-body text-xs font-bold text-brutal-black">{label}</span>
+                    <span className="font-body text-xs font-semibold text-clinical-text">{label}</span>
                     {showValue && (
-                        <span className="font-mono text-xs font-bold text-brutal-muted">
+                        <span className="font-mono text-xs font-semibold text-clinical-muted">
                             {Math.round(value)}/{max}
                         </span>
                     )}
                 </div>
             )}
-            <div className="h-3 border-2 border-brutal-black bg-brutal-gray overflow-hidden">
+            <div className="clinical-progress-track">
                 <div
-                    className={cn("h-full transition-all duration-500", colorMap[color] || colorMap.blue)}
+                    className={cn("clinical-progress-fill", colorMap[color] || colorMap.blue)}
                     style={{ width: `${pct}%` }}
                 />
             </div>
@@ -64,12 +55,12 @@ function ProgressBar({ label, value, max = 100, color = "blue", showValue = true
     );
 }
 
-// ── Range Slider (inline) ────────────────────────────────
+// ── Range Slider ────────────────────────────────────────────
 function RangeSlider({ label, value, min, max, step = 1, onChange }) {
     return (
         <div className="py-2">
             {label && (
-                <p className="font-display text-xl md:text-2xl mb-5 leading-tight">{label}</p>
+                <p className="font-display text-xl md:text-2xl font-bold text-clinical-text mb-5 leading-tight">{label}</p>
             )}
             <div className="flex items-center gap-4">
                 <input
@@ -79,14 +70,14 @@ function RangeSlider({ label, value, min, max, step = 1, onChange }) {
                     step={step}
                     value={value}
                     onChange={(e) => onChange(Number(e.target.value))}
-                    className="flex-1 h-3 appearance-none bg-brutal-gray border-2 border-brutal-black cursor-pointer
+                    className="flex-1 h-2 appearance-none bg-clinical-bg border border-clinical-border rounded-full cursor-pointer
                         [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6
-                        [&::-webkit-slider-thumb]:bg-brutal-yellow [&::-webkit-slider-thumb]:border-3 [&::-webkit-slider-thumb]:border-brutal-black
-                        [&::-webkit-slider-thumb]:shadow-brutal-sm [&::-webkit-slider-thumb]:cursor-grab
+                        [&::-webkit-slider-thumb]:bg-clinical-primary [&::-webkit-slider-thumb]:rounded-full
+                        [&::-webkit-slider-thumb]:shadow-clinical-sm [&::-webkit-slider-thumb]:cursor-grab
                         [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6
-                        [&::-moz-range-thumb]:bg-brutal-yellow [&::-moz-range-thumb]:border-3 [&::-moz-range-thumb]:border-brutal-black"
+                        [&::-moz-range-thumb]:bg-clinical-primary [&::-moz-range-thumb]:rounded-full"
                 />
-                <span className="w-12 h-12 flex items-center justify-center border-3 border-brutal-black bg-brutal-black text-brutal-yellow font-display text-xl">
+                <span className="w-12 h-12 flex items-center justify-center rounded-clinical-lg bg-clinical-primary text-white font-display text-xl">
                     {value}
                 </span>
             </div>
@@ -94,7 +85,7 @@ function RangeSlider({ label, value, min, max, step = 1, onChange }) {
     );
 }
 
-// ── Single Question ──────────────────────────────────────
+// ── Single Question ──────────────────────────────────────────
 function QuestionStep({ question, value, onChange }) {
     if (question.type === "range") {
         return (
@@ -107,7 +98,7 @@ function QuestionStep({ question, value, onChange }) {
                     step={1}
                     onChange={onChange}
                 />
-                <div className="flex justify-between text-xs text-brutal-muted mt-2 font-body">
+                <div className="flex justify-between text-xs text-clinical-muted mt-2 font-body">
                     <span>
                         {question.id.includes("stress")
                             ? "Sangat Rendah"
@@ -132,23 +123,22 @@ function QuestionStep({ question, value, onChange }) {
                         key={i}
                         onClick={() => onChange(opt.value)}
                         className={cn(
-                            "w-full text-left px-4 py-3.5 border-3 border-brutal-black",
-                            "font-body text-sm transition-all duration-150",
-                            "shadow-brutal-sm hover:shadow-brutal",
-                            "hover:-translate-x-0.5 hover:-translate-y-0.5",
-                            "active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+                            "w-full text-left px-4 py-3.5 border rounded-clinical-md",
+                            "font-body text-sm transition-all duration-200",
+                            "shadow-clinical-xs hover:shadow-clinical-sm",
+                            "hover:-translate-y-0.5",
                             "flex items-center gap-3 group",
                             isSelected
-                                ? "bg-brutal-black text-brutal-white font-bold"
-                                : "bg-brutal-white text-brutal-black hover:bg-brutal-gray",
+                                ? "bg-clinical-primary text-white border-clinical-primary font-semibold shadow-clinical-sm"
+                                : "bg-white text-clinical-text border-clinical-border hover:bg-clinical-primary-light hover:border-clinical-primary",
                         )}
                     >
                         <span
                             className={cn(
-                                "w-6 h-6 shrink-0 border-2 flex items-center justify-center font-display text-xs transition-all",
+                                "w-6 h-6 shrink-0 rounded-full flex items-center justify-center font-display text-xs transition-all",
                                 isSelected
-                                    ? "border-brutal-yellow bg-brutal-yellow text-brutal-black"
-                                    : "border-brutal-black bg-transparent text-brutal-black group-hover:bg-brutal-black group-hover:text-brutal-white",
+                                    ? "bg-white text-clinical-primary font-bold"
+                                    : "border border-clinical-border bg-clinical-bg text-clinical-text group-hover:bg-clinical-primary group-hover:text-white",
                             )}
                         >
                             {isSelected ? "✓" : String.fromCharCode(65 + i)}
@@ -161,10 +151,10 @@ function QuestionStep({ question, value, onChange }) {
     );
 }
 
-// ── Radar Chart ──────────────────────────────────────────
+// ── Radar Chart ──────────────────────────────────────────────
 function ScoreRadarChart({ dimensionScores }) {
     const data = DIMENSIONS.map((d) => ({
-        dimension: d.label.split(" ")[0], // short label
+        dimension: d.label.split(" ")[0],
         score: dimensionScores[d.id] || 0,
         fullMark: 100,
     }));
@@ -173,35 +163,35 @@ function ScoreRadarChart({ dimensionScores }) {
         <ResponsiveContainer width="100%" height={260}>
             <RadarChart data={data}>
                 <PolarGrid
-                    stroke="#0A0A0A"
-                    strokeWidth={1.5}
+                    stroke="#E2E8F0"
+                    strokeWidth={1}
                     strokeDasharray="4 2"
                 />
                 <PolarAngleAxis
                     dataKey="dimension"
                     tick={{
                         fontSize: 11,
-                        fontFamily: "DM Sans",
-                        fontWeight: 700,
-                        fill: "#0A0A0A",
+                        fontFamily: "Inter",
+                        fontWeight: 600,
+                        fill: "#475569",
                     }}
                 />
                 <Radar
                     name="Skor Kamu"
                     dataKey="score"
-                    stroke="#0047FF"
-                    strokeWidth={3}
-                    fill="#0047FF"
-                    fillOpacity={0.2}
+                    stroke="#2563EB"
+                    strokeWidth={2}
+                    fill="#2563EB"
+                    fillOpacity={0.15}
                 />
                 <Tooltip
                     contentStyle={{
-                        border: "3px solid #0A0A0A",
-                        borderRadius: 0,
-                        fontFamily: "DM Sans",
-                        fontWeight: 700,
+                        border: "1px solid #E2E8F0",
+                        borderRadius: "0.5rem",
+                        fontFamily: "Inter",
+                        fontWeight: 600,
                         fontSize: 12,
-                        boxShadow: "4px 4px 0px #0A0A0A",
+                        boxShadow: "0 4px 6px -1px rgba(15, 23, 42, 0.07)",
                     }}
                     formatter={(val) => [`${val}/100`, "Skor"]}
                 />
@@ -210,17 +200,17 @@ function ScoreRadarChart({ dimensionScores }) {
     );
 }
 
-// ── Result Screen ────────────────────────────────────────
+// ── Result Screen ────────────────────────────────────────────
 function HealthScoreResult({ result, onRetake }) {
     const grade = getScoreGrade(result.aggregate);
     const weakest = getWeakestDimensions(result.dimensions, 2);
 
     const gradeColors = {
-        green: { bg: "bg-brutal-green", text: "text-brutal-white" },
-        blue: { bg: "bg-brutal-blue", text: "text-brutal-white" },
-        yellow: { bg: "bg-brutal-yellow", text: "text-brutal-black" },
-        orange: { bg: "bg-brutal-orange", text: "text-brutal-white" },
-        red: { bg: "bg-brutal-red", text: "text-brutal-white" },
+        green: { bg: "bg-clinical-success", text: "text-white" },
+        blue: { bg: "bg-clinical-primary", text: "text-white" },
+        yellow: { bg: "bg-clinical-warning-light", text: "text-clinical-text" },
+        orange: { bg: "bg-clinical-warning", text: "text-white" },
+        red: { bg: "bg-clinical-danger", text: "text-white" },
     };
 
     const gc = gradeColors[grade.color];
@@ -235,7 +225,6 @@ function HealthScoreResult({ result, onRetake }) {
         }
     };
 
-    // Save to localStorage
     storage.set("medicheck_health_score", {
         ...result,
         date: new Date().toISOString(),
@@ -246,13 +235,13 @@ function HealthScoreResult({ result, onRetake }) {
             {/* Score Hero */}
             <div
                 className={cn(
-                    "border-4 border-brutal-black shadow-brutal-xl p-8 text-center",
+                    "rounded-clinical-2xl p-8 text-center shadow-clinical-lg",
                     gc.bg,
                 )}
             >
                 <p
                     className={cn(
-                        "font-body text-sm font-bold uppercase tracking-widest mb-2",
+                        "font-body text-sm font-semibold uppercase tracking-widest mb-2",
                         gc.text,
                     )}
                 >
@@ -261,9 +250,8 @@ function HealthScoreResult({ result, onRetake }) {
                 <div className="flex items-end justify-center gap-3 mb-2">
                     <span
                         className={cn(
-                            "font-display leading-none",
+                            "font-display leading-none text-8xl font-extrabold",
                             gc.text,
-                            "text-8xl",
                         )}
                     >
                         {result.aggregate}
@@ -279,7 +267,7 @@ function HealthScoreResult({ result, onRetake }) {
                 </div>
                 <div
                     className={cn(
-                        "inline-block border-3 border-current px-4 py-1 font-display text-xl",
+                        "inline-block border border-current/30 rounded-full px-5 py-1.5 font-display text-lg font-bold",
                         gc.text,
                     )}
                 >
@@ -296,9 +284,9 @@ function HealthScoreResult({ result, onRetake }) {
             </div>
 
             {/* Radar Chart */}
-            <Card className="border-3 border-brutal-black shadow-brutal-lg">
+            <Card className="border border-clinical-border rounded-clinical-xl shadow-clinical-sm">
                 <CardHeader>
-                    <h3 className="font-display text-xl">
+                    <h3 className="font-display text-xl font-bold text-clinical-text">
                         📊 Profil Kesehatan 6 Dimensi
                     </h3>
                 </CardHeader>
@@ -308,9 +296,9 @@ function HealthScoreResult({ result, onRetake }) {
             </Card>
 
             {/* Dimension Breakdown */}
-            <Card className="border-3 border-brutal-black shadow-brutal">
+            <Card className="border border-clinical-border rounded-clinical-xl shadow-clinical-sm">
                 <CardHeader>
-                    <h3 className="font-display text-lg">Skor Per Dimensi</h3>
+                    <h3 className="font-display text-lg font-bold text-clinical-text">Skor Per Dimensi</h3>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {DIMENSIONS.map((dim) => {
@@ -336,34 +324,34 @@ function HealthScoreResult({ result, onRetake }) {
             </Card>
 
             {/* Priority Recommendations */}
-            <Card className="border-3 border-brutal-black bg-brutal-yellow/10 shadow-brutal-lg">
+            <Card className="border border-clinical-border rounded-clinical-xl bg-clinical-primary-light/30 shadow-clinical-sm">
                 <CardHeader>
-                    <h3 className="font-display text-lg">
+                    <h3 className="font-display text-lg font-bold text-clinical-text">
                         ⚡ Prioritas Perbaikan
                     </h3>
                 </CardHeader>
                 <CardContent>
-                    <p className="font-body text-sm mb-4 font-bold">
+                    <p className="font-body text-sm font-semibold text-clinical-text mb-4">
                         Fokus pada 2 dimensi dengan skor terendah kamu:
                     </p>
                     {weakest.map((dim) => (
                         <div
                             key={dim.id}
-                            className="border-3 border-brutal-black bg-brutal-white p-3 mb-3 shadow-brutal-sm"
+                            className="bg-white border border-clinical-border rounded-clinical-lg p-3 mb-3 shadow-clinical-xs"
                         >
                             <div className="flex items-center gap-2 mb-1">
                                 <span className="text-xl">{dim.emoji}</span>
-                                <span className="font-display text-base">
+                                <span className="font-display text-base font-bold text-clinical-text">
                                     {dim.label}
                                 </span>
                                 <Badge
                                     variant="default"
-                                    className="ml-auto border-2 border-brutal-black rounded-none"
+                                    className="ml-auto rounded-full"
                                 >
                                     {dim.score}/100
                                 </Badge>
                             </div>
-                            <p className="text-xs font-body text-brutal-muted">
+                            <p className="text-xs font-body text-clinical-text-secondary">
                                 {dim.id === "sleep" &&
                                     "Tingkatkan konsistensi jam tidur. Targetkan 7-8 jam per malam dengan jadwal tetap."}
                                 {dim.id === "activity" &&
@@ -387,7 +375,7 @@ function HealthScoreResult({ result, onRetake }) {
                 <Button
                     variant="outline"
                     onClick={onRetake}
-                    className="w-full border-3 border-brutal-black shadow-brutal-sm"
+                    className="w-full"
                 >
                     <RotateCcw size={14} />
                     Tes Ulang
@@ -395,7 +383,7 @@ function HealthScoreResult({ result, onRetake }) {
                 <Button
                     variant="secondary"
                     onClick={handleShare}
-                    className="w-full border-3 border-brutal-black shadow-brutal-sm"
+                    className="w-full"
                 >
                     <Share2 size={14} />
                     Share Skor
@@ -405,11 +393,11 @@ function HealthScoreResult({ result, onRetake }) {
     );
 }
 
-// ── Main Assessment ──────────────────────────────────────
+// ── Main Assessment ──────────────────────────────────────────
 export default function HealthScoreAssessment() {
-    const [phase, setPhase] = useState("intro"); // intro | questions | result
-    const [dimIndex, setDimIndex] = useState(0); // current dimension
-    const [qIndex, setQIndex] = useState(0); // current question within dimension
+    const [phase, setPhase] = useState("intro");
+    const [dimIndex, setDimIndex] = useState(0);
+    const [qIndex, setQIndex] = useState(0);
     const [answers, setAnswers] = useState({});
     const [result, setResult] = useState(null);
 
@@ -454,7 +442,6 @@ export default function HealthScoreAssessment() {
                 setDimIndex(nextDimIndex);
                 setQIndex(0);
             } else {
-                // All done
                 const score = calculateHealthScore(answers);
                 setResult(score);
                 setPhase("result");
@@ -485,12 +472,12 @@ export default function HealthScoreAssessment() {
     if (phase === "intro") {
         return (
             <div className="animate-slide-up">
-                <div className="border-4 border-brutal-black bg-brutal-yellow shadow-brutal-xl p-8 mb-6 text-center">
+                <div className="clinical-gradient-hero rounded-clinical-2xl p-8 mb-6 text-center shadow-clinical-sm">
                     <p className="font-display text-6xl mb-4">🩺</p>
-                    <h2 className="font-display text-3xl mb-3">
+                    <h2 className="font-display text-3xl font-bold text-clinical-text mb-3">
                         Health Score Check
                     </h2>
-                    <p className="font-body text-brutal-black/80 max-w-md mx-auto mb-6">
+                    <p className="font-body text-clinical-text-secondary max-w-md mx-auto mb-6">
                         Jawab <strong>{totalQuestions} pertanyaan</strong>{" "}
                         tentang gaya hidupmu dan dapatkan skor kesehatan
                         personal dari <strong>6 dimensi</strong>. Estimasi
@@ -500,22 +487,22 @@ export default function HealthScoreAssessment() {
                         {DIMENSIONS.map((d) => (
                             <div
                                 key={d.id}
-                                className="border-3 border-brutal-black bg-brutal-white p-2.5 shadow-brutal-sm text-center"
+                                className="bg-white border border-clinical-border rounded-clinical-lg p-2.5 shadow-clinical-xs text-center"
                             >
                                 <span className="text-2xl block mb-1">
                                     {d.emoji}
                                 </span>
-                                <span className="font-body text-xs font-bold">
+                                <span className="font-body text-xs font-semibold text-clinical-text">
                                     {d.label}
                                 </span>
                             </div>
                         ))}
                     </div>
                     <Button
-                        variant="secondary"
+                        variant="default"
                         size="lg"
                         onClick={() => setPhase("questions")}
-                        className="w-full border-3 border-brutal-black shadow-brutal"
+                        className="w-full"
                     >
                         Mulai Sekarang →
                     </Button>
@@ -536,11 +523,11 @@ export default function HealthScoreAssessment() {
                 <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                         <span className="text-xl">{currentDim?.emoji}</span>
-                        <span className="font-display text-sm text-brutal-muted">
+                        <span className="font-display text-sm font-semibold text-clinical-text-secondary">
                             {currentDim?.label}
                         </span>
                     </div>
-                    <span className="font-mono text-xs font-bold text-brutal-muted">
+                    <span className="font-mono text-xs font-semibold text-clinical-muted">
                         {currentFlatIndex + 1} / {totalQuestions}
                     </span>
                 </div>
@@ -553,7 +540,7 @@ export default function HealthScoreAssessment() {
             </div>
 
             {/* Dimension tabs */}
-            <div className="flex gap-1 mb-5 overflow-x-auto pb-1 no-scrollbar">
+            <div className="flex gap-1.5 mb-5 overflow-x-auto pb-1 no-scrollbar">
                 {DIMENSIONS.map((d, i) => {
                     const dimComplete = d.questions.every(
                         (q) => answers[q.id] !== undefined,
@@ -562,12 +549,12 @@ export default function HealthScoreAssessment() {
                         <div
                             key={d.id}
                             className={cn(
-                                "shrink-0 px-3 py-1.5 border-2 border-brutal-black text-xs font-body font-bold transition-all",
+                                "shrink-0 px-3 py-1.5 rounded-full text-xs font-body font-semibold transition-all",
                                 i === dimIndex
-                                    ? "bg-brutal-black text-brutal-white"
+                                    ? "bg-clinical-primary text-white"
                                     : dimComplete
-                                        ? "bg-brutal-green text-brutal-white"
-                                        : "bg-brutal-gray text-brutal-muted",
+                                        ? "bg-clinical-success text-white"
+                                        : "bg-clinical-bg text-clinical-muted border border-clinical-border",
                             )}
                         >
                             {d.emoji} {d.label.split(" ")[0]}
@@ -577,15 +564,15 @@ export default function HealthScoreAssessment() {
             </div>
 
             {/* Question */}
-            <Card className="mb-5 border-3 border-brutal-black shadow-brutal-lg">
-                <CardHeader className="bg-brutal-gray">
-                    <p className="font-body text-xs font-bold uppercase tracking-wider text-brutal-muted">
+            <Card className="mb-5 border border-clinical-border rounded-clinical-xl shadow-clinical-md">
+                <CardHeader className="bg-clinical-bg">
+                    <p className="font-body text-xs font-semibold uppercase tracking-wider text-clinical-muted">
                         {currentDim?.label} — Pertanyaan {qIndex + 1} dari{" "}
                         {currentDim?.questions.length}
                     </p>
                 </CardHeader>
                 <CardContent className="p-5">
-                    <h3 className="font-display text-xl md:text-2xl mb-5 leading-tight">
+                    <h3 className="font-display text-xl md:text-2xl font-bold text-clinical-text mb-5 leading-tight">
                         {currentQ?.text}
                     </h3>
                     {currentQ && (
@@ -604,7 +591,6 @@ export default function HealthScoreAssessment() {
                     variant="outline"
                     onClick={handleBack}
                     disabled={dimIndex === 0 && qIndex === 0}
-                    className="border-3 border-brutal-black"
                 >
                     <ChevronLeft size={14} />
                     Kembali
@@ -613,7 +599,7 @@ export default function HealthScoreAssessment() {
                     variant={currentAnswer !== undefined ? "default" : "ghost"}
                     onClick={handleNext}
                     disabled={currentAnswer === undefined}
-                    className="flex-1 border-3 border-brutal-black shadow-brutal-sm"
+                    className="flex-1"
                 >
                     {currentFlatIndex === totalQuestions - 1
                         ? "Lihat Hasil"

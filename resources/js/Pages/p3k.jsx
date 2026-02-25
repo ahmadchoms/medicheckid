@@ -7,12 +7,12 @@ export default function P3KPage() {
         <PublicLayout>
             <Head title="Panduan P3K — MediCheck ID" />
 
-            <div className="py-8">
+            <div className="py-4">
                 <P3KGuide />
 
                 {/* Disclaimer */}
-                <div className="mt-8 border-t-3 border-brutal-gray pt-4">
-                    <p className="text-xs font-body text-brutal-muted">
+                <div className="mt-8 border-t border-clinical-border pt-4">
+                    <p className="text-xs font-body text-clinical-muted">
                         ⚠️ <strong>Disclaimer:</strong> Panduan pertolongan
                         pertama ini bersifat informatif berdasarkan standar PMI
                         dan WHO. Dalam keadaan darurat, selalu hubungi{" "}
