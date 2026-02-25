@@ -227,14 +227,16 @@ export default function Faskes({ facilities, filters, cities }) {
                             onClick={() => setIsCityOpen(!isCityOpen)}
                             className={cn(
                                 "w-64 px-4 py-2.5 border border-clinical-border rounded-clinical-md font-body text-xs font-semibold bg-white shadow-clinical-xs flex justify-between items-center transition-all",
-                                city && "bg-clinical-primary-light border-clinical-primary text-clinical-primary",
-                                isCityOpen && "border-clinical-primary ring-2 ring-clinical-primary/20",
+                                city &&
+                                    "bg-clinical-primary-light border-clinical-primary text-clinical-primary",
+                                isCityOpen &&
+                                    "border-clinical-primary ring-2 ring-clinical-primary/20",
                             )}
                         >
                             <span className="truncate">
                                 {city
                                     ? cities.find((c) => c.value === city)
-                                        ?.label
+                                          ?.label
                                     : "Semua Wilayah"}
                             </span>
                             <ChevronDown
@@ -291,7 +293,7 @@ export default function Faskes({ facilities, filters, cities }) {
                                                 className={cn(
                                                     "w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-clinical-primary-light hover:text-clinical-primary transition-colors",
                                                     city === c.value &&
-                                                    "bg-clinical-primary text-white",
+                                                        "bg-clinical-primary text-white",
                                                 )}
                                             >
                                                 {c.label}
@@ -313,7 +315,8 @@ export default function Faskes({ facilities, filters, cities }) {
                         onChange={(e) => setType(e.target.value)}
                         className={cn(
                             "px-4 py-2.5 border border-clinical-border rounded-clinical-md font-body text-xs font-semibold bg-white shadow-clinical-xs appearance-none cursor-pointer",
-                            type && "bg-clinical-primary-light border-clinical-primary text-clinical-primary",
+                            type &&
+                                "bg-clinical-primary-light border-clinical-primary text-clinical-primary",
                         )}
                     >
                         <option value="">Semua Jenis</option>

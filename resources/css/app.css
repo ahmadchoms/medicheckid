@@ -3,6 +3,15 @@
    ═══════════════════════════════════════════════════════════ */
 
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../**/*.jsx';
 
 /* ── Google Fonts ─────────────────────────────────────────── */
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap");
@@ -15,43 +24,52 @@
     --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
     /* Color Palette — Clinical Blues & Neutrals */
-    --color-clinical-white: #FFFFFF;
-    --color-clinical-bg: #F8FAFC;
-    --color-clinical-surface: #FFFFFF;
-    --color-clinical-border: #E2E8F0;
-    --color-clinical-border-strong: #CBD5E1;
-    --color-clinical-text: #0F172A;
+    --color-clinical-white: #ffffff;
+    --color-clinical-bg: #f8fafc;
+    --color-clinical-surface: #ffffff;
+    --color-clinical-border: #e2e8f0;
+    --color-clinical-border-strong: #cbd5e1;
+    --color-clinical-text: #0f172a;
     --color-clinical-text-secondary: #475569;
-    --color-clinical-muted: #94A3B8;
+    --color-clinical-muted: #94a3b8;
 
     /* Primary — Medical Blue */
-    --color-clinical-primary: #2563EB;
-    --color-clinical-primary-light: #DBEAFE;
-    --color-clinical-primary-dark: #1D4ED8;
-    --color-clinical-primary-hover: #1E40AF;
+    --color-clinical-primary: #2563eb;
+    --color-clinical-primary-light: #dbeafe;
+    --color-clinical-primary-dark: #1d4ed8;
+    --color-clinical-primary-hover: #1e40af;
 
     /* Accent — Teal/Green for health */
-    --color-clinical-accent: #0D9488;
-    --color-clinical-accent-light: #CCFBF1;
-    --color-clinical-accent-dark: #0F766E;
+    --color-clinical-accent: #0d9488;
+    --color-clinical-accent-light: #ccfbf1;
+    --color-clinical-accent-dark: #0f766e;
 
     /* Semantic Colors */
-    --color-clinical-success: #16A34A;
-    --color-clinical-success-light: #DCFCE7;
-    --color-clinical-warning: #F59E0B;
-    --color-clinical-warning-light: #FEF3C7;
-    --color-clinical-danger: #DC2626;
-    --color-clinical-danger-light: #FEE2E2;
-    --color-clinical-info: #2563EB;
-    --color-clinical-info-light: #DBEAFE;
+    --color-clinical-success: #16a34a;
+    --color-clinical-success-light: #dcfce7;
+    --color-clinical-warning: #f59e0b;
+    --color-clinical-warning-light: #fef3c7;
+    --color-clinical-danger: #dc2626;
+    --color-clinical-danger-light: #fee2e2;
+    --color-clinical-info: #2563eb;
+    --color-clinical-info-light: #dbeafe;
 
     /* Shadows — Soft & Layered */
     --shadow-clinical-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
-    --shadow-clinical-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
-    --shadow-clinical: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
-    --shadow-clinical-md: 0 6px 12px -2px rgba(15, 23, 42, 0.08), 0 3px 7px -3px rgba(15, 23, 42, 0.05);
-    --shadow-clinical-lg: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.06);
-    --shadow-clinical-xl: 0 20px 40px -8px rgba(15, 23, 42, 0.12), 0 8px 16px -6px rgba(15, 23, 42, 0.06);
+    --shadow-clinical-sm:
+        0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow-clinical:
+        0 4px 6px -1px rgba(15, 23, 42, 0.07),
+        0 2px 4px -2px rgba(15, 23, 42, 0.05);
+    --shadow-clinical-md:
+        0 6px 12px -2px rgba(15, 23, 42, 0.08),
+        0 3px 7px -3px rgba(15, 23, 42, 0.05);
+    --shadow-clinical-lg:
+        0 10px 25px -5px rgba(15, 23, 42, 0.1),
+        0 8px 10px -6px rgba(15, 23, 42, 0.06);
+    --shadow-clinical-xl:
+        0 20px 40px -8px rgba(15, 23, 42, 0.12),
+        0 8px 16px -6px rgba(15, 23, 42, 0.06);
     --shadow-clinical-glow: 0 0 20px rgba(37, 99, 235, 0.15);
 
     /* Border Radius */
@@ -73,28 +91,54 @@
 
 /* ── Keyframes ────────────────────────────────────────────── */
 @keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes slide-up {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes slide-in {
-    from { opacity: 0; transform: translateX(-12px); }
-    to { opacity: 1; transform: translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateX(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 @keyframes pulse-soft {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-6px); }
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
 }
 
 /* ── Base / Reset ─────────────────────────────────────────── */
@@ -118,7 +162,9 @@ body {
     border: 1px solid var(--color-clinical-border);
     border-radius: var(--radius-clinical-lg);
     box-shadow: var(--shadow-clinical-sm);
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    transition:
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
 }
 
 .clinical-card:hover {
@@ -210,7 +256,7 @@ body {
 
 .clinical-badge-yellow {
     background: var(--color-clinical-warning-light);
-    color: #92400E;
+    color: #92400e;
 }
 
 .clinical-badge-red {
@@ -228,7 +274,9 @@ body {
     border-radius: var(--radius-clinical-md);
     background: var(--color-clinical-surface);
     color: var(--color-clinical-text);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
     outline: none;
 }
 
@@ -263,12 +311,24 @@ body {
 }
 
 /* Scrollbar */
-.custom-scrollbar::-webkit-scrollbar { width: 6px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: var(--color-clinical-bg); }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: var(--color-clinical-border-strong); border-radius: 6px; }
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--color-clinical-bg);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--color-clinical-border-strong);
+    border-radius: 6px;
+}
 
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
 
 /* ── Glass Effect (for overlays) ──────────────────────────── */
 .clinical-glass {
@@ -279,13 +339,21 @@ body {
 
 /* ── Gradient Backgrounds ─────────────────────────────────── */
 .clinical-gradient-primary {
-    background: linear-gradient(135deg, var(--color-clinical-primary) 0%, #3B82F6 100%);
+    background: linear-gradient(
+        135deg,
+        var(--color-clinical-primary) 0%,
+        #3b82f6 100%
+    );
 }
 
 .clinical-gradient-accent {
-    background: linear-gradient(135deg, var(--color-clinical-accent) 0%, #14B8A6 100%);
+    background: linear-gradient(
+        135deg,
+        var(--color-clinical-accent) 0%,
+        #14b8a6 100%
+    );
 }
 
 .clinical-gradient-hero {
-    background: linear-gradient(135deg, #DBEAFE 0%, #CCFBF1 50%, #F0FDF4 100%);
+    background: linear-gradient(135deg, #dbeafe 0%, #ccfbf1 50%, #f0fdf4 100%);
 }
