@@ -168,6 +168,12 @@ const NAV_LINKS = [
         icon: BookOpen,
         emoji: "📊",
     },
+    {
+        href: "/health-insight",
+        label: "Health Insight",
+        icon: Info,
+        emoji: "📚",
+    },
     { href: "/p3k", label: "P3K", icon: AlertTriangle, emoji: "🚨" },
     {
         href: "/fasilitas-kesehatan",
