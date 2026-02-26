@@ -21,3 +21,7 @@ Route::get('/p3k', function () {
 });
 
 Route::get('/fasilitas-kesehatan', [HealthFacilityController::class, 'index'])->name('faskes.index');
+
+Route::get('/admin/epidemiology', function () {
+    return Inertia::render('admin-epidemiology');
+})->name('admin.epidemiology');

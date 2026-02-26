@@ -8,11 +8,155 @@ import {
     MapPin,
     AlertTriangle,
     Home,
-    Phone,
     Menu,
     X,
     Heart,
+    PhoneCall,
+    Info,
+    Phone,
 } from "lucide-react";
+
+// ─── Panic Mode ──────────────────────────────────────────────
+function PanicMode() {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <>
+            {/* Floating Panic Button */}
+            <motion.button
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsOpen(true)}
+                className="fixed bottom-24 left-4 md:bottom-8 md:left-8 z-50 w-16 h-16 md:w-20 md:h-20 bg-clinical-danger rounded-full shadow-clinical-lg shadow-clinical-danger/30 flex flex-col items-center justify-center border-[3px] border-white text-white group"
+            >
+                <div className="absolute inset-0 rounded-full animate-ping bg-clinical-danger/40" />
+                <AlertTriangle className="w-7 h-7 md:w-8 md:h-8 mb-0.5 group-hover:scale-110 transition-transform" />
+                <span className="font-display font-bold text-[10px] md:text-xs tracking-wider">
+                    PANIC
+                </span>
+            </motion.button>
+
+            {/* Fullscreen Overlay */}
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[9999] bg-clinical-danger flex flex-col items-center justify-center p-6 text-white overflow-y-auto"
+                    >
+                        <button
+                            onClick={() => setIsOpen(false)}
+                            className="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors backdrop-blur-md"
+                        >
+                            <X size={28} />
+                        </button>
+
+                        <div className="text-center mb-8 mt-12 w-full max-w-xl">
+                            <h2 className="font-display text-2xl md:text-3xl font-bold mb-2 uppercase tracking-widest text-white/90">
+                                DARURAT MEDIS
+                            </h2>
+                            <p className="font-body text-base md:text-lg opacity-90 mb-6">
+                                Segera hubungi ambulans / layanan gawat darurat:
+                            </p>
+
+                            <a
+                                href="tel:119"
+                                className="inline-flex items-center justify-center gap-4 bg-white text-clinical-danger w-full py-6 rounded-clinical-2xl shadow-clinical-xl hover:scale-[1.02] active:scale-[0.98] transition-all mb-8"
+                            >
+                                <PhoneCall className="w-10 h-10 md:w-12 md:h-12 animate-pulse" />
+                                <span className="font-display text-5xl md:text-7xl font-black tracking-tight">
+                                    119
+                                </span>
+                            </a>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                                <div className="bg-black/20 backdrop-blur-sm p-5 rounded-clinical-xl border border-white/20">
+                                    <h3 className="font-display text-lg font-bold flex items-center gap-2 mb-3 text-white">
+                                        <Activity size={18} /> Panduan CPR RJP
+                                    </h3>
+                                    <ul className="space-y-2 font-body text-xs md:text-sm text-white/90">
+                                        <li className="flex gap-2">
+                                            <span>1.</span>
+                                            <span>
+                                                Pastikan lingkungan aman, cek
+                                                respon korban.
+                                            </span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span>2.</span>
+                                            <span>
+                                                Minta orang lain menelepon 119.
+                                            </span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span>3.</span>
+                                            <span>
+                                                Letakkan pangkal telapak tangan
+                                                di tengah dada.
+                                            </span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span>4.</span>
+                                            <span>
+                                                Tekan keras dan cepat
+                                                (100-120x/menit, kedalaman 5cm).
+                                            </span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span>5.</span>
+                                            <span>
+                                                Jangan berhenti sampai bantuan
+                                                datang.
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div className="bg-black/20 backdrop-blur-sm p-5 rounded-clinical-xl border border-white/20">
+                                    <h3 className="font-display text-lg font-bold flex items-center gap-2 mb-3 text-white">
+                                        <Info size={18} /> Tersedak (Heimlich)
+                                    </h3>
+                                    <ul className="space-y-2 font-body text-xs md:text-sm text-white/90">
+                                        <li className="flex gap-2">
+                                            <span>1.</span>
+                                            <span>
+                                                Berdirilah di belakang korban
+                                                yang tersedak.
+                                            </span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span>2.</span>
+                                            <span>
+                                                Lingkarkan tangan ke perut
+                                                koban.
+                                            </span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span>3.</span>
+                                            <span>
+                                                Kepalkan satu tangan di atas
+                                                pusar.
+                                            </span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span>4.</span>
+                                            <span>
+                                                Tarik kepalan tangan ke dalam
+                                                dan ke atas dengan kuat.
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </>
+    );
+}
 
 // ─── Navigation Data ─────────────────────────────────────────
 const NAV_LINKS = [
@@ -430,6 +574,7 @@ export default function PublicLayout({ children, fullWidth = false }) {
                 </motion.div>
             </main>
 
+            <PanicMode />
             <Footer />
             <BottomNav />
         </div>

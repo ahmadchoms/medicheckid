@@ -263,3 +263,66 @@ export function getWeakestDimensions(dimensionScores, n = 2) {
         .sort((a, b) => a.score - b.score)
         .slice(0, n);
 }
+
+/**
+ * Generate 3 micro-habits based on weakest dimensions.
+ */
+export function generateDailyHabits(weakestDimensions) {
+    const habitBank = {
+        sleep: [
+            "Tidur 30 menit lebih awal malam ini",
+            "Hindari layar HP 1 jam sebelum tidur",
+            "Lakukan rutinitas relaksasi 10 menit sebelum tidur (misal membaca)",
+        ],
+        activity: [
+            "Jalan kaki 15 menit setelah makan siang/malam",
+            "Lakukan peregangan peregangan ringan 5 menit",
+            "Pilih naik tangga daripada lift/eskalator hari ini",
+        ],
+        nutrition: [
+            "Tambahkan 1 porsi sayuran di makan siang/malam",
+            "Ganti camilan manis dengan buah segar",
+            "Tuliskan apa saja yang kamu makan hari ini (Food Journaling)",
+        ],
+        hydration: [
+            "Minum 1 gelas air putih segera setelah bangun tidur",
+            "Bawa botol minum penuh 1.5L dan habiskan sebelum jam 5 sore",
+            "Minum 1 gelas air setiap kali sebelum makan",
+        ],
+        stress: [
+            "Lakukan meditasi pernapasan 4-7-8 selama 3 menit",
+            "Tuliskan 3 hal kecil yang kamu syukuri hari ini",
+            "Jauhkan HP selama 30 menit saat istirahat siang",
+        ],
+        social: [
+            "Telepon atau chat orang tersayang minimal 5 menit",
+            "Ucapkan terima kasih pada 1 orang yang membantu kamu hari ini",
+            "Senyum dan sapa orang di sekitarmu (tetangga/rekan kerja)",
+        ],
+    };
+
+    let habits = [];
+    if (weakestDimensions.length > 0) {
+        // Ambil 2 habit dari dimensi terlemah pertama
+        const firstDimId = weakestDimensions[0]?.id;
+        if (firstDimId && habitBank[firstDimId]) {
+            habits.push({ id: `h1_${firstDimId}`, text: habitBank[firstDimId][0], done: false });
+            habits.push({ id: `h2_${firstDimId}`, text: habitBank[firstDimId][1], done: false });
+        }
+    }
+    
+    if (weakestDimensions.length > 1) {
+        // Ambil 1 habit dari dimensi terlemah kedua
+        const secondDimId = weakestDimensions[1]?.id;
+        if (secondDimId && habitBank[secondDimId]) {
+            habits.push({ id: `h3_${secondDimId}`, text: habitBank[secondDimId][0], done: false });
+        }
+    }
+
+    // Fallback jika kurang dari 3
+    if (habits.length < 3) {
+        habits.push({ id: "h_extra", text: "Minum 8 gelas air hari ini", done: false });
+    }
+
+    return habits.slice(0, 3);
+}

@@ -16,7 +16,19 @@ class HealthFacilityController extends Controller
         $query = HealthFacility::query()->with('regency');
 
         if ($request->filled('search')) {
-            $query->where('unit_kerja', 'like', '%' . $request->search . '%');
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                // 1. Exact LIKE match (prioritas utama)
+                $q->where('unit_kerja', 'like', '%' . $searchTerm . '%');
+                
+                // 2. SOUNDEX match untuk toleransi typo
+                $words = preg_split('/\s+/', $searchTerm);
+                foreach ($words as $word) {
+                    if (strlen($word) >= 3) {
+                        $q->orWhereRaw('SOUNDEX(unit_kerja) = SOUNDEX(?)', [$word]);
+                    }
+                }
+            });
         }
 
         if ($request->filled('type')) {

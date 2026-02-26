@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import {
     ChevronLeft,
@@ -13,6 +13,8 @@ import {
     Send,
     MessageSquare,
     ListChecks,
+    Mic,
+    MicOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SYMPTOM_AREAS, SYMPTOM_TREE } from "@/lib/symptomTree";
@@ -104,9 +106,108 @@ function QuestionCard({ node, onAnswer, stepIndex, isLoading }) {
 }
 
 // ── AI Prompt Card (Mode Cerita) ─────────────────────────
-function AIPromptCard({ areaId, onAnalyze, isLoading }) {
+function AIPromptCard({ areaId, onAnalyze, isLoading, contextPath = [] }) {
     const [symptomDesc, setSymptomDesc] = useState("");
+    const [isListening, setIsListening] = useState(false);
+    const recognitionRef = useRef(null);
     const area = SYMPTOM_AREAS[areaId];
+
+    // Context-Aware Switching: Isi textarea dengan history path jika ada
+    useEffect(() => {
+        if (contextPath.length > 0 && !symptomDesc) {
+            const ctx = `Saya sebelumnya menjawab: ${contextPath.join(" → ")}. `;
+            setSymptomDesc(ctx);
+        }
+    }, [contextPath]);
+
+    // Setup Web Speech API (Voice-to-Text)
+    useEffect(() => {
+        if (
+            "webkitSpeechRecognition" in window ||
+            "SpeechRecognition" in window
+        ) {
+            const SpeechRecognition =
+                window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = "id-ID"; // Deteksi bahasa Indonesia / daerah
+
+            recognition.onresult = (event) => {
+                let currentTranscript = "";
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    currentTranscript += event.results[i][0].transcript;
+                }
+
+                // Tambahkan spasi jika sebelumnya sudah ada teks
+                setSymptomDesc((prev) => {
+                    const separator =
+                        prev.length > 0 && !prev.endsWith(" ") ? " " : "";
+                    // Jangan re-append seluruh transcript, hanya yang final atau biarkan user melihat interimnya
+                    // Untuk kesederhanaan, kita ambil hasil akhir per sequence lalu append
+                    return prev + separator + currentTranscript;
+                });
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Speech recognition error", event.error);
+                setIsListening(false);
+                toast.error(
+                    "Gagal mendengarkan suara. Pastikan izin mikrofon diberikan.",
+                );
+            };
+
+            recognition.onend = () => {
+                setIsListening(false);
+            };
+
+            recognitionRef.current = recognition;
+        }
+    }, []);
+
+    const toggleListening = () => {
+        if (!recognitionRef.current) {
+            toast.error(
+                "Browser Anda tidak mendukung fitur suara (Gunakan Chrome/Edge).",
+            );
+            return;
+        }
+
+        if (isListening) {
+            recognitionRef.current.stop();
+        } else {
+            // Karena kita append otomatis, kita simpan versi terakhir untuk ditambahkan
+            const currentDesc = symptomDesc;
+
+            // Rekonfigurasi onresult agar tidak dobel
+            recognitionRef.current.onresult = (event) => {
+                let interimTranscript = "";
+                let finalTranscript = "";
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript + " ";
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+
+                // Append ke text yang sudah ada sebelum mulai rekaman ini
+                const newText = (
+                    currentDesc +
+                    (currentDesc && !currentDesc.endsWith(" ") ? " " : "") +
+                    finalTranscript +
+                    interimTranscript
+                ).trim();
+                setSymptomDesc(newText);
+            };
+
+            recognitionRef.current.start();
+            setIsListening(true);
+            toast.info("Mendengarkan... Silakan bicara.");
+        }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -143,13 +244,39 @@ function AIPromptCard({ areaId, onAnalyze, isLoading }) {
                         onSubmit={handleSubmit}
                         className="flex flex-col gap-4"
                     >
-                        <textarea
-                            className="w-full min-h-[120px] p-4 border border-clinical-border rounded-clinical-md font-body text-sm resize-y focus:outline-none focus:border-clinical-primary focus:ring-2 focus:ring-clinical-primary/20 transition-all"
-                            placeholder="Contoh: Saya merasa sakit kepala sebelah kiri berdenyut sejak kemarin sore..."
-                            value={symptomDesc}
-                            onChange={(e) => setSymptomDesc(e.target.value)}
-                            disabled={isLoading}
-                        />
+                        <div className="relative">
+                            <textarea
+                                className="w-full min-h-[140px] pl-4 pr-12 py-4 border border-clinical-border rounded-clinical-md font-body text-sm resize-y focus:outline-none focus:border-clinical-primary focus:ring-2 focus:ring-clinical-primary/20 transition-all"
+                                placeholder="Contoh: Saya merasa sakit kepala sebelah kiri berdenyut sejak kemarin sore..."
+                                value={symptomDesc}
+                                onChange={(e) => setSymptomDesc(e.target.value)}
+                                disabled={isLoading}
+                            />
+
+                            {/* Voice-to-Text Button */}
+                            <button
+                                type="button"
+                                onClick={toggleListening}
+                                disabled={isLoading}
+                                className={cn(
+                                    "absolute top-4 right-4 p-2 rounded-full transition-all",
+                                    isListening
+                                        ? "bg-clinical-danger text-white animate-pulse shadow-clinical-sm shadow-clinical-danger/30"
+                                        : "bg-clinical-bg text-clinical-muted hover:bg-clinical-primary-light hover:text-clinical-primary",
+                                )}
+                                title={
+                                    isListening
+                                        ? "Hentikan mendengarkan"
+                                        : "Mulai bicara"
+                                }
+                            >
+                                {isListening ? (
+                                    <Mic size={18} />
+                                ) : (
+                                    <MicOff size={18} />
+                                )}
+                            </button>
+                        </div>
                         <Button
                             type="submit"
                             disabled={isLoading}
@@ -219,6 +346,30 @@ function ResultCard({ result, userQuery, onReset, pathArr }) {
         window.print();
         toast.success("Membuka dialog cetak...");
     };
+
+    // Export to WhatsApp feature
+    const handleExportWA = () => {
+        const conditions = result.conditions?.join(", ") || "Tidak diketahui";
+        const urgency = result.urgency || "low";
+        const homeCare = result.homeCare?.slice(0, 3).join(", ") || "-";
+
+        let urgencyText = "Rendah 🟢";
+        if (urgency === "moderate") urgencyText = "Sedang 🟡";
+        if (urgency === "high") urgencyText = "Tinggi 🟠";
+        if (urgency === "emergency") urgencyText = "DARURAT 🔴";
+
+        const msg =
+            `Halo, saya baru cek gejala di *MediCheck ID*.\n\n` +
+            `🩺 *Gejala:* ${userQuery || (pathArr && pathArr.join(" → ")) || "Tidak dituliskan"}\n` +
+            `🤔 *Kemungkinan:* ${conditions}\n` +
+            `⚠️ *Urgensi:* ${urgencyText}\n` +
+            `🏠 *Tindakan:* ${homeCare}\n\n` +
+            `_(Ini adalah estimasi AI, bukan diagnosis medis)_`;
+
+        const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+        window.open(waUrl, "_blank", "noopener,noreferrer");
+    };
+
     const handleShare = async () => {
         const text = `Hasil Cek Gejala:\n${result.conditions?.join(", ")}\nUrgency: ${result.urgency}`;
         if (navigator.share)
@@ -418,15 +569,15 @@ function ResultCard({ result, userQuery, onReset, pathArr }) {
                     onClick={handlePrint}
                     className="w-full no-print"
                 >
-                    <Printer size={14} className="mr-2" /> Cetak
+                    <Printer size={14} className="mr-2" /> Cetak Hasil
                 </Button>
             </div>
             <Button
-                variant="secondary"
-                onClick={handleShare}
-                className="w-full no-print"
+                variant="outline"
+                onClick={handleExportWA}
+                className="w-full mt-3 border-clinical-success text-clinical-success hover:bg-clinical-success hover:text-white transition-colors"
             >
-                <Share2 size={14} className="mr-2" /> Bagikan Ringkasan
+                <Share2 size={14} className="mr-2" /> Beri Tahu Keluarga
             </Button>
 
             {!isEmergency && (
@@ -489,6 +640,7 @@ export default function SymptomChecker({ mode }) {
         onSuccess: (data) => {
             setResult(data);
             toast.success("Analisis selesai!");
+            saveEpidemiologyLog(data);
         },
         onError: (error) => {
             const msg =
@@ -499,6 +651,45 @@ export default function SymptomChecker({ mode }) {
     });
 
     const isLoading = analysisMutation.isPending;
+
+    // Simpan ke logger Epidemiologi secara diam-diam (background)
+    const saveEpidemiologyLog = (analysisResult) => {
+        const logData = {
+            symptoms_summary: userQuery || path.join(" -> "),
+            conditions: analysisResult.conditions?.join(", "),
+            urgency: analysisResult.urgency,
+        };
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    logData.latitude = position.coords.latitude;
+                    logData.longitude = position.coords.longitude;
+                    axios
+                        .post("/api/epidemiology/log", logData)
+                        .catch((e) =>
+                            console.error("Gagal simpan log geoloc", e),
+                        );
+                },
+                (error) => {
+                    console.warn("Geolokasi ditolak atau gagal:", error);
+                    // tetap simpan tanpa lokasi spesifik
+                    axios
+                        .post("/api/epidemiology/log", logData)
+                        .catch((e) =>
+                            console.error("Gagal simpan log non-geoloc", e),
+                        );
+                },
+                { enableHighAccuracy: false, timeout: 5000 },
+            );
+        } else {
+            axios
+                .post("/api/epidemiology/log", logData)
+                .catch((e) =>
+                    console.error("Gagal simpan log (Browser no geoloc)", e),
+                );
+        }
+    };
 
     // Area selection handler
     const handleAreaSelect = (id) => {
@@ -665,6 +856,7 @@ export default function SymptomChecker({ mode }) {
                     areaId={areaId}
                     onAnalyze={(text) => handleAnalyze(text, false)}
                     isLoading={isLoading}
+                    contextPath={path}
                 />
             )}
 

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ChevronLeft, ChevronRight, RotateCcw, Share2 } from "lucide-react";
 import {
     Radar,
@@ -14,6 +14,7 @@ import {
     calculateHealthScore,
     getScoreGrade,
     getWeakestDimensions,
+    generateDailyHabits,
 } from "@/lib/healthScore";
 import { storage } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -205,6 +206,24 @@ function HealthScoreResult({ result, onRetake }) {
     const grade = getScoreGrade(result.aggregate);
     const weakest = getWeakestDimensions(result.dimensions, 2);
 
+    // State untuk Micro-Habit Tracker
+    const [habits, setHabits] = useState(() => {
+        const dateKey = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        const saved = storage.get(`medicheck_habits_${dateKey}`);
+        if (saved) return saved;
+        return generateDailyHabits(weakest);
+    });
+
+    // Auto-save habits ketika dicentang
+    const toggleHabit = (id) => {
+        const newHabits = habits.map(h => h.id === id ? { ...h, done: !h.done } : h);
+        setHabits(newHabits);
+
+        const dateKey = new Date().toISOString().split('T')[0];
+        storage.set(`medicheck_habits_${dateKey}`, newHabits);
+        toast.success(newHabits.find(h => h.id === id)?.done ? "Misi selesai! 🎉" : "Misi dibatalkan.");
+    };
+
     const gradeColors = {
         green: { bg: "bg-clinical-success", text: "text-white" },
         blue: { bg: "bg-clinical-primary", text: "text-white" },
@@ -370,6 +389,48 @@ function HealthScoreResult({ result, onRetake }) {
                 </CardContent>
             </Card>
 
+            {/* Micro-Habit Tracker */}
+            <Card className="border border-clinical-border rounded-clinical-xl shadow-clinical-sm bg-gradient-to-br from-white to-clinical-success-light/30">
+                <CardHeader className="pb-3 border-b border-clinical-border">
+                    <div className="flex justify-between items-center">
+                        <h3 className="font-display text-lg font-bold text-clinical-text flex items-center gap-2">
+                            <span>🌱</span> Misi Harian Kamu
+                        </h3>
+                        <span className="text-xs font-semibold bg-clinical-success text-white px-2 py-0.5 rounded-full">
+                            {habits.filter(h => h.done).length}/3 Selesai
+                        </span>
+                    </div>
+                    <p className="font-body text-xs text-clinical-text-secondary mt-1">
+                        Dibuat khusus (AI) berdasarkan dimensi terlemahmu
+                    </p>
+                </CardHeader>
+                <CardContent className="pt-4">
+                    <div className="space-y-3">
+                        {habits.map(habit => (
+                            <label key={habit.id} className={cn(
+                                "flex items-start gap-3 p-3 rounded-clinical-lg border cursor-pointer transition-all",
+                                habit.done ? "bg-clinical-success/10 border-clinical-success text-clinical-success line-through opacity-70" : "bg-white border-clinical-border hover:border-clinical-primary shadow-clinical-xs"
+                            )}>
+                                <div className="mt-0.5 shrink-0">
+                                    <input
+                                        type="checkbox"
+                                        className="w-5 h-5 rounded border-clinical-border text-clinical-primary focus:ring-clinical-primary cursor-pointer"
+                                        checked={habit.done}
+                                        onChange={() => toggleHabit(habit.id)}
+                                    />
+                                </div>
+                                <span className={cn(
+                                    "font-body text-sm font-medium",
+                                    habit.done ? "text-clinical-success/70" : "text-clinical-text"
+                                )}>
+                                    {habit.text}
+                                </span>
+                            </label>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
+
             {/* Actions */}
             <div className="grid grid-cols-2 gap-3">
                 <Button
@@ -395,11 +456,32 @@ function HealthScoreResult({ result, onRetake }) {
 
 // ── Main Assessment ──────────────────────────────────────────
 export default function HealthScoreAssessment() {
-    const [phase, setPhase] = useState("intro");
-    const [dimIndex, setDimIndex] = useState(0);
-    const [qIndex, setQIndex] = useState(0);
-    const [answers, setAnswers] = useState({});
+    // Muat progres tersimpan dari localStorage jika ada
+    const [phase, setPhase] = useState(() => {
+        const saved = storage.get("medicheck_hs_progress");
+        return saved ? saved.phase : "intro";
+    });
+    const [dimIndex, setDimIndex] = useState(() => {
+        const saved = storage.get("medicheck_hs_progress");
+        return saved ? saved.dimIndex : 0;
+    });
+    const [qIndex, setQIndex] = useState(() => {
+        const saved = storage.get("medicheck_hs_progress");
+        return saved ? saved.qIndex : 0;
+    });
+    const [answers, setAnswers] = useState(() => {
+        const saved = storage.get("medicheck_hs_progress");
+        return saved ? saved.answers : {};
+    });
     const [result, setResult] = useState(null);
+
+    // Auto-save efek
+    useEffect(() => {
+        if (phase === "questions" || phase === "intro") {
+            // Jangan save hasil (result) agar bisa re-take
+            storage.set("medicheck_hs_progress", { phase, dimIndex, qIndex, answers });
+        }
+    }, [phase, dimIndex, qIndex, answers]);
 
     const allQuestions = useMemo(
         () =>
@@ -467,9 +549,28 @@ export default function HealthScoreAssessment() {
         setQIndex(0);
         setAnswers({});
         setResult(null);
+        storage.remove("medicheck_hs_progress");
     };
 
+    const handleContinue = () => {
+        if (Object.keys(answers).length > 0) {
+            setPhase("questions");
+        } else {
+            setPhase("questions");
+        }
+    };
+
+    const handleStartNew = () => {
+        setDimIndex(0);
+        setQIndex(0);
+        setAnswers({});
+        setPhase("questions");
+        storage.remove("medicheck_hs_progress");
+    }
+
     if (phase === "intro") {
+        const hasSavedProgress = Object.keys(answers).length > 0;
+
         return (
             <div className="animate-slide-up">
                 <div className="clinical-gradient-hero rounded-clinical-2xl p-8 mb-6 text-center shadow-clinical-sm">
@@ -498,14 +599,35 @@ export default function HealthScoreAssessment() {
                             </div>
                         ))}
                     </div>
-                    <Button
-                        variant="default"
-                        size="lg"
-                        onClick={() => setPhase("questions")}
-                        className="w-full"
-                    >
-                        Mulai Sekarang →
-                    </Button>
+                    {hasSavedProgress ? (
+                        <div className="flex gap-3">
+                            <Button
+                                variant="outline"
+                                size="lg"
+                                onClick={handleStartNew}
+                                className="w-1/3"
+                            >
+                                Ulang Baru
+                            </Button>
+                            <Button
+                                variant="default"
+                                size="lg"
+                                onClick={handleContinue}
+                                className="w-2/3"
+                            >
+                                Lanjut Progres →
+                            </Button>
+                        </div>
+                    ) : (
+                        <Button
+                            variant="default"
+                            size="lg"
+                            onClick={() => setPhase("questions")}
+                            className="w-full"
+                        >
+                            Mulai Sekarang →
+                        </Button>
+                    )}
                 </div>
             </div>
         );
