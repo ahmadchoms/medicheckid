@@ -27,12 +27,6 @@ Route::get('/admin/epidemiology', function () {
     return Inertia::render('admin-epidemiology');
 })->name('admin.epidemiology');
 
-// Route untuk render halaman (di web.php)
 Route::get('/health-insight', function () {
     return Inertia::render('health-insight');
-})->name('health-insight.index');
-
-// Routes untuk API (bisa di web.php atau api.php)
-Route::post('/health-insight/lab', [HealthInsightController::class, 'analyzeLab']);
-Route::post('/health-insight/doc', [HealthInsightController::class, 'simplifyDoc']);
-Route::post('/health-insight/term', [HealthInsightController::class, 'explainTerm']);
+});

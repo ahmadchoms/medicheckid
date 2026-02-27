@@ -1,12 +1,12 @@
 import { useState, useRef } from "react";
 import { Head } from "@inertiajs/react";
 import axios from "axios";
+import { toast } from "sonner";
 import {
     Activity,
     FileText,
     ArrowRight,
     AlertTriangle,
-    Sparkles,
     Loader2,
     Info,
     FlaskConical,
@@ -14,9 +14,15 @@ import {
     X,
     CheckCircle2,
     XCircle,
+    Trash2,
+    Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PublicLayout from "@/components/layouts/public-layout";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 const MODES = [
     {
@@ -65,32 +71,204 @@ const HighlightedText = ({ text, terms, onTermClick }) => {
     );
 };
 
+const AnalysisResult = ({ result, handleTermClick }) => {
+    return (
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+            <div className="bg-clinical-warning-light/50 border border-clinical-warning/20 rounded-clinical-lg p-5 flex gap-3">
+                <AlertTriangle className="w-6 h-6 text-clinical-warning shrink-0" />
+                <p className="font-body text-sm font-medium text-clinical-text-secondary leading-relaxed">
+                    {result.data.disclaimer}
+                </p>
+            </div>
+
+            <div>
+                {result.data.document_type && (
+                    <span className="inline-block px-4 py-1.5 bg-clinical-primary-light text-clinical-primary font-bold text-xs rounded-full uppercase tracking-wider mb-4">
+                        {result.data.document_type}
+                    </span>
+                )}
+                <h3 className="font-display text-2xl font-bold text-clinical-text mb-3">
+                    Ringkasan Analisis
+                </h3>
+                <p className="font-body text-base text-clinical-text-secondary leading-relaxed">
+                    <HighlightedText
+                        text={result.data.summary}
+                        terms={result.data.identified_terms}
+                        onTermClick={handleTermClick}
+                    />
+                </p>
+            </div>
+
+            {/* Indikator dari Upload Dokumen */}
+            {result.type === "doc" && result.data.indicators?.length > 0 && (
+                <div>
+                    <h3 className="font-display text-xl font-bold text-clinical-text mb-4">
+                        Rincian Indikator
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {result.data.indicators.map((ind, idx) => {
+                            const isNormal =
+                                ind.status?.toLowerCase() === "normal";
+                            return (
+                                <div
+                                    key={idx}
+                                    className="bg-white p-5 rounded-clinical-lg border border-clinical-border shadow-clinical-xs"
+                                >
+                                    <div className="flex flex-col gap-2 mb-3 pb-3 border-b border-clinical-border/50">
+                                        <span className="font-display font-bold text-clinical-text text-lg">
+                                            {ind.nama}
+                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-body text-base font-bold text-clinical-text">
+                                                {ind.nilai}
+                                            </span>
+                                            <span
+                                                className={cn(
+                                                    "text-xs px-2.5 py-1 rounded-full font-bold flex items-center gap-1.5",
+                                                    isNormal
+                                                        ? "bg-clinical-success-light text-clinical-success"
+                                                        : "bg-clinical-danger-light text-clinical-danger",
+                                                )}
+                                            >
+                                                {isNormal ? (
+                                                    <CheckCircle2 size={14} />
+                                                ) : (
+                                                    <XCircle size={14} />
+                                                )}{" "}
+                                                {ind.status}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <p className="font-body text-sm text-clinical-text-secondary leading-relaxed">
+                                        <HighlightedText
+                                            text={ind.penjelasan}
+                                            terms={result.data.identified_terms}
+                                            onTermClick={handleTermClick}
+                                        />
+                                    </p>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {/* Indikator dari Input Manual Lab */}
+            {result.type === "lab" && result.data.details && (
+                <div>
+                    <h3 className="font-display text-xl font-bold text-clinical-text mb-4">
+                        Detail Indikator
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {result.data.details.map((item, idx) => (
+                            <div
+                                key={idx}
+                                className="bg-white p-5 rounded-clinical-lg border border-clinical-border shadow-clinical-xs"
+                            >
+                                <span className="font-display font-bold text-clinical-primary text-lg block mb-2">
+                                    {item.indikator}
+                                </span>
+                                <p className="font-body text-sm text-clinical-text-secondary leading-relaxed">
+                                    <HighlightedText
+                                        text={item.penjelasan}
+                                        terms={result.data.identified_terms}
+                                        onTermClick={handleTermClick}
+                                    />
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Poin Penting */}
+            {result.data.key_points?.length > 0 && (
+                <div>
+                    <h3 className="font-display text-xl font-bold text-clinical-text mb-4">
+                        Poin Penting Keseluruhan
+                    </h3>
+                    <ul className="space-y-3">
+                        {result.data.key_points.map((point, idx) => (
+                            <li
+                                key={idx}
+                                className="flex gap-3 font-body text-base text-clinical-text-secondary bg-white p-4 rounded-clinical-md border border-clinical-border"
+                            >
+                                <span className="text-clinical-primary font-bold text-xl mt-[-2px]">
+                                    •
+                                </span>
+                                <span>
+                                    <HighlightedText
+                                        text={point}
+                                        terms={result.data.identified_terms}
+                                        onTermClick={handleTermClick}
+                                    />
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+        </div>
+    );
+};
+
 function HealthInsightFeature({ mode }) {
-    const [labData, setLabData] = useState({
-        hba1c: "",
-        ldl: "",
-        blood_pressure: "",
-        other_notes: "",
-    });
+    const fileInputRef = useRef(null);
     const [docFile, setDocFile] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
-    const fileInputRef = useRef(null);
-
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState(null);
     const [activeTerm, setActiveTerm] = useState(null);
     const [termExplanation, setTermExplanation] = useState("");
     const [isTermLoading, setIsTermLoading] = useState(false);
+    const [labInputs, setLabInputs] = useState([
+        { id: Date.now(), indicator: "", value: "" },
+    ]);
+    const [otherNotes, setOtherNotes] = useState("");
+
+    const addLabInput = () =>
+        setLabInputs([
+            ...labInputs,
+            { id: Date.now(), indicator: "", value: "" },
+        ]);
+    const removeLabInput = (id) =>
+        labInputs.length > 1 &&
+        setLabInputs(labInputs.filter((item) => item.id !== id));
+    const updateLabInput = (id, field, val) =>
+        setLabInputs(
+            labInputs.map((item) =>
+                item.id === id ? { ...item, [field]: val } : item,
+            ),
+        );
 
     const handleLabSubmit = async (e) => {
         e.preventDefault();
+
+        const validInputs = labInputs.filter(
+            (item) => item.indicator.trim() !== "" && item.value.trim() !== "",
+        );
+        if (validInputs.length === 0) {
+            toast.error("Silakan isi minimal satu indikator dan nilai lab.");
+            return;
+        }
+
         setIsLoading(true);
         setResult(null);
         try {
-            const res = await axios.post("/health-insight/lab", labData);
+            const payload = {
+                indicators: validInputs,
+                other_notes: otherNotes,
+            };
+
+            const res = await axios.post("/api/health-insight/lab", payload);
+
             setResult({ type: "lab", data: res.data });
+            toast.success("Analisis berhasil dimuat!");
         } catch (error) {
-            alert(error.response?.data?.message || "Terjadi kesalahan.");
+            toast.error(
+                error.response?.data?.message ||
+                    "Terjadi kesalahan pada server.",
+            );
         } finally {
             setIsLoading(false);
         }
@@ -98,23 +276,23 @@ function HealthInsightFeature({ mode }) {
 
     const handleDocSubmit = async (e) => {
         e.preventDefault();
-        if (!docFile) {
-            alert("Pilih file dokumen terlebih dahulu!");
-            return;
-        }
+        if (!docFile) return toast.error("Pilih file dokumen terlebih dahulu!");
+
         setIsLoading(true);
         setResult(null);
-
         const formData = new FormData();
         formData.append("document_file", docFile);
 
         try {
-            const res = await axios.post("/health-insight/doc", formData, {
+            const res = await axios.post("/api/health-insight/doc", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             setResult({ type: "doc", data: res.data });
+            toast.success("Dokumen berhasil dipindai!");
         } catch (error) {
-            alert(error.response?.data?.message || "Gagal memproses file.");
+            toast.error(
+                error.response?.data?.message || "Gagal memproses file.",
+            );
         } finally {
             setIsLoading(false);
         }
@@ -125,7 +303,7 @@ function HealthInsightFeature({ mode }) {
         setTermExplanation("");
         setIsTermLoading(true);
         try {
-            const res = await axios.post("/health-insight/term", { term });
+            const res = await axios.post("/api/health-insight/term", { term });
             setTermExplanation(res.data.explanation);
         } catch (error) {
             setTermExplanation("Gagal memuat penjelasan istilah.");
@@ -145,28 +323,26 @@ function HealthInsightFeature({ mode }) {
     const handleDrop = (e) => {
         e.preventDefault();
         setIsDragging(false);
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            const droppedFile = e.dataTransfer.files[0];
-            const validTypes = ["image/jpeg", "image/png", "application/pdf"];
-            if (validTypes.includes(droppedFile.type)) {
-                setDocFile(droppedFile);
-            } else {
-                alert(
-                    "Format file tidak didukung. Harap unggah JPG, PNG, atau PDF.",
-                );
-            }
+        if (e.dataTransfer.files?.[0]) {
+            const file = e.dataTransfer.files[0];
+            if (
+                ["image/jpeg", "image/png", "application/pdf"].includes(
+                    file.type,
+                )
+            )
+                setDocFile(file);
+            else toast.error("Format file tidak didukung.");
         }
-    };
-    const handleFileChange = (e) => {
-        if (e.target.files && e.target.files[0]) setDocFile(e.target.files[0]);
     };
 
     return (
         <div className="max-w-4xl mx-auto mt-6 space-y-8">
-            {/* Area Input (Bagian Atas) */}
             <div className="bg-white p-6 md:p-8 rounded-clinical-xl shadow-clinical-sm border border-clinical-border">
                 {mode === "lab" ? (
-                    <form onSubmit={handleLabSubmit} className="space-y-4">
+                    <form
+                        onSubmit={handleLabSubmit}
+                        className="space-y-4 animate-in fade-in"
+                    >
                         <div className="flex items-center gap-2 mb-6 pb-3 border-b border-clinical-border">
                             <FlaskConical
                                 size={24}
@@ -177,96 +353,122 @@ function HealthInsightFeature({ mode }) {
                                     Input Data Manual
                                 </h2>
                                 <p className="font-body text-xs text-clinical-muted mt-1">
-                                    Isi angka hasil laboratorium Anda pada kolom
-                                    di bawah ini.
+                                    Masukkan nama indikator dan nilai hasil lab.
+                                    Tambahkan baris baru jika diperlukan.
                                 </p>
                             </div>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block font-body text-sm font-semibold text-clinical-text mb-1.5">
-                                    HbA1c (%)
-                                </label>
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    className="w-full h-11 px-4 rounded-clinical-md border border-clinical-border focus:border-clinical-primary focus:ring-1 focus:ring-clinical-primary text-sm font-body"
-                                    value={labData.hba1c}
-                                    onChange={(e) =>
-                                        setLabData({
-                                            ...labData,
-                                            hba1c: e.target.value,
-                                        })
-                                    }
-                                    placeholder="Contoh: 5.7"
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-body text-sm font-semibold text-clinical-text mb-1.5">
-                                    LDL Kolesterol (mg/dL)
-                                </label>
-                                <input
-                                    type="number"
-                                    className="w-full h-11 px-4 rounded-clinical-md border border-clinical-border focus:border-clinical-primary focus:ring-1 focus:ring-clinical-primary text-sm font-body"
-                                    value={labData.ldl}
-                                    onChange={(e) =>
-                                        setLabData({
-                                            ...labData,
-                                            ldl: e.target.value,
-                                        })
-                                    }
-                                    placeholder="Contoh: 120"
-                                />
-                            </div>
-                            <div className="md:col-span-2">
-                                <label className="block font-body text-sm font-semibold text-clinical-text mb-1.5">
-                                    Tekanan Darah (mmHg)
-                                </label>
-                                <input
-                                    type="text"
-                                    className="w-full h-11 px-4 rounded-clinical-md border border-clinical-border focus:border-clinical-primary focus:ring-1 focus:ring-clinical-primary text-sm font-body"
-                                    value={labData.blood_pressure}
-                                    onChange={(e) =>
-                                        setLabData({
-                                            ...labData,
-                                            blood_pressure: e.target.value,
-                                        })
-                                    }
-                                    placeholder="Contoh: 120/80"
-                                />
-                            </div>
-                            <div className="md:col-span-2">
-                                <label className="block font-body text-sm font-semibold text-clinical-text mb-1.5">
-                                    Catatan Tambahan (Opsional)
-                                </label>
-                                <textarea
-                                    rows={3}
-                                    className="w-full p-4 rounded-clinical-md border border-clinical-border focus:border-clinical-primary focus:ring-1 focus:ring-clinical-primary text-sm font-body transition-all resize-none"
-                                    value={labData.other_notes}
-                                    onChange={(e) =>
-                                        setLabData({
-                                            ...labData,
-                                            other_notes: e.target.value,
-                                        })
-                                    }
-                                    placeholder="Masukkan hasil lab lainnya (misal: Asam Urat 7.0)..."
-                                />
-                            </div>
+
+                        <div className="space-y-4">
+                            {labInputs.map((item, index) => (
+                                <div
+                                    key={item.id}
+                                    className="flex items-center gap-4 bg-clinical-bg/50 p-4 rounded-clinical-lg border border-clinical-border hover:border-clinical-primary/30 transition-all"
+                                >
+                                    <div className="flex-1 flex flex-col gap-3">
+                                        <div className="space-y-1.5">
+                                            <label className="font-body text-xs font-semibold text-clinical-text">
+                                                Nama Indikator
+                                            </label>
+                                            <Input
+                                                placeholder="Misal: HbA1c, LDL..."
+                                                value={item.indicator}
+                                                onChange={(e) =>
+                                                    updateLabInput(
+                                                        item.id,
+                                                        "indicator",
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                className="bg-white"
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="font-body text-xs font-semibold text-clinical-text">
+                                                Nilai Hasil
+                                            </label>
+                                            <Input
+                                                placeholder="Misal: 5.7, 120..."
+                                                value={item.value}
+                                                onChange={(e) =>
+                                                    updateLabInput(
+                                                        item.id,
+                                                        "value",
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                className="bg-white"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col gap-2 justify-center pt-5">
+                                        {index === labInputs.length - 1 && (
+                                            <Button
+                                                type="button"
+                                                onClick={addLabInput}
+                                                size="icon"
+                                                className="h-10 w-10 bg-clinical-primary text-white hover:bg-clinical-primary/90"
+                                                title="Tambah Baris"
+                                            >
+                                                <Plus size={18} />
+                                            </Button>
+                                        )}
+                                        {labInputs.length > 1 && (
+                                            <Button
+                                                type="button"
+                                                onClick={() =>
+                                                    removeLabInput(item.id)
+                                                }
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-10 w-10 text-clinical-danger border-clinical-danger/30 hover:bg-clinical-danger-light"
+                                                title="Hapus Baris"
+                                            >
+                                                <Trash2 size={18} />
+                                            </Button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                        <button
+
+                        <div className="pt-4 border-t border-clinical-border mt-6">
+                            <label className="block font-body text-sm font-semibold text-clinical-text mb-2">
+                                Catatan Tambahan (Opsional)
+                            </label>
+                            <Textarea
+                                rows={3}
+                                value={otherNotes}
+                                onChange={(e) => setOtherNotes(e.target.value)}
+                                placeholder="Riwayat terkait atau keluhan tambahan..."
+                                className="resize-none"
+                            />
+                        </div>
+
+                        <Button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full mt-4 h-12 bg-clinical-primary text-white font-body font-bold text-sm rounded-clinical-md hover:shadow-clinical-md disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                            className="w-full mt-6 h-12"
                         >
                             {isLoading ? (
-                                <Loader2 size={18} className="animate-spin" />
+                                <>
+                                    <Loader2
+                                        size={18}
+                                        className="animate-spin mr-2"
+                                    />{" "}
+                                    Menganalisis...
+                                </>
                             ) : (
                                 "Analisis Data Lab"
                             )}
-                        </button>
+                        </Button>
                     </form>
                 ) : (
-                    <form onSubmit={handleDocSubmit} className="space-y-4">
+                    /* Form Upload Dokumen tidak berubah, hanya update UX Button */
+                    <form
+                        onSubmit={handleDocSubmit}
+                        className="space-y-4 animate-in fade-in"
+                    >
                         <div className="flex items-center gap-2 mb-6 pb-3 border-b border-clinical-border">
                             <FileText
                                 size={24}
@@ -277,8 +479,7 @@ function HealthInsightFeature({ mode }) {
                                     Upload Dokumen
                                 </h2>
                                 <p className="font-body text-xs text-clinical-muted mt-1">
-                                    Format yang didukung: JPG, PNG, atau PDF
-                                    (Maks. 5MB).
+                                    Format: JPG, PNG, PDF (Maks. 5MB).
                                 </p>
                             </div>
                         </div>
@@ -290,50 +491,45 @@ function HealthInsightFeature({ mode }) {
                                 onDragLeave={handleDragLeave}
                                 onDrop={handleDrop}
                                 className={cn(
-                                    "border-2 border-dashed rounded-clinical-xl p-10 text-center cursor-pointer transition-all group",
+                                    "border-2 border-dashed rounded-clinical-xl p-10 text-center cursor-pointer transition-all",
                                     isDragging
                                         ? "border-clinical-primary bg-clinical-primary-light/50"
-                                        : "border-clinical-border hover:bg-clinical-bg hover:border-clinical-primary",
+                                        : "border-clinical-border hover:bg-clinical-bg",
                                 )}
                             >
                                 <UploadCloud
                                     className={cn(
-                                        "w-12 h-12 mx-auto mb-4 transition-colors",
+                                        "w-12 h-12 mx-auto mb-4",
                                         isDragging
                                             ? "text-clinical-primary"
-                                            : "text-clinical-muted group-hover:text-clinical-primary",
+                                            : "text-clinical-muted",
                                     )}
                                 />
-                                <span className="font-body text-base font-semibold text-clinical-text block">
-                                    {isDragging
-                                        ? "Lepaskan file di sini"
-                                        : "Klik untuk memilih file"}
-                                </span>
-                                <span className="font-body text-sm text-clinical-muted mt-2 block">
-                                    Atau tarik (drag) dokumen Anda ke area ini
+                                <span className="font-body text-base font-semibold block">
+                                    Klik atau Tarik File Kesini
                                 </span>
                                 <input
                                     type="file"
                                     className="hidden"
                                     ref={fileInputRef}
                                     accept=".jpg,.jpeg,.png,.pdf"
-                                    onChange={handleFileChange}
+                                    onChange={(e) =>
+                                        e.target.files?.[0] &&
+                                        setDocFile(e.target.files[0])
+                                    }
                                 />
                             </div>
                         ) : (
-                            <div className="border border-clinical-border rounded-clinical-lg p-5 flex items-center justify-between bg-clinical-bg">
-                                <div className="flex items-center gap-4 overflow-hidden">
-                                    <div className="w-12 h-12 bg-clinical-primary-light rounded-clinical-md flex items-center justify-center shrink-0">
-                                        <FileText
-                                            className="text-clinical-primary"
-                                            size={24}
-                                        />
+                            <div className="border border-clinical-border rounded-clinical-lg p-5 flex justify-between bg-clinical-bg">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-clinical-primary-light rounded-clinical-md flex items-center justify-center">
+                                        <FileText className="text-clinical-primary" />
                                     </div>
-                                    <div className="truncate">
-                                        <p className="font-body text-base font-semibold text-clinical-text truncate">
+                                    <div>
+                                        <p className="font-body text-base font-semibold truncate">
                                             {docFile.name}
                                         </p>
-                                        <p className="font-body text-sm text-clinical-muted">
+                                        <p className="text-sm text-clinical-muted">
                                             {(
                                                 docFile.size /
                                                 1024 /
@@ -346,261 +542,101 @@ function HealthInsightFeature({ mode }) {
                                 <button
                                     type="button"
                                     onClick={() => setDocFile(null)}
-                                    className="p-2 hover:bg-white rounded-full text-clinical-muted hover:text-clinical-danger transition-colors"
-                                    title="Hapus File"
+                                    className="p-2 text-clinical-muted hover:text-clinical-danger"
                                 >
                                     <X size={20} />
                                 </button>
                             </div>
                         )}
-
-                        <button
+                        <Button
                             type="submit"
                             disabled={isLoading || !docFile}
-                            className="w-full mt-6 h-12 bg-clinical-primary text-white font-body font-bold text-sm rounded-clinical-md hover:shadow-clinical-md disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                            className="w-full mt-6 h-12"
                         >
                             {isLoading ? (
-                                <Loader2 size={18} className="animate-spin" />
+                                <>
+                                    <Loader2
+                                        size={18}
+                                        className="animate-spin mr-2"
+                                    />{" "}
+                                    Memindai...
+                                </>
                             ) : (
                                 "Pindai & Analisis File"
                             )}
-                        </button>
+                        </Button>
                     </form>
                 )}
             </div>
 
-            {/* Area Output (Bagian Bawah) */}
-            <div className="bg-clinical-bg p-6 md:p-8 rounded-clinical-xl border border-clinical-border relative overflow-hidden min-h-[300px] flex flex-col">
+            <div className="bg-clinical-bg p-6 md:p-8 rounded-clinical-xl border border-clinical-border relative min-h-[300px] flex flex-col">
                 {isLoading ? (
                     <div className="m-auto flex flex-col items-center justify-center text-clinical-muted py-12">
                         <Loader2
                             size={48}
                             className="animate-spin mb-4 text-clinical-primary"
                         />
-                        <p className="font-body text-base font-semibold text-clinical-text">
-                            AI sedang memproses dokumen Anda...
-                        </p>
-                        <p className="font-body text-sm mt-2">
-                            Mohon tunggu sebentar, AI sedang mengidentifikasi
-                            indikator klinis.
+                        <p className="font-body text-base font-semibold">
+                            AI sedang memproses data...
                         </p>
                     </div>
                 ) : result ? (
-                    <div className="space-y-8">
-                        <div className="bg-clinical-warning-light/50 border border-clinical-warning/20 rounded-clinical-lg p-5 flex gap-3">
-                            <AlertTriangle className="w-6 h-6 text-clinical-warning shrink-0" />
-                            <p className="font-body text-sm font-medium text-clinical-text-secondary leading-relaxed">
-                                {result.data.disclaimer}
-                            </p>
-                        </div>
-
-                        <div>
-                            {result.data.document_type && (
-                                <span className="inline-block px-4 py-1.5 bg-clinical-primary-light text-clinical-primary font-bold text-xs rounded-full uppercase tracking-wider mb-4">
-                                    {result.data.document_type}
-                                </span>
-                            )}
-                            <h3 className="font-display text-2xl font-bold text-clinical-text mb-3">
-                                Ringkasan Analisis
-                            </h3>
-                            <p className="font-body text-base text-clinical-text-secondary leading-relaxed">
-                                <HighlightedText
-                                    text={result.data.summary}
-                                    terms={result.data.identified_terms}
-                                    onTermClick={handleTermClick}
-                                />
-                            </p>
-                        </div>
-
-                        {/* Rendering Indikator Fitur Upload */}
-                        {result.type === "doc" &&
-                            result.data.indicators &&
-                            result.data.indicators.length > 0 && (
-                                <div>
-                                    <h3 className="font-display text-xl font-bold text-clinical-text mb-4">
-                                        Rincian Indikator
-                                    </h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {result.data.indicators.map(
-                                            (ind, idx) => {
-                                                const isNormal =
-                                                    ind.status?.toLowerCase() ===
-                                                    "normal";
-                                                return (
-                                                    <div
-                                                        key={idx}
-                                                        className="bg-white p-5 rounded-clinical-lg border border-clinical-border shadow-clinical-xs"
-                                                    >
-                                                        <div className="flex flex-col gap-2 mb-3 pb-3 border-b border-clinical-border/50">
-                                                            <span className="font-display font-bold text-clinical-text text-lg">
-                                                                {ind.nama}
-                                                            </span>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="font-body text-base font-bold text-clinical-text">
-                                                                    {ind.nilai}
-                                                                </span>
-                                                                <span
-                                                                    className={cn(
-                                                                        "text-xs px-2.5 py-1 rounded-full font-bold flex items-center gap-1.5",
-                                                                        isNormal
-                                                                            ? "bg-clinical-success-light text-clinical-success"
-                                                                            : "bg-clinical-danger-light text-clinical-danger",
-                                                                    )}
-                                                                >
-                                                                    {isNormal ? (
-                                                                        <CheckCircle2
-                                                                            size={
-                                                                                14
-                                                                            }
-                                                                        />
-                                                                    ) : (
-                                                                        <XCircle
-                                                                            size={
-                                                                                14
-                                                                            }
-                                                                        />
-                                                                    )}
-                                                                    {ind.status}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <p className="font-body text-sm text-clinical-text-secondary leading-relaxed">
-                                                            <HighlightedText
-                                                                text={
-                                                                    ind.penjelasan
-                                                                }
-                                                                terms={
-                                                                    result.data
-                                                                        .identified_terms
-                                                                }
-                                                                onTermClick={
-                                                                    handleTermClick
-                                                                }
-                                                            />
-                                                        </p>
-                                                    </div>
-                                                );
-                                            },
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-
-                        {/* Rendering Details Fitur Manual Lab */}
-                        {result.type === "lab" && result.data.details && (
-                            <div>
-                                <h3 className="font-display text-xl font-bold text-clinical-text mb-4">
-                                    Detail Indikator
-                                </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {result.data.details.map((item, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="bg-white p-5 rounded-clinical-lg border border-clinical-border shadow-clinical-xs"
-                                        >
-                                            <span className="font-display font-bold text-clinical-primary text-lg block mb-2">
-                                                {item.indikator}
-                                            </span>
-                                            <p className="font-body text-sm text-clinical-text-secondary leading-relaxed">
-                                                <HighlightedText
-                                                    text={item.penjelasan}
-                                                    terms={
-                                                        result.data
-                                                            .identified_terms
-                                                    }
-                                                    onTermClick={
-                                                        handleTermClick
-                                                    }
-                                                />
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Rendering Key Points */}
-                        {result.data.key_points &&
-                            result.data.key_points.length > 0 && (
-                                <div>
-                                    <h3 className="font-display text-xl font-bold text-clinical-text mb-4">
-                                        Poin Penting Keseluruhan
-                                    </h3>
-                                    <ul className="space-y-3">
-                                        {result.data.key_points.map(
-                                            (point, idx) => (
-                                                <li
-                                                    key={idx}
-                                                    className="flex gap-3 font-body text-base text-clinical-text-secondary bg-white p-4 rounded-clinical-md border border-clinical-border"
-                                                >
-                                                    <span className="text-clinical-primary font-bold text-xl mt-[-2px]">
-                                                        •
-                                                    </span>
-                                                    <span>
-                                                        <HighlightedText
-                                                            text={point}
-                                                            terms={
-                                                                result.data
-                                                                    .identified_terms
-                                                            }
-                                                            onTermClick={
-                                                                handleTermClick
-                                                            }
-                                                        />
-                                                    </span>
-                                                </li>
-                                            ),
-                                        )}
-                                    </ul>
-                                </div>
-                            )}
-                    </div>
+                    <AnalysisResult
+                        result={result}
+                        handleTermClick={handleTermClick}
+                    />
                 ) : (
                     <div className="m-auto flex flex-col items-center justify-center text-clinical-muted py-12">
                         <Activity
                             size={56}
                             className="mb-4 text-clinical-primary/20"
                         />
-                        <h4 className="font-display text-lg font-bold text-clinical-text mb-2">
+                        <h4 className="font-display text-lg font-bold mb-2">
                             Menunggu Input Data
                         </h4>
-                        <p className="font-body text-sm text-center max-w-md">
-                            Silakan isi form atau unggah dokumen di atas
-                            terlebih dahulu. Hasil analisis dari AI akan
-                            ditampilkan di area ini.
+                        <p className="font-body text-sm text-center">
+                            Silakan isi form atau unggah dokumen di atas untuk
+                            dianalisis.
                         </p>
                     </div>
                 )}
 
-                {/* Tooltip Modal Istilah Medis (Lebih besar posisinya jika di bawah) */}
+                {/* Term Explanation Tooltip */}
                 {activeTerm && (
-                    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-clinical-text p-5 rounded-clinical-xl shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-8">
-                        <div className="flex justify-between items-start mb-3">
-                            <h4 className="font-display font-bold text-white flex items-center gap-2">
+                    <Card className="fixed bottom-20 md:bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-clinical-text border-none shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-8">
+                        <CardHeader className="p-5 pb-3 flex flex-row items-start justify-between space-y-0">
+                            <CardTitle className="font-display font-bold text-white flex items-center gap-2 text-base">
                                 <Info
                                     size={18}
                                     className="text-clinical-primary-light"
-                                />{" "}
+                                />
                                 {activeTerm}
-                            </h4>
-                            <button
+                            </CardTitle>
+                            <Button
+                                variant="ghost"
+                                size="icon"
                                 onClick={() => setActiveTerm(null)}
-                                className="text-clinical-muted hover:text-white transition-colors p-1"
+                                className="h-6 w-6 text-clinical-muted hover:text-white hover:bg-white/10 -mt-1 -mr-2 rounded-full"
                             >
-                                ✕
-                            </button>
-                        </div>
-                        {isTermLoading ? (
-                            <div className="flex items-center gap-2 text-sm text-clinical-muted font-body">
-                                <Loader2 size={16} className="animate-spin" />{" "}
-                                Memuat penjelasan...
-                            </div>
-                        ) : (
-                            <p className="font-body text-sm text-clinical-bg leading-relaxed">
-                                {termExplanation}
-                            </p>
-                        )}
-                    </div>
+                                <X size={16} />
+                            </Button>
+                        </CardHeader>
+                        <CardContent className="p-5 pt-0">
+                            {isTermLoading ? (
+                                <div className="flex items-center gap-2 text-sm text-clinical-muted font-body">
+                                    <Loader2
+                                        size={16}
+                                        className="animate-spin"
+                                    />
+                                    Memuat penjelasan...
+                                </div>
+                            ) : (
+                                <p className="font-body text-sm text-clinical-bg leading-relaxed">
+                                    {termExplanation}
+                                </p>
+                            )}
+                        </CardContent>
+                    </Card>
                 )}
             </div>
         </div>

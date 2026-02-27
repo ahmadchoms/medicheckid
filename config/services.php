@@ -36,7 +36,8 @@ return [
     ],
 
     'gemini' => [
-        'key' => env('GEMINI_API_KEY'),
+        'cek_gejala_key' => env('CEK_GEJALA_GEMINI_API_KEY'),
+        'health_insight_key' => env('HEALTH_INSIGHT_GEMINI_API_KEY'),
     ],
 
 ];

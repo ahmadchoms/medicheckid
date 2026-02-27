@@ -23,7 +23,7 @@
     --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
     --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-    /* Color Palette — Clinical Blues & Neutrals */
+    /* ═ Color Palette — Clinical Blues & Neutrals ═ */
     --color-clinical-white: #ffffff;
     --color-clinical-bg: #f8fafc;
     --color-clinical-surface: #ffffff;
@@ -33,18 +33,18 @@
     --color-clinical-text-secondary: #475569;
     --color-clinical-muted: #94a3b8;
 
-    /* Primary — Medical Blue */
+    /* ═ Primary — Medical Blue ═ */
     --color-clinical-primary: #2563eb;
     --color-clinical-primary-light: #dbeafe;
     --color-clinical-primary-dark: #1d4ed8;
     --color-clinical-primary-hover: #1e40af;
 
-    /* Accent — Teal/Green for health */
+    /* ═ Accent — Teal/Green for health ═ */
     --color-clinical-accent: #0d9488;
     --color-clinical-accent-light: #ccfbf1;
     --color-clinical-accent-dark: #0f766e;
 
-    /* Semantic Colors */
+    /* ═ Semantic Colors ═ */
     --color-clinical-success: #16a34a;
     --color-clinical-success-light: #dcfce7;
     --color-clinical-warning: #f59e0b;
@@ -54,7 +54,7 @@
     --color-clinical-info: #2563eb;
     --color-clinical-info-light: #dbeafe;
 
-    /* Shadows — Soft & Layered */
+    /* ═ Shadows — Soft & Layered ═ */
     --shadow-clinical-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
     --shadow-clinical-sm:
         0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
@@ -72,7 +72,7 @@
         0 8px 16px -6px rgba(15, 23, 42, 0.06);
     --shadow-clinical-glow: 0 0 20px rgba(37, 99, 235, 0.15);
 
-    /* Border Radius */
+    /* ═ Border Radius ═ */
     --radius-clinical-sm: 0.375rem;
     --radius-clinical: 0.5rem;
     --radius-clinical-md: 0.625rem;
@@ -81,12 +81,48 @@
     --radius-clinical-2xl: 1.25rem;
     --radius-clinical-full: 9999px;
 
-    /* Animations */
+    /* ═ Animations ═ */
     --animate-fade-in: fade-in 0.4s ease-out;
     --animate-slide-up: slide-up 0.4s ease-out;
     --animate-slide-in: slide-in 0.3s ease-out;
     --animate-pulse-soft: pulse-soft 2s ease-in-out infinite;
     --animate-float: float 3s ease-in-out infinite;
+
+    /* ═ Semantic Design Tokens (mapped to clinical system) ═ */
+    /* These bridge shadcn/ui components with clinical design system */
+    --color-background: var(--color-clinical-bg);
+    --color-foreground: var(--color-clinical-text);
+    --color-primary: var(--color-clinical-primary);
+    --color-primary-foreground: #ffffff;
+    --color-secondary: var(--color-clinical-accent);
+    --color-secondary-foreground: #ffffff;
+    --color-accent: var(--color-clinical-accent);
+    --color-accent-foreground: #ffffff;
+    --color-destructive: var(--color-clinical-danger);
+    --color-destructive-foreground: #ffffff;
+    --color-muted: var(--color-clinical-muted);
+    --color-muted-foreground: var(--color-clinical-text-secondary);
+    --color-card: var(--color-clinical-surface);
+    --color-card-foreground: var(--color-clinical-text);
+    --color-popover: var(--color-clinical-surface);
+    --color-popover-foreground: var(--color-clinical-text);
+    --color-border: var(--color-clinical-border);
+    --color-input: var(--color-clinical-surface);
+    --color-ring: var(--color-clinical-primary);
+
+    /* ═ Shadow Mapping ═ */
+    --shadow-xs: var(--shadow-clinical-xs);
+    --shadow-sm: var(--shadow-clinical-sm);
+    --shadow-md: var(--shadow-clinical-md);
+    --shadow-lg: var(--shadow-clinical-lg);
+    --shadow-xl: var(--shadow-clinical-xl);
+
+    /* ═ Border Radius Mapping ═ */
+    --radius-xs: 0.25rem;
+    --radius-sm: var(--radius-clinical-sm);
+    --radius-md: var(--radius-clinical-md);
+    --radius-lg: var(--radius-clinical-lg);
+    --radius-xl: var(--radius-clinical-xl);
 }
 
 /* ── Keyframes ────────────────────────────────────────────── */
@@ -186,174 +222,17 @@ body {
     border-color: var(--color-clinical-primary);
 }
 
-/* Buttons */
-.clinical-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    font-family: var(--font-body);
-    font-weight: 600;
-    font-size: 0.875rem;
-    border-radius: var(--radius-clinical-md);
-    transition: all 0.2s ease;
-    cursor: pointer;
-    line-height: 1;
-}
+/* ── Component-Specific Utility Classes (Optional, for backward compatibility) ── */
+/* These are deprecated in favor of Tailwind semantic tokens */
+/* But kept for any legacy components that might use them */
 
-.clinical-btn-primary {
-    background: var(--color-clinical-primary);
-    color: white;
-    padding: 0.625rem 1.25rem;
-    box-shadow: var(--shadow-clinical-sm);
-}
+/* Card States */
+@supports (--color: var(--color-clinical-primary)) {
+    .card-elevated {
+        box-shadow: var(--shadow-clinical-lg);
+    }
 
-.clinical-btn-primary:hover {
-    background: var(--color-clinical-primary-hover);
-    box-shadow: var(--shadow-clinical-md);
-    transform: translateY(-1px);
-}
-
-.clinical-btn-primary:active {
-    transform: translateY(0);
-    box-shadow: var(--shadow-clinical-xs);
-}
-
-.clinical-btn-outline {
-    background: transparent;
-    color: var(--color-clinical-text);
-    border: 1.5px solid var(--color-clinical-border-strong);
-    padding: 0.625rem 1.25rem;
-}
-
-.clinical-btn-outline:hover {
-    background: var(--color-clinical-bg);
-    border-color: var(--color-clinical-primary);
-    color: var(--color-clinical-primary);
-}
-
-/* Badge */
-.clinical-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.625rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    border-radius: var(--radius-clinical-full);
-    line-height: 1.2;
-}
-
-.clinical-badge-blue {
-    background: var(--color-clinical-primary-light);
-    color: var(--color-clinical-primary-dark);
-}
-
-.clinical-badge-green {
-    background: var(--color-clinical-success-light);
-    color: var(--color-clinical-success);
-}
-
-.clinical-badge-yellow {
-    background: var(--color-clinical-warning-light);
-    color: #92400e;
-}
-
-.clinical-badge-red {
-    background: var(--color-clinical-danger-light);
-    color: var(--color-clinical-danger);
-}
-
-/* Input */
-.clinical-input {
-    width: 100%;
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    padding: 0.625rem 0.875rem;
-    border: 1.5px solid var(--color-clinical-border);
-    border-radius: var(--radius-clinical-md);
-    background: var(--color-clinical-surface);
-    color: var(--color-clinical-text);
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
-    outline: none;
-}
-
-.clinical-input:focus {
-    border-color: var(--color-clinical-primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-}
-
-.clinical-input::placeholder {
-    color: var(--color-clinical-muted);
-}
-
-/* Progress bar */
-.clinical-progress-track {
-    height: 0.5rem;
-    background: var(--color-clinical-bg);
-    border-radius: var(--radius-clinical-full);
-    overflow: hidden;
-    border: 1px solid var(--color-clinical-border);
-}
-
-.clinical-progress-fill {
-    height: 100%;
-    border-radius: var(--radius-clinical-full);
-    transition: width 0.5s ease;
-}
-
-/* Divider */
-.clinical-divider {
-    border: none;
-    border-top: 1px solid var(--color-clinical-border);
-}
-
-/* Scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: var(--color-clinical-bg);
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: var(--color-clinical-border-strong);
-    border-radius: 6px;
-}
-
-.no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-.no-scrollbar::-webkit-scrollbar {
-    display: none;
-}
-
-/* ── Glass Effect (for overlays) ──────────────────────────── */
-.clinical-glass {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-}
-
-/* ── Gradient Backgrounds ─────────────────────────────────── */
-.clinical-gradient-primary {
-    background: linear-gradient(
-        135deg,
-        var(--color-clinical-primary) 0%,
-        #3b82f6 100%
-    );
-}
-
-.clinical-gradient-accent {
-    background: linear-gradient(
-        135deg,
-        var(--color-clinical-accent) 0%,
-        #14b8a6 100%
-    );
-}
-
-.clinical-gradient-hero {
-    background: linear-gradient(135deg, #dbeafe 0%, #ccfbf1 50%, #f0fdf4 100%);
+    .card-flat {
+        box-shadow: var(--shadow-clinical-xs);
+    }
 }

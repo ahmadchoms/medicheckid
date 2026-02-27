@@ -11,10 +11,8 @@ class AiSymptomCheckerController extends Controller
 {
     public function analyze(Request $request)
     {
-        // Extend execution time untuk API call yang mungkin lambat
         set_time_limit(120);
 
-        // 1. Validasi input dari React
         $request->validate([
             'area' => 'required|string',
             'symptoms' => 'required|string|max:1000',
@@ -23,15 +21,13 @@ class AiSymptomCheckerController extends Controller
         $area = $request->input('area');
         $symptoms = $request->input('symptoms');
 
-        // 2. Siapkan API Key dan URL
-        $apiKey = config('services.gemini.key');
+        $apiKey = config('services.gemini.cek_gejala_key');
         if (!$apiKey) {
             return response()->json(['message' => 'API Key belum dikonfigurasi.'], 500);
         }
 
         $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={$apiKey}";
 
-        // 3. Prompt Sistem agar output 100% JSON sesuai format React
         $systemInstruction = "Anda adalah asisten dokter AI. Analisis gejala pengguna di area tubuh: '{$area}'. Keluhan pengguna: '{$symptoms}'. "
             . "PENTING: Jawab HANYA dalam format JSON. Jangan gunakan block markdown (```json). Gunakan struktur eksak berikut:\n"
             . "{\n"
@@ -48,7 +44,6 @@ class AiSymptomCheckerController extends Controller
             . "Catatan Penting: Value untuk key 'urgency' HANYA boleh diisi dengan salah satu string ini: 'low', 'moderate', 'high', atau 'emergency'.";
 
         try {
-            // 4. Request ke Gemini API dengan timeout 30 detik
             $response = Http::timeout(30)->post($url, [
                 'contents' => [
                     [
@@ -58,24 +53,20 @@ class AiSymptomCheckerController extends Controller
                     ]
                 ],
                 'generationConfig' => [
-                    'temperature' => 0.2, // Rendah agar output stabil
-                    'response_mime_type' => 'application/json', // Memaksa format JSON
+                    'temperature' => 0.2,
+                    'response_mime_type' => 'application/json',
                 ]
             ]);
 
-            // 5. Tangani Response
             if ($response->successful()) {
                 $responseData = $response->json();
 
-                // Ambil string dari response Gemini
                 $generatedText = $responseData['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
 
-                // Sanitasi: Extract JSON object dari kemungkinan markdown/teks tambahan menggunakan regex /s modifier
                 if (preg_match('/\{.*\}/s', $generatedText, $matches)) {
                     $generatedText = $matches[0];
                 }
 
-                // Decode ke array untuk memastikan JSON tidak rusak
                 $jsonResult = json_decode($generatedText, true);
 
                 if (json_last_error() === JSON_ERROR_NONE) {
