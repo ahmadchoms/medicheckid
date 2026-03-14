@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             HealthFacilitySeeder::class,
             RegionSeeder::class,
+            SymptomLogSeeder::class,
         ]);
     }
 }

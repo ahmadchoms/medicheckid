@@ -17,6 +17,8 @@ return new class extends Migration
             $table->text('symptoms_summary');
             $table->text('conditions')->nullable();
             $table->string('urgency')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
             $table->timestamps();
         });
     }
