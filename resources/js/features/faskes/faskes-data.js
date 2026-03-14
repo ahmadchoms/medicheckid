@@ -1,5 +1,5 @@
-// Static faskes data — 8 healthcare facilities in Indramayu & Cirebon
-// Expandable to API Kemenkes in the future.
+
+
 
 export const FASKES_TYPES = {
     puskesmas: { label: "Puskesmas", emoji: "🏥", color: "green" },

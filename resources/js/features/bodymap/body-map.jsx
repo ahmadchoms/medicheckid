@@ -38,7 +38,6 @@ export default function BodyMap({ onAreaSelect, selectedArea }) {
 
     return (
         <div className="flex flex-col items-center gap-6">
-            {/* SVG Body Map */}
             <div className="relative w-full max-w-[280px]">
                 <svg
                     viewBox="0 0 300 520"
@@ -46,11 +45,22 @@ export default function BodyMap({ onAreaSelect, selectedArea }) {
                     role="img"
                     aria-label="Pilih area tubuh"
                 >
-                    {/* Background silhouette */}
                     <defs>
-                        <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="var(--color-clinical-primary-light)" />
-                            <stop offset="100%" stopColor="var(--color-clinical-accent-light)" />
+                        <linearGradient
+                            id="bodyGradient"
+                            x1="0%"
+                            y1="0%"
+                            x2="0%"
+                            y2="100%"
+                        >
+                            <stop
+                                offset="0%"
+                                stopColor="var(--color-clinical-primary-light)"
+                            />
+                            <stop
+                                offset="100%"
+                                stopColor="var(--color-clinical-accent-light)"
+                            />
                         </linearGradient>
                     </defs>
 
@@ -67,8 +77,8 @@ export default function BodyMap({ onAreaSelect, selectedArea }) {
                                     isSelected
                                         ? "fill-clinical-primary stroke-clinical-primary-dark"
                                         : isHovered
-                                            ? "fill-clinical-primary-light stroke-clinical-primary"
-                                            : "fill-clinical-bg stroke-clinical-border-strong",
+                                          ? "fill-clinical-primary-light stroke-clinical-primary"
+                                          : "fill-clinical-bg stroke-clinical-border-strong",
                                 )}
                                 style={{
                                     strokeWidth: isSelected ? 2.5 : 1.5,
@@ -81,7 +91,6 @@ export default function BodyMap({ onAreaSelect, selectedArea }) {
                     })}
                 </svg>
 
-                {/* Hover tooltip */}
                 {hoveredArea && (
                     <div className="absolute top-2 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-clinical-text text-white font-body text-xs font-semibold rounded-full shadow-clinical-md animate-fade-in pointer-events-none">
                         {BODY_PATHS[hoveredArea]?.label}
@@ -89,7 +98,6 @@ export default function BodyMap({ onAreaSelect, selectedArea }) {
                 )}
             </div>
 
-            {/* Area Buttons Grid */}
             <div className="w-full grid grid-cols-2 gap-2">
                 {Object.entries(BODY_PATHS).map(([key, body]) => {
                     const areaInfo = SYMPTOM_AREAS[key];

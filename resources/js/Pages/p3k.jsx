@@ -10,7 +10,6 @@ export default function P3KPage() {
             <div className="py-4">
                 <P3KGuide />
 
-                {/* Disclaimer */}
                 <div className="mt-8 border-t border-clinical-border pt-4">
                     <p className="text-xs font-body text-clinical-muted">
                         ⚠️ <strong>Disclaimer:</strong> Panduan pertolongan

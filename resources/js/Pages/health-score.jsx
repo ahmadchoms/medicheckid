@@ -10,7 +10,6 @@ export default function HealthScorePage() {
             <Head title="Health Score — MediCheck ID" />
 
             <div className="max-w-2xl mx-auto">
-                {/* Header */}
                 <div className="flex items-center gap-3 mb-6">
                     <div className="w-11 h-11 bg-clinical-accent-light rounded-clinical-lg flex items-center justify-center">
                         <Heart

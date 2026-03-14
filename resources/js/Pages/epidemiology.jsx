@@ -21,7 +21,7 @@ import {
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Fix leaflet icon issue in React
+
 import L from "leaflet";
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -85,10 +85,10 @@ export default function AdminEpidemiology() {
     const activeCities = data.cityStats.length;
 
     const getUrgencyColor = (urgency) => {
-        if (urgency === "emergency") return "#ef4444"; // clinical-danger
-        if (urgency === "high") return "#f59e0b"; // clinical-warning
-        if (urgency === "moderate") return "#fbbf24"; // warning light
-        return "#10b981"; // clinical-success
+        if (urgency === "emergency") return "#ef4444"; 
+        if (urgency === "high") return "#f59e0b"; 
+        if (urgency === "moderate") return "#fbbf24"; 
+        return "#10b981"; 
     };
 
     return (
@@ -112,7 +112,6 @@ export default function AdminEpidemiology() {
                 </div>
             </header>
 
-            {/* Top Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <StatCard
                     title="TOTAL LAPORAN GEJALA"
@@ -136,7 +135,6 @@ export default function AdminEpidemiology() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Map Section */}
                 <div className="lg:col-span-2 bg-white rounded-clinical-2xl border border-clinical-border shadow-clinical-md overflow-hidden flex flex-col">
                     <div className="p-5 border-b border-clinical-border bg-clinical-bg/50 backdrop-blur-sm flex justify-between items-center">
                         <div className="flex items-center gap-2">
@@ -156,7 +154,7 @@ export default function AdminEpidemiology() {
                             </div>
                         ) : (
                             <MapContainer
-                                center={[-2.5489, 118.0149]} // Center of Indonesia
+                                center={[-2.5489, 118.0149]} 
                                 zoom={5}
                                 scrollWheelZoom={false}
                                 style={{ height: "100%", width: "100%" }}
@@ -201,7 +199,6 @@ export default function AdminEpidemiology() {
                     </div>
                 </div>
 
-                {/* Chart Section */}
                 <div className="bg-white rounded-clinical-2xl border border-clinical-border shadow-clinical-md flex flex-col">
                     <div className="p-5 border-b border-clinical-border">
                         <h2 className="font-display text-lg font-bold text-clinical-text">
@@ -215,7 +212,7 @@ export default function AdminEpidemiology() {
                         {!isLoading && data.cityStats.length > 0 ? (
                             <ResponsiveContainer width="100%" height={350}>
                                 <BarChart
-                                    data={data.cityStats.slice(0, 7)} // Top 7 cities
+                                    data={data.cityStats.slice(0, 7)} 
                                     layout="vertical"
                                     margin={{ left: 10, right: 20 }}
                                 >

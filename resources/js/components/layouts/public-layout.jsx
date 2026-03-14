@@ -17,13 +17,12 @@ import {
     Users,
 } from "lucide-react";
 
-// ─── Panic Mode ──────────────────────────────────────────────
+
 function PanicMode() {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
         <>
-            {/* Floating Panic Button */}
             <motion.button
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
@@ -39,7 +38,6 @@ function PanicMode() {
                 </span>
             </motion.button>
 
-            {/* Fullscreen Overlay */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
@@ -159,7 +157,7 @@ function PanicMode() {
     );
 }
 
-// ─── Navigation Data ─────────────────────────────────────────
+
 const NAV_LINKS = [
     { href: "/", label: "Beranda", icon: Home, emoji: "🏠" },
     { href: "/cek-gejala", label: "Cek Gejala", icon: Activity, emoji: "🩺" },
@@ -190,7 +188,7 @@ const NAV_LINKS = [
     },
 ];
 
-// ─── Emergency Banner ────────────────────────────────────────
+
 function EmergencyBanner() {
     return (
         <div className="bg-clinical-danger relative overflow-hidden">
@@ -215,13 +213,13 @@ function EmergencyBanner() {
     );
 }
 
-// ─── Header ──────────────────────────────────────────────────
+
 function Header() {
     const { url } = usePage();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
-    // Dynamic shadow on scroll
+    
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
         window.addEventListener("scroll", handleScroll);
@@ -239,7 +237,6 @@ function Header() {
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
                 <div className="flex items-center justify-between h-16 md:h-20">
-                    {/* Logo */}
                     <Link href="/" className="flex items-center gap-2.5 group">
                         <motion.div
                             whileHover={{ rotate: 10, scale: 1.05 }}
@@ -260,7 +257,6 @@ function Header() {
                         </div>
                     </Link>
 
-                    {/* Desktop Nav */}
                     <nav className="hidden lg:flex items-center gap-1.5 bg-clinical-bg/50 p-1 rounded-clinical-lg border border-clinical-border/50">
                         {NAV_LINKS.map((link) => {
                             const isActive =
@@ -295,7 +291,6 @@ function Header() {
                         })}
                     </nav>
 
-                    {/* CTA + Mobile toggle */}
                     <div className="flex items-center gap-3">
                         <Link
                             href="/cek-gejala"
@@ -334,7 +329,6 @@ function Header() {
                     </div>
                 </div>
 
-                {/* Mobile Drawer */}
                 <AnimatePresence>
                     {mobileOpen && (
                         <motion.div
@@ -399,16 +393,14 @@ function Header() {
     );
 }
 
-// ─── Footer ──────────────────────────────────────────────────
+
 function Footer() {
     return (
         <footer className="bg-white border-t border-clinical-border mt-auto relative overflow-hidden">
-            {/* Background Decorative Gradient */}
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-clinical-primary-light/20 pointer-events-none" />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-10 mb-10">
-                    {/* Brand */}
                     <div className="md:col-span-5">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-10 h-10 bg-clinical-primary rounded-clinical-lg flex items-center justify-center shadow-clinical-sm">
@@ -430,7 +422,6 @@ function Footer() {
                         </p>
                     </div>
 
-                    {/* Navigation */}
                     <div className="md:col-span-3">
                         <h4 className="font-display text-sm text-clinical-text font-bold mb-4 uppercase tracking-wider">
                             Jelajahi Fitur
@@ -448,7 +439,6 @@ function Footer() {
                         </nav>
                     </div>
 
-                    {/* Sources */}
                     <div className="md:col-span-4">
                         <h4 className="font-display text-sm text-clinical-text font-bold mb-4 uppercase tracking-wider">
                             Berdasarkan Referensi
@@ -470,7 +460,6 @@ function Footer() {
                     </div>
                 </div>
 
-                {/* Disclaimer & Copyright */}
                 <div className="border-t border-clinical-border pt-8">
                     <div className="flex items-start gap-3 bg-clinical-warning-light/50 border border-clinical-warning/20 rounded-clinical-xl p-4 mb-6">
                         <AlertTriangle
@@ -506,7 +495,7 @@ function Footer() {
     );
 }
 
-// ─── Bottom Navigation (Mobile Only) ─────────────────────────
+
 function BottomNav() {
     const { url } = usePage();
 
@@ -563,7 +552,7 @@ function BottomNav() {
     );
 }
 
-// ─── PublicLayout ────────────────────────────────────────────
+
 export default function PublicLayout({ children, fullWidth = false }) {
     return (
         <div className="min-h-screen flex flex-col bg-clinical-bg selection:bg-clinical-primary-light selection:text-clinical-primary">
@@ -577,7 +566,6 @@ export default function PublicLayout({ children, fullWidth = false }) {
                         "max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12",
                 )}
             >
-                {/* Wrap children in a fade-in animation */}
                 <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}

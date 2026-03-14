@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import {
     Play,
@@ -271,7 +270,7 @@ const P3K_DATA = [
     },
 ];
 
-// ── Timer Component ──────────────────────────────────────────
+
 function StepTimer({ duration, onComplete }) {
     const [timeLeft, setTimeLeft] = useState(duration);
     const [running, setRunning] = useState(false);
@@ -307,7 +306,6 @@ function StepTimer({ duration, onComplete }) {
 
     return (
         <div className="bg-clinical-text rounded-clinical-xl p-4 mt-3">
-            {/* Circular timer display */}
             <div className="relative w-24 h-24 mx-auto mb-3">
                 <svg
                     viewBox="0 0 100 100"
@@ -344,11 +342,7 @@ function StepTimer({ duration, onComplete }) {
 
             <div className="flex justify-center gap-2">
                 {!running && timeLeft === duration && (
-                    <Button
-                        size="sm"
-                        variant="default"
-                        onClick={start}
-                    >
+                    <Button size="sm" variant="default" onClick={start}>
                         <Play size={14} />
                         Mulai Timer
                     </Button>
@@ -366,11 +360,7 @@ function StepTimer({ duration, onComplete }) {
                 )}
                 {!running && timeLeft < duration && timeLeft > 0 && (
                     <>
-                        <Button
-                            size="sm"
-                            variant="default"
-                            onClick={start}
-                        >
+                        <Button size="sm" variant="default" onClick={start}>
                             <Play size={14} />
                             Lanjut
                         </Button>
@@ -399,7 +389,7 @@ function StepTimer({ duration, onComplete }) {
     );
 }
 
-// ── Guide Viewer ─────────────────────────────────────────────
+
 function GuideViewer({ guide, onBack }) {
     const [currentStep, setCurrentStep] = useState(0);
 
@@ -415,7 +405,6 @@ function GuideViewer({ guide, onBack }) {
 
     return (
         <div className="animate-slide-in">
-            {/* Header */}
             <div
                 className={cn(
                     "rounded-clinical-xl p-4 mb-4 shadow-clinical-md flex items-center gap-3",
@@ -449,7 +438,6 @@ function GuideViewer({ guide, onBack }) {
                 </div>
             )}
 
-            {/* Step counter */}
             <div className="flex gap-1.5 mb-4">
                 {guide.steps.map((_, i) => (
                     <div
@@ -460,14 +448,13 @@ function GuideViewer({ guide, onBack }) {
                             i < currentStep
                                 ? "bg-clinical-primary"
                                 : i === currentStep
-                                    ? "bg-clinical-primary"
-                                    : "bg-clinical-border",
+                                  ? "bg-clinical-primary"
+                                  : "bg-clinical-border",
                         )}
                     />
                 ))}
             </div>
 
-            {/* Step Content */}
             <Card className="mb-4 border border-clinical-border rounded-clinical-xl shadow-clinical-md">
                 <CardHeader className="bg-clinical-primary text-white">
                     <div className="flex items-center gap-3">
@@ -506,7 +493,6 @@ function GuideViewer({ guide, onBack }) {
                 </CardContent>
             </Card>
 
-            {/* Navigation */}
             <div className="flex gap-3">
                 <Button
                     variant="outline"
@@ -537,7 +523,7 @@ function GuideViewer({ guide, onBack }) {
     );
 }
 
-// ── Main P3K Guide ───────────────────────────────────────────
+
 export default function P3KGuide() {
     const [selected, setSelected] = useState(null);
 
@@ -549,7 +535,6 @@ export default function P3KGuide() {
 
     return (
         <div className="animate-fade-in">
-            {/* Emergency Banner */}
             <div className="bg-clinical-danger rounded-clinical-xl shadow-clinical-md p-4 mb-6 flex items-center gap-3">
                 <AlertTriangle
                     size={24}
@@ -564,16 +549,19 @@ export default function P3KGuide() {
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-white/20 backdrop-blur-sm font-display text-sm text-white font-bold rounded-full">
                             📞 119
                         </span>
-                        <span className="font-body text-white/70 text-xs self-center">Ambulans</span>
+                        <span className="font-body text-white/70 text-xs self-center">
+                            Ambulans
+                        </span>
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-white/20 backdrop-blur-sm font-display text-sm text-white font-bold rounded-full">
                             📞 1500-567
                         </span>
-                        <span className="font-body text-white/70 text-xs self-center">Hotline</span>
+                        <span className="font-body text-white/70 text-xs self-center">
+                            Hotline
+                        </span>
                     </div>
                 </div>
             </div>
 
-            {/* Title */}
             <div className="border-b border-clinical-border pb-4 mb-6">
                 <h2 className="font-display text-3xl font-bold text-clinical-text">
                     Panduan Pertolongan Pertama
@@ -583,23 +571,25 @@ export default function P3KGuide() {
                 </p>
             </div>
 
-            {/* Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {P3K_DATA.map((guide) => {
                     const urgencyConfig = {
                         emergency: {
                             border: "border-clinical-danger/30",
-                            badgeClass: "bg-clinical-danger-light text-clinical-danger",
+                            badgeClass:
+                                "bg-clinical-danger-light text-clinical-danger",
                             label: "DARURAT",
                         },
                         high: {
                             border: "border-clinical-warning/30",
-                            badgeClass: "bg-clinical-warning-light text-amber-700",
+                            badgeClass:
+                                "bg-clinical-warning-light text-amber-700",
                             label: "SEGERA",
                         },
                         moderate: {
                             border: "border-clinical-border",
-                            badgeClass: "bg-clinical-bg text-clinical-text-secondary",
+                            badgeClass:
+                                "bg-clinical-bg text-clinical-text-secondary",
                             label: "PENTING",
                         },
                     }[guide.urgency];
@@ -617,7 +607,12 @@ export default function P3KGuide() {
                         >
                             <div className="flex items-start justify-between gap-2 mb-2">
                                 <span className="text-4xl">{guide.emoji}</span>
-                                <span className={cn("text-[10px] font-bold px-2 py-1 rounded-full", urgencyConfig.badgeClass)}>
+                                <span
+                                    className={cn(
+                                        "text-[10px] font-bold px-2 py-1 rounded-full",
+                                        urgencyConfig.badgeClass,
+                                    )}
+                                >
                                     {urgencyConfig.label}
                                 </span>
                             </div>

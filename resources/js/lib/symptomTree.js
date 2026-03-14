@@ -22,7 +22,7 @@ export const SYMPTOM_AREAS = {
     },
 };
 
-// Pohon pertanyaan yang ujungnya memerintahkan AI untuk menganalisis (analyze: true)
+
 export const SYMPTOM_TREE = {
     head: {
         question:

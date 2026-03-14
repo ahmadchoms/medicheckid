@@ -1,462 +1,19 @@
 import { useState, useMemo, useEffect } from "react";
-import { ChevronLeft, ChevronRight, RotateCcw, Share2 } from "lucide-react";
-import {
-    Radar,
-    RadarChart,
-    PolarGrid,
-    PolarAngleAxis,
-    ResponsiveContainer,
-    Tooltip,
-} from "recharts";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-    DIMENSIONS,
-    calculateHealthScore,
-    getScoreGrade,
-    getWeakestDimensions,
-    generateDailyHabits,
-} from "@/lib/healthScore";
+import { DIMENSIONS, calculateHealthScore } from "@/lib/healthScore";
 import { storage } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { StepProgress } from "@/components/ui/feedback";
-import { toast } from "sonner";
 
-// ── Progress Bar ────────────────────────────────────────────
-function ProgressBar({ label, value, max = 100, color = "blue", showValue = true, className }) {
-    const pct = Math.min((value / max) * 100, 100);
-    const colorMap = {
-        blue: "bg-clinical-primary",
-        green: "bg-clinical-success",
-        yellow: "bg-clinical-warning",
-        orange: "bg-clinical-warning",
-        red: "bg-clinical-danger",
-        gray: "bg-clinical-muted",
-    };
-    return (
-        <div className={className}>
-            {label && (
-                <div className="flex items-center justify-between mb-1">
-                    <span className="font-body text-xs font-semibold text-clinical-text">{label}</span>
-                    {showValue && (
-                        <span className="font-mono text-xs font-semibold text-clinical-muted">
-                            {Math.round(value)}/{max}
-                        </span>
-                    )}
-                </div>
-            )}
-            <div className="clinical-progress-track">
-                <div
-                    className={cn("clinical-progress-fill", colorMap[color] || colorMap.blue)}
-                    style={{ width: `${pct}%` }}
-                />
-            </div>
-        </div>
-    );
-}
 
-// ── Range Slider ────────────────────────────────────────────
-function RangeSlider({ label, value, min, max, step = 1, onChange }) {
-    return (
-        <div className="py-2">
-            {label && (
-                <p className="font-display text-xl md:text-2xl font-bold text-clinical-text mb-5 leading-tight">{label}</p>
-            )}
-            <div className="flex items-center gap-4">
-                <input
-                    type="range"
-                    min={min}
-                    max={max}
-                    step={step}
-                    value={value}
-                    onChange={(e) => onChange(Number(e.target.value))}
-                    className="flex-1 h-2 appearance-none bg-clinical-bg border border-clinical-border rounded-full cursor-pointer
-                        [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6
-                        [&::-webkit-slider-thumb]:bg-clinical-primary [&::-webkit-slider-thumb]:rounded-full
-                        [&::-webkit-slider-thumb]:shadow-clinical-sm [&::-webkit-slider-thumb]:cursor-grab
-                        [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6
-                        [&::-moz-range-thumb]:bg-clinical-primary [&::-moz-range-thumb]:rounded-full"
-                />
-                <span className="w-12 h-12 flex items-center justify-center rounded-clinical-lg bg-clinical-primary text-white font-display text-xl">
-                    {value}
-                </span>
-            </div>
-        </div>
-    );
-}
+import ProgressBar from "@/components/ui/progress-bar";
+import QuestionStep from "./components/QuestionStep";
+import HealthScoreResult from "./components/HealthScoreResult";
 
-// ── Single Question ──────────────────────────────────────────
-function QuestionStep({ question, value, onChange }) {
-    if (question.type === "range") {
-        return (
-            <div className="py-4">
-                <RangeSlider
-                    label={question.text}
-                    value={value ?? question.min}
-                    min={question.min}
-                    max={question.max}
-                    step={1}
-                    onChange={onChange}
-                />
-                <div className="flex justify-between text-xs text-clinical-muted mt-2 font-body">
-                    <span>
-                        {question.id.includes("stress")
-                            ? "Sangat Rendah"
-                            : "Sangat Tidak Puas"}
-                    </span>
-                    <span>
-                        {question.id.includes("stress")
-                            ? "Sangat Tinggi"
-                            : "Sangat Puas"}
-                    </span>
-                </div>
-            </div>
-        );
-    }
 
-    return (
-        <div className="flex flex-col gap-2.5 py-2">
-            {question.options.map((opt, i) => {
-                const isSelected = value === opt.value;
-                return (
-                    <button
-                        key={i}
-                        onClick={() => onChange(opt.value)}
-                        className={cn(
-                            "w-full text-left px-4 py-3.5 border rounded-clinical-md",
-                            "font-body text-sm transition-all duration-200",
-                            "shadow-clinical-xs hover:shadow-clinical-sm",
-                            "hover:-translate-y-0.5",
-                            "flex items-center gap-3 group",
-                            isSelected
-                                ? "bg-clinical-primary text-white border-clinical-primary font-semibold shadow-clinical-sm"
-                                : "bg-white text-clinical-text border-clinical-border hover:bg-clinical-primary-light hover:border-clinical-primary",
-                        )}
-                    >
-                        <span
-                            className={cn(
-                                "w-6 h-6 shrink-0 rounded-full flex items-center justify-center font-display text-xs transition-all",
-                                isSelected
-                                    ? "bg-white text-clinical-primary font-bold"
-                                    : "border border-clinical-border bg-clinical-bg text-clinical-text group-hover:bg-clinical-primary group-hover:text-white",
-                            )}
-                        >
-                            {isSelected ? "✓" : String.fromCharCode(65 + i)}
-                        </span>
-                        <span className="flex-1">{opt.label}</span>
-                    </button>
-                );
-            })}
-        </div>
-    );
-}
-
-// ── Radar Chart ──────────────────────────────────────────────
-function ScoreRadarChart({ dimensionScores }) {
-    const data = DIMENSIONS.map((d) => ({
-        dimension: d.label.split(" ")[0],
-        score: dimensionScores[d.id] || 0,
-        fullMark: 100,
-    }));
-
-    return (
-        <ResponsiveContainer width="100%" height={260}>
-            <RadarChart data={data}>
-                <PolarGrid
-                    stroke="#E2E8F0"
-                    strokeWidth={1}
-                    strokeDasharray="4 2"
-                />
-                <PolarAngleAxis
-                    dataKey="dimension"
-                    tick={{
-                        fontSize: 11,
-                        fontFamily: "Inter",
-                        fontWeight: 600,
-                        fill: "#475569",
-                    }}
-                />
-                <Radar
-                    name="Skor Kamu"
-                    dataKey="score"
-                    stroke="#2563EB"
-                    strokeWidth={2}
-                    fill="#2563EB"
-                    fillOpacity={0.15}
-                />
-                <Tooltip
-                    contentStyle={{
-                        border: "1px solid #E2E8F0",
-                        borderRadius: "0.5rem",
-                        fontFamily: "Inter",
-                        fontWeight: 600,
-                        fontSize: 12,
-                        boxShadow: "0 4px 6px -1px rgba(15, 23, 42, 0.07)",
-                    }}
-                    formatter={(val) => [`${val}/100`, "Skor"]}
-                />
-            </RadarChart>
-        </ResponsiveContainer>
-    );
-}
-
-// ── Result Screen ────────────────────────────────────────────
-function HealthScoreResult({ result, onRetake }) {
-    const grade = getScoreGrade(result.aggregate);
-    const weakest = getWeakestDimensions(result.dimensions, 2);
-
-    // State untuk Micro-Habit Tracker
-    const [habits, setHabits] = useState(() => {
-        const dateKey = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-        const saved = storage.get(`medicheck_habits_${dateKey}`);
-        if (saved) return saved;
-        return generateDailyHabits(weakest);
-    });
-
-    // Auto-save habits ketika dicentang
-    const toggleHabit = (id) => {
-        const newHabits = habits.map(h => h.id === id ? { ...h, done: !h.done } : h);
-        setHabits(newHabits);
-
-        const dateKey = new Date().toISOString().split('T')[0];
-        storage.set(`medicheck_habits_${dateKey}`, newHabits);
-        toast.success(newHabits.find(h => h.id === id)?.done ? "Misi selesai! 🎉" : "Misi dibatalkan.");
-    };
-
-    const gradeColors = {
-        green: { bg: "bg-clinical-success", text: "text-white" },
-        blue: { bg: "bg-clinical-primary", text: "text-white" },
-        yellow: { bg: "bg-clinical-warning-light", text: "text-clinical-text" },
-        orange: { bg: "bg-clinical-warning", text: "text-white" },
-        red: { bg: "bg-clinical-danger", text: "text-white" },
-    };
-
-    const gc = gradeColors[grade.color];
-
-    const handleShare = async () => {
-        const text = `Health Score saya di MediCheck ID: ${result.aggregate}/100 — Grade ${grade.grade} (${grade.label}) 💪\nCek kesehatan kamu juga di medicheckid.com`;
-        if (navigator.share) {
-            await navigator.share({ title: "Health Score MediCheck ID", text });
-        } else {
-            await navigator.clipboard.writeText(text);
-            toast.success("Disalin ke clipboard!");
-        }
-    };
-
-    storage.set("medicheck_health_score", {
-        ...result,
-        date: new Date().toISOString(),
-    });
-
-    return (
-        <div className="space-y-6 animate-slide-up">
-            {/* Score Hero */}
-            <div
-                className={cn(
-                    "rounded-clinical-2xl p-8 text-center shadow-clinical-lg",
-                    gc.bg,
-                )}
-            >
-                <p
-                    className={cn(
-                        "font-body text-sm font-semibold uppercase tracking-widest mb-2",
-                        gc.text,
-                    )}
-                >
-                    HEALTH SCORE KAMU
-                </p>
-                <div className="flex items-end justify-center gap-3 mb-2">
-                    <span
-                        className={cn(
-                            "font-display leading-none text-8xl font-extrabold",
-                            gc.text,
-                        )}
-                    >
-                        {result.aggregate}
-                    </span>
-                    <span
-                        className={cn(
-                            "font-display text-3xl mb-2 opacity-60",
-                            gc.text,
-                        )}
-                    >
-                        /100
-                    </span>
-                </div>
-                <div
-                    className={cn(
-                        "inline-block border border-current/30 rounded-full px-5 py-1.5 font-display text-lg font-bold",
-                        gc.text,
-                    )}
-                >
-                    Grade {grade.grade} — {grade.label}
-                </div>
-                <p
-                    className={cn(
-                        "font-body text-sm mt-3 max-w-xs mx-auto opacity-80",
-                        gc.text,
-                    )}
-                >
-                    {grade.message}
-                </p>
-            </div>
-
-            {/* Radar Chart */}
-            <Card className="border border-clinical-border rounded-clinical-xl shadow-clinical-sm">
-                <CardHeader>
-                    <h3 className="font-display text-xl font-bold text-clinical-text">
-                        📊 Profil Kesehatan 6 Dimensi
-                    </h3>
-                </CardHeader>
-                <CardContent>
-                    <ScoreRadarChart dimensionScores={result.dimensions} />
-                </CardContent>
-            </Card>
-
-            {/* Dimension Breakdown */}
-            <Card className="border border-clinical-border rounded-clinical-xl shadow-clinical-sm">
-                <CardHeader>
-                    <h3 className="font-display text-lg font-bold text-clinical-text">Skor Per Dimensi</h3>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    {DIMENSIONS.map((dim) => {
-                        const score = result.dimensions[dim.id] || 0;
-                        return (
-                            <ProgressBar
-                                key={dim.id}
-                                label={`${dim.emoji} ${dim.label}`}
-                                value={score}
-                                max={100}
-                                color={
-                                    score >= 70
-                                        ? "green"
-                                        : score >= 45
-                                            ? "yellow"
-                                            : "red"
-                                }
-                                showValue
-                            />
-                        );
-                    })}
-                </CardContent>
-            </Card>
-
-            {/* Priority Recommendations */}
-            <Card className="border border-clinical-border rounded-clinical-xl bg-clinical-primary-light/30 shadow-clinical-sm">
-                <CardHeader>
-                    <h3 className="font-display text-lg font-bold text-clinical-text">
-                        ⚡ Prioritas Perbaikan
-                    </h3>
-                </CardHeader>
-                <CardContent>
-                    <p className="font-body text-sm font-semibold text-clinical-text mb-4">
-                        Fokus pada 2 dimensi dengan skor terendah kamu:
-                    </p>
-                    {weakest.map((dim) => (
-                        <div
-                            key={dim.id}
-                            className="bg-white border border-clinical-border rounded-clinical-lg p-3 mb-3 shadow-clinical-xs"
-                        >
-                            <div className="flex items-center gap-2 mb-1">
-                                <span className="text-xl">{dim.emoji}</span>
-                                <span className="font-display text-base font-bold text-clinical-text">
-                                    {dim.label}
-                                </span>
-                                <Badge
-                                    variant="default"
-                                    className="ml-auto rounded-full"
-                                >
-                                    {dim.score}/100
-                                </Badge>
-                            </div>
-                            <p className="text-xs font-body text-clinical-text-secondary">
-                                {dim.id === "sleep" &&
-                                    "Tingkatkan konsistensi jam tidur. Targetkan 7-8 jam per malam dengan jadwal tetap."}
-                                {dim.id === "activity" &&
-                                    "Mulai dengan 20-30 menit jalan kaki 3x seminggu, lalu tingkatkan bertahap."}
-                                {dim.id === "nutrition" &&
-                                    "Tambahkan satu porsi sayur atau buah setiap hari. Kurangi makanan ultra-proses."}
-                                {dim.id === "hydration" &&
-                                    "Siapkan botol minum 1.5L setiap pagi. Habiskan sebelum tidur."}
-                                {dim.id === "stress" &&
-                                    "Coba 10 menit meditasi atau pernapasan dalam setiap pagi. Journaling bisa membantu."}
-                                {dim.id === "social" &&
-                                    "Jadwalkan satu sesi berkualitas dengan orang tersayang setiap minggu."}
-                            </p>
-                        </div>
-                    ))}
-                </CardContent>
-            </Card>
-
-            {/* Micro-Habit Tracker */}
-            <Card className="border border-clinical-border rounded-clinical-xl shadow-clinical-sm bg-gradient-to-br from-white to-clinical-success-light/30">
-                <CardHeader className="pb-3 border-b border-clinical-border">
-                    <div className="flex justify-between items-center">
-                        <h3 className="font-display text-lg font-bold text-clinical-text flex items-center gap-2">
-                            <span>🌱</span> Misi Harian Kamu
-                        </h3>
-                        <span className="text-xs font-semibold bg-clinical-success text-white px-2 py-0.5 rounded-full">
-                            {habits.filter(h => h.done).length}/3 Selesai
-                        </span>
-                    </div>
-                    <p className="font-body text-xs text-clinical-text-secondary mt-1">
-                        Dibuat khusus (AI) berdasarkan dimensi terlemahmu
-                    </p>
-                </CardHeader>
-                <CardContent className="pt-4">
-                    <div className="space-y-3">
-                        {habits.map(habit => (
-                            <label key={habit.id} className={cn(
-                                "flex items-start gap-3 p-3 rounded-clinical-lg border cursor-pointer transition-all",
-                                habit.done ? "bg-clinical-success/10 border-clinical-success text-clinical-success line-through opacity-70" : "bg-white border-clinical-border hover:border-clinical-primary shadow-clinical-xs"
-                            )}>
-                                <div className="mt-0.5 shrink-0">
-                                    <input
-                                        type="checkbox"
-                                        className="w-5 h-5 rounded border-clinical-border text-clinical-primary focus:ring-clinical-primary cursor-pointer"
-                                        checked={habit.done}
-                                        onChange={() => toggleHabit(habit.id)}
-                                    />
-                                </div>
-                                <span className={cn(
-                                    "font-body text-sm font-medium",
-                                    habit.done ? "text-clinical-success/70" : "text-clinical-text"
-                                )}>
-                                    {habit.text}
-                                </span>
-                            </label>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Actions */}
-            <div className="grid grid-cols-2 gap-3">
-                <Button
-                    variant="outline"
-                    onClick={onRetake}
-                    className="w-full"
-                >
-                    <RotateCcw size={14} />
-                    Tes Ulang
-                </Button>
-                <Button
-                    variant="secondary"
-                    onClick={handleShare}
-                    className="w-full"
-                >
-                    <Share2 size={14} />
-                    Share Skor
-                </Button>
-            </div>
-        </div>
-    );
-}
-
-// ── Main Assessment ──────────────────────────────────────────
 export default function HealthScoreAssessment() {
-    // Muat progres tersimpan dari localStorage jika ada
+    
     const [phase, setPhase] = useState(() => {
         const saved = storage.get("medicheck_hs_progress");
         return saved ? saved.phase : "intro";
@@ -475,11 +32,16 @@ export default function HealthScoreAssessment() {
     });
     const [result, setResult] = useState(null);
 
-    // Auto-save efek
+    
     useEffect(() => {
         if (phase === "questions" || phase === "intro") {
-            // Jangan save hasil (result) agar bisa re-take
-            storage.set("medicheck_hs_progress", { phase, dimIndex, qIndex, answers });
+            
+            storage.set("medicheck_hs_progress", {
+                phase,
+                dimIndex,
+                qIndex,
+                answers,
+            });
         }
     }, [phase, dimIndex, qIndex, answers]);
 
@@ -550,14 +112,14 @@ export default function HealthScoreAssessment() {
         setAnswers({});
         setResult(null);
         storage.remove("medicheck_hs_progress");
+
+        
+        const dateKey = new Date().toISOString().split("T")[0];
+        storage.remove(`medicheck_habits_${dateKey}`);
     };
 
     const handleContinue = () => {
-        if (Object.keys(answers).length > 0) {
-            setPhase("questions");
-        } else {
-            setPhase("questions");
-        }
+        setPhase("questions");
     };
 
     const handleStartNew = () => {
@@ -566,7 +128,11 @@ export default function HealthScoreAssessment() {
         setAnswers({});
         setPhase("questions");
         storage.remove("medicheck_hs_progress");
-    }
+
+        
+        const dateKey = new Date().toISOString().split("T")[0];
+        storage.remove(`medicheck_habits_${dateKey}`);
+    };
 
     if (phase === "intro") {
         const hasSavedProgress = Object.keys(answers).length > 0;
@@ -574,7 +140,12 @@ export default function HealthScoreAssessment() {
         return (
             <div className="animate-slide-up">
                 <div className="clinical-gradient-hero rounded-clinical-2xl p-8 mb-6 text-center shadow-clinical-sm">
-                    <p className="font-display text-6xl mb-4">🩺</p>
+                    <p
+                        className="font-display text-6xl mb-4"
+                        aria-hidden="true"
+                    >
+                        🩺
+                    </p>
                     <h2 className="font-display text-3xl font-bold text-clinical-text mb-3">
                         Health Score Check
                     </h2>
@@ -590,7 +161,10 @@ export default function HealthScoreAssessment() {
                                 key={d.id}
                                 className="bg-white border border-clinical-border rounded-clinical-lg p-2.5 shadow-clinical-xs text-center"
                             >
-                                <span className="text-2xl block mb-1">
+                                <span
+                                    className="text-2xl block mb-1"
+                                    aria-hidden="true"
+                                >
                                     {d.emoji}
                                 </span>
                                 <span className="font-body text-xs font-semibold text-clinical-text">
@@ -637,19 +211,23 @@ export default function HealthScoreAssessment() {
         return <HealthScoreResult result={result} onRetake={handleRetake} />;
     }
 
-    // Questions phase
+    
     return (
         <div className="animate-slide-up">
-            {/* Progress */}
             <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                        <span className="text-xl">{currentDim?.emoji}</span>
+                        <span className="text-xl" aria-hidden="true">
+                            {currentDim?.emoji}
+                        </span>
                         <span className="font-display text-sm font-semibold text-clinical-text-secondary">
                             {currentDim?.label}
                         </span>
                     </div>
-                    <span className="font-mono text-xs font-semibold text-clinical-muted">
+                    <span
+                        className="font-mono text-xs font-semibold text-clinical-muted"
+                        aria-live="polite"
+                    >
                         {currentFlatIndex + 1} / {totalQuestions}
                     </span>
                 </div>
@@ -658,11 +236,15 @@ export default function HealthScoreAssessment() {
                     max={totalQuestions}
                     color="blue"
                     showValue={false}
+                    aria-valuenow={currentFlatIndex + 1}
+                    aria-valuemax={totalQuestions}
                 />
             </div>
 
-            {/* Dimension tabs */}
-            <div className="flex gap-1.5 mb-5 overflow-x-auto pb-1 no-scrollbar">
+            <div
+                className="flex gap-1.5 mb-5 overflow-x-auto pb-1 no-scrollbar"
+                role="tablist"
+            >
                 {DIMENSIONS.map((d, i) => {
                     const dimComplete = d.questions.every(
                         (q) => answers[q.id] !== undefined,
@@ -670,23 +252,29 @@ export default function HealthScoreAssessment() {
                     return (
                         <div
                             key={d.id}
+                            role="tab"
+                            aria-selected={i === dimIndex}
                             className={cn(
                                 "shrink-0 px-3 py-1.5 rounded-full text-xs font-body font-semibold transition-all",
                                 i === dimIndex
                                     ? "bg-clinical-primary text-white"
                                     : dimComplete
-                                        ? "bg-clinical-success text-white"
-                                        : "bg-clinical-bg text-clinical-muted border border-clinical-border",
+                                      ? "bg-clinical-success text-white"
+                                      : "bg-clinical-bg text-clinical-muted border border-clinical-border",
                             )}
                         >
-                            {d.emoji} {d.label.split(" ")[0]}
+                            <span aria-hidden="true">{d.emoji}</span>{" "}
+                            {d.label.split(" ")[0]}
                         </div>
                     );
                 })}
             </div>
 
-            {/* Question */}
-            <Card className="mb-5 border border-clinical-border rounded-clinical-xl shadow-clinical-md">
+            <Card
+                className="mb-5 border border-clinical-border rounded-clinical-xl shadow-clinical-md"
+                role="region"
+                aria-live="polite"
+            >
                 <CardHeader className="bg-clinical-bg">
                     <p className="font-body text-xs font-semibold uppercase tracking-wider text-clinical-muted">
                         {currentDim?.label} — Pertanyaan {qIndex + 1} dari{" "}
@@ -707,14 +295,14 @@ export default function HealthScoreAssessment() {
                 </CardContent>
             </Card>
 
-            {/* Navigation */}
             <div className="flex gap-3">
                 <Button
                     variant="outline"
                     onClick={handleBack}
                     disabled={dimIndex === 0 && qIndex === 0}
+                    aria-label="Kembali ke pertanyaan sebelumnya"
                 >
-                    <ChevronLeft size={14} />
+                    <ChevronLeft size={14} aria-hidden="true" />
                     Kembali
                 </Button>
                 <Button
@@ -722,11 +310,12 @@ export default function HealthScoreAssessment() {
                     onClick={handleNext}
                     disabled={currentAnswer === undefined}
                     className="flex-1"
+                    aria-label="Lanjut ke pertanyaan berikutnya"
                 >
                     {currentFlatIndex === totalQuestions - 1
                         ? "Lihat Hasil"
                         : "Lanjut"}
-                    <ChevronRight size={14} />
+                    <ChevronRight size={14} aria-hidden="true" />
                 </Button>
             </div>
         </div>

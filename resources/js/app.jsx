@@ -3,8 +3,8 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { createInertiaApp } from "@inertiajs/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "sonner";
 import { ErrorBoundary } from "@/components/ui/feedback";
+import { Toaster } from "./components/ui/sonner";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -33,25 +33,14 @@ createInertiaApp({
             <QueryClientProvider client={queryClient}>
                 <ErrorBoundary>
                     <App {...props} />
-                    <Toaster
-                        position="top-right"
-                        richColors
-                        toastOptions={{
-                            style: {
-                                border: "3px solid #0A0A0A",
-                                borderRadius: "0px",
-                                boxShadow: "4px 4px 0px 0px #0A0A0A",
-                                fontFamily: '"DM Sans", sans-serif',
-                            },
-                        }}
-                    />
+                    <Toaster position="top-right" richColors />
                 </ErrorBoundary>
             </QueryClientProvider>,
         );
     },
 
     progress: {
-        color: "#FFE500",
+        color: "#2563eb",
         showSpinner: false,
     },
 });

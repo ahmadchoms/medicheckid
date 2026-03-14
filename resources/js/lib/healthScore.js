@@ -1,4 +1,4 @@
-// Health Score Dimensions & Calculation
+
 
 export const DIMENSIONS = [
     {
@@ -166,20 +166,16 @@ export const DIMENSIONS = [
     },
 ];
 
-/**
- * Calculate health score from user answers.
- * @param {Object} answers - { questionId: value }
- * @returns {{ aggregate: number, dimensions: { [dimId]: number } }}
- */
+
 export function calculateHealthScore(answers) {
     const dimensions = {};
 
     for (const dim of DIMENSIONS) {
         const questionScores = dim.questions.map((q) => {
             const val = answers[q.id];
-            if (val === undefined) return 50; // default
+            if (val === undefined) return 50; 
             if (q.type === "range") {
-                // For stress, invert the scale (high stress = low score)
+                
                 if (q.id.includes("stress")) {
                     return Math.round(((q.max - val) / (q.max - q.min)) * 100);
                 }
@@ -193,7 +189,7 @@ export function calculateHealthScore(answers) {
         dimensions[dim.id] = dimScore;
     }
 
-    // Weighted aggregate
+    
     const aggregate = Math.round(
         DIMENSIONS.reduce((sum, dim) => {
             return sum + (dimensions[dim.id] || 0) * dim.weight;
@@ -203,9 +199,7 @@ export function calculateHealthScore(answers) {
     return { aggregate, dimensions };
 }
 
-/**
- * Get grade based on aggregate score.
- */
+
 export function getScoreGrade(score) {
     if (score >= 85) {
         return {
@@ -252,9 +246,7 @@ export function getScoreGrade(score) {
     };
 }
 
-/**
- * Get the N weakest dimensions.
- */
+
 export function getWeakestDimensions(dimensionScores, n = 2) {
     return DIMENSIONS.map((d) => ({
         ...d,
@@ -264,9 +256,7 @@ export function getWeakestDimensions(dimensionScores, n = 2) {
         .slice(0, n);
 }
 
-/**
- * Generate 3 micro-habits based on weakest dimensions.
- */
+
 export function generateDailyHabits(weakestDimensions) {
     const habitBank = {
         sleep: [
@@ -303,7 +293,7 @@ export function generateDailyHabits(weakestDimensions) {
 
     let habits = [];
     if (weakestDimensions.length > 0) {
-        // Ambil 2 habit dari dimensi terlemah pertama
+        
         const firstDimId = weakestDimensions[0]?.id;
         if (firstDimId && habitBank[firstDimId]) {
             habits.push({ id: `h1_${firstDimId}`, text: habitBank[firstDimId][0], done: false });
@@ -312,14 +302,14 @@ export function generateDailyHabits(weakestDimensions) {
     }
     
     if (weakestDimensions.length > 1) {
-        // Ambil 1 habit dari dimensi terlemah kedua
+        
         const secondDimId = weakestDimensions[1]?.id;
         if (secondDimId && habitBank[secondDimId]) {
             habits.push({ id: `h3_${secondDimId}`, text: habitBank[secondDimId][0], done: false });
         }
     }
 
-    // Fallback jika kurang dari 3
+    
     if (habits.length < 3) {
         habits.push({ id: "h_extra", text: "Minum 8 gelas air hari ini", done: false });
     }

@@ -14,7 +14,7 @@ import {
     ChevronRight,
     Building2,
     ChevronDown,
-    Mail, // Tambahan icon email
+    Mail, 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PublicLayout from "@/components/layouts/public-layout";
@@ -23,15 +23,15 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/feedback";
 
-// ─── Data Konstanta ──────────────────────────────────────────
+
 const FASKES_TYPES = {
     rumah_sakit: { label: "Rumah Sakit", emoji: "🏥", color: "blue" },
     puskesmas: { label: "Puskesmas", emoji: "🩺", color: "green" },
 };
 
-// ─── Sub-Komponen: FaskesCard ────────────────────────────────
+
 function FaskesCard({ item }) {
-    // Menampilkan nama wilayah jika ada relasi (regency), atau fallback ke kode_kab
+    
     const cityName = item.regency?.nama_wilayah || `Kode Kab: ${item.kode_kab}`;
 
     const typeInfo = FASKES_TYPES[item.type] || {
@@ -40,7 +40,7 @@ function FaskesCard({ item }) {
         color: "gray",
     };
 
-    // Format URL Google Maps yang lebih akurat
+    
     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
         item.unit_kerja + " " + cityName,
     )}`;
@@ -86,7 +86,6 @@ function FaskesCard({ item }) {
                     </p>
                 </div>
 
-                {/* Menampilkan Email dari Data */}
                 {item.email && (
                     <div className="flex items-center gap-2">
                         <Mail
@@ -99,7 +98,6 @@ function FaskesCard({ item }) {
                     </div>
                 )}
 
-                {/* Menampilkan Nomor Telepon dari Data */}
                 {item.telp && (
                     <div className="flex items-center gap-2">
                         <Phone
@@ -124,7 +122,7 @@ function FaskesCard({ item }) {
 
             <div className="flex gap-2 mt-auto">
                 <a
-                    // Menggunakan nomor telepon asli dari data, fallback ke 119 jika tidak ada
+                    
                     href={`tel:${item.telp || "119"}`}
                     className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-clinical-success text-white font-body font-semibold text-xs rounded-clinical-md shadow-clinical-sm hover:shadow-clinical-md transition-all"
                 >
@@ -143,7 +141,7 @@ function FaskesCard({ item }) {
     );
 }
 
-// ─── Main Page Component ─────────────────────────────────────
+
 export default function Faskes({ facilities, filters, cities }) {
     const [search, setSearch] = useState(filters?.search || "");
     const [city, setCity] = useState(filters?.city || "");
@@ -206,7 +204,6 @@ export default function Faskes({ facilities, filters, cities }) {
         <PublicLayout>
             <Head title="Cari Fasilitas Kesehatan" />
 
-            {/* Page Header */}
             <div className="mb-8">
                 <div className="flex items-center gap-3 mb-3">
                     <div className="w-11 h-11 bg-clinical-warning-light rounded-clinical-lg flex items-center justify-center">
@@ -227,7 +224,6 @@ export default function Faskes({ facilities, filters, cities }) {
                 </div>
             </div>
 
-            {/* Search & Filters */}
             <div className="mb-6 space-y-3">
                 <div className="relative">
                     <Search
@@ -251,7 +247,6 @@ export default function Faskes({ facilities, filters, cities }) {
                         </span>
                     </div>
 
-                    {/* Searchable Wilayah Filter */}
                     <div className="relative" ref={dropdownRef}>
                         <button
                             type="button"
@@ -340,7 +335,6 @@ export default function Faskes({ facilities, filters, cities }) {
                         )}
                     </div>
 
-                    {/* Filter Jenis */}
                     <select
                         value={type}
                         onChange={(e) => setType(e.target.value)}
@@ -366,7 +360,6 @@ export default function Faskes({ facilities, filters, cities }) {
                 </div>
             </div>
 
-            {/* Status Information */}
             <div className="mb-4 flex items-center justify-between pl-3 border-l-2 border-clinical-primary">
                 <p className="font-body text-sm text-clinical-text-secondary">
                     Ditemukan{" "}
@@ -382,7 +375,6 @@ export default function Faskes({ facilities, filters, cities }) {
                 )}
             </div>
 
-            {/* Results Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {facilities.data.length === 0 ? (
                     <div className="col-span-full">
@@ -404,7 +396,6 @@ export default function Faskes({ facilities, filters, cities }) {
                 )}
             </div>
 
-            {/* Pagination */}
             {facilities.last_page > 1 && (
                 <div className="mt-12 flex justify-center items-center gap-4">
                     <Button
@@ -439,7 +430,6 @@ export default function Faskes({ facilities, filters, cities }) {
                 </div>
             )}
 
-            {/* Disclaimer Footer */}
             <div className="mt-12 bg-clinical-warning-light/50 border border-clinical-warning/20 rounded-clinical-xl p-5 flex items-start gap-4">
                 <div className="w-11 h-11 bg-clinical-warning-light rounded-clinical-lg flex items-center justify-center shrink-0">
                     <Stethoscope size={22} className="text-clinical-warning" />

@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { AlertTriangle, RefreshCcw, PackageOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// ─── ErrorBoundary ────────────────────────────────────────
+
 class ErrorBoundary extends React.Component {
     constructor(props) {
         super(props);
@@ -65,7 +65,7 @@ class ErrorBoundary extends React.Component {
     }
 }
 
-// ─── EmptyState ────────────────────────────────────────────
+
 function EmptyState({
     icon: Icon = PackageOpen,
     emoji,
@@ -104,7 +104,7 @@ function EmptyState({
     );
 }
 
-// ─── StepProgress ────────────────────────────────────────────
+
 function StepProgress({ steps = [], currentStep = 0, className }) {
     return (
         <div className={cn("flex items-center gap-1", className)}>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 
-// ─── useLocalStorage ────────────────────────────────────────
-// Read/write to localStorage with SSR safety and JSON serialization.
+
+
 
 export function useLocalStorage(key, initialValue) {
     const [storedValue, setStoredValue] = useState(() => {
@@ -39,8 +39,8 @@ export function useLocalStorage(key, initialValue) {
     return [storedValue, setValue, removeValue];
 }
 
-// ─── useDebounce ────────────────────────────────────────────
-// Returns a debounced version of the input value.
+
+
 
 export function useDebounce(value, delay = 300) {
     const [debouncedValue, setDebouncedValue] = useState(value);
@@ -53,8 +53,8 @@ export function useDebounce(value, delay = 300) {
     return debouncedValue;
 }
 
-// ─── useMediaQuery ──────────────────────────────────────────
-// Returns whether a CSS media query matches.
+
+
 
 export function useMediaQuery(query) {
     const [matches, setMatches] = useState(() => {

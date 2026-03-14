@@ -99,7 +99,6 @@ const AnalysisResult = ({ result, handleTermClick }) => {
                 </p>
             </div>
 
-            {/* Indikator dari Upload Dokumen */}
             {result.type === "doc" && result.data.indicators?.length > 0 && (
                 <div>
                     <h3 className="font-display text-xl font-bold text-clinical-text mb-4">
@@ -153,7 +152,6 @@ const AnalysisResult = ({ result, handleTermClick }) => {
                 </div>
             )}
 
-            {/* Indikator dari Input Manual Lab */}
             {result.type === "lab" && result.data.details && (
                 <div>
                     <h3 className="font-display text-xl font-bold text-clinical-text mb-4">
@@ -181,7 +179,6 @@ const AnalysisResult = ({ result, handleTermClick }) => {
                 </div>
             )}
 
-            {/* Poin Penting */}
             {result.data.key_points?.length > 0 && (
                 <div>
                     <h3 className="font-display text-xl font-bold text-clinical-text mb-4">
@@ -464,7 +461,7 @@ function HealthInsightFeature({ mode }) {
                         </Button>
                     </form>
                 ) : (
-                    /* Form Upload Dokumen tidak berubah, hanya update UX Button */
+                    
                     <form
                         onSubmit={handleDocSubmit}
                         className="space-y-4 animate-in fade-in"
@@ -601,7 +598,6 @@ function HealthInsightFeature({ mode }) {
                     </div>
                 )}
 
-                {/* Term Explanation Tooltip */}
                 {activeTerm && (
                     <Card className="fixed bottom-20 md:bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-clinical-text border-none shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-8">
                         <CardHeader className="p-5 pb-3 flex flex-row items-start justify-between space-y-0">

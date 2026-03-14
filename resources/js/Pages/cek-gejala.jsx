@@ -40,7 +40,6 @@ export default function CekGejala() {
             <PublicLayout>
                 <Head title="Cek Gejala — MediCheck ID" />
 
-                {/* Back button */}
                 <button
                     onClick={() => setSelectedMode(null)}
                     className="font-body text-sm text-clinical-text-secondary hover:text-clinical-primary transition-colors mb-4 inline-flex items-center gap-1"
@@ -57,7 +56,6 @@ export default function CekGejala() {
         <PublicLayout>
             <Head title="Cek Gejala — MediCheck ID" />
 
-            {/* Header */}
             <div className="mb-8">
                 <div className="flex items-center gap-3 mb-3">
                     <div className="w-11 h-11 bg-clinical-primary-light rounded-clinical-lg flex items-center justify-center">
@@ -78,7 +76,6 @@ export default function CekGejala() {
                 </div>
             </div>
 
-            {/* Mode Selection */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
                 {MODES.map((mode) => {
                     const Icon = mode.icon;
@@ -122,7 +119,6 @@ export default function CekGejala() {
                 })}
             </div>
 
-            {/* Info Section */}
             <div className="bg-white border border-clinical-border rounded-clinical-xl p-6 shadow-clinical-xs mb-8">
                 <div className="flex items-center gap-2 mb-3">
                     <Sparkles size={18} className="text-clinical-primary" />
@@ -170,7 +166,6 @@ export default function CekGejala() {
                 </div>
             </div>
 
-            {/* Disclaimer */}
             <div className="bg-clinical-warning-light/50 border border-clinical-warning/20 rounded-clinical-xl p-5">
                 <div className="flex items-start gap-3">
                     <AlertTriangle

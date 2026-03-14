@@ -14,8 +14,10 @@ import {
     ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
-// ─── Animation Variants ──────────────────────────────────────
+
 const fadeUp = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -33,7 +35,7 @@ const staggerContainer = {
     },
 };
 
-// ─── Feature Cards Data ──────────────────────────────────────
+
 const FEATURES = [
     {
         href: "/cek-gejala",
@@ -104,7 +106,7 @@ const colorMap = {
     },
 };
 
-// ─── Stats ───────────────────────────────────────────────────
+
 const STATS = [
     { emoji: "🩺", value: "15+", label: "Kondisi Medis" },
     { emoji: "📊", value: "6", label: "Dimensi Gaya Hidup" },
@@ -112,20 +114,18 @@ const STATS = [
     { emoji: "🤖", value: "AI", label: "Triage Pintar" },
 ];
 
-// ─── Main Component ──────────────────────────────────────────
+
 export default function Home() {
     return (
         <PublicLayout>
             <Head title="MediCheck ID — Platform Kesehatan Digital Modern" />
 
-            {/* ── Hero Section ── */}
             <motion.section
                 initial="hidden"
                 animate="visible"
                 variants={staggerContainer}
-                className="relative overflow-hidden rounded-clinical-2xl bg-gradient-to-br from-white via-clinical-primary-light/20 to-clinical-accent-light/30 border border-clinical-border mb-16 shadow-clinical-sm"
+                className="relative overflow-hidden rounded-clinical-2xl bg-linear-to-br from-white via-clinical-primary-light/20 to-clinical-accent-light/30 border border-clinical-border mb-16 shadow-clinical-sm"
             >
-                {/* Decorative Blobs */}
                 <div className="absolute -top-24 -right-24 w-96 h-96 bg-clinical-primary/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-clinical-success/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -148,7 +148,7 @@ export default function Home() {
                         className="font-display text-4xl md:text-5xl lg:text-7xl font-extrabold text-clinical-text leading-[1.15] mb-6 tracking-tight"
                     >
                         Literasi Kesehatan Anda,{" "}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-clinical-primary to-clinical-success">
+                        <span className="text-transparent bg-clip-text bg-linear-to-r from-clinical-primary to-clinical-success">
                             Dalam Genggaman
                         </span>
                     </motion.h1>
@@ -181,11 +181,23 @@ export default function Home() {
                             <Heart size={18} className="text-clinical-danger" />
                             Kalkulator Health Score
                         </Link>
+                        <Button
+                            onClick={() =>
+                                toast.success(
+                                    "Fitur sedang dalam pengembangan.",
+                                )
+                            }
+                            variant="outline"
+                            size="sm"
+                            className="hidden md:inline-flex"
+                        >
+                            <span>Pelajari Lebih Lanjut</span>
+                            <ChevronRight size={16} />
+                        </Button>
                     </motion.div>
                 </div>
             </motion.section>
 
-            {/* ── Stats Bar ── */}
             <motion.section
                 initial="hidden"
                 whileInView="visible"
@@ -199,7 +211,7 @@ export default function Home() {
                         key={i}
                         className="bg-white border border-clinical-border rounded-clinical-xl p-6 text-center shadow-clinical-xs hover:shadow-clinical-md hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-clinical-bg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute inset-0 bg-linear-to-b from-transparent to-clinical-bg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         <span className="text-3xl block mb-2 relative z-10">
                             {stat.emoji}
                         </span>
@@ -213,7 +225,6 @@ export default function Home() {
                 ))}
             </motion.section>
 
-            {/* ── Features Grid ── */}
             <motion.section
                 initial="hidden"
                 whileInView="visible"
@@ -249,7 +260,7 @@ export default function Home() {
                                     className="group block bg-white border border-clinical-border rounded-clinical-2xl p-6 md:p-8 shadow-clinical-xs hover:shadow-clinical-lg hover:-translate-y-1.5 transition-all duration-300 relative overflow-hidden"
                                 >
                                     <div
-                                        className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-transparent to-${feature.color}-500/5 rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}
+                                        className={`absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-transparent to-${feature.color}-500/5 rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}
                                     />
 
                                     <div className="flex flex-col sm:flex-row items-start gap-5 relative z-10">
@@ -296,7 +307,6 @@ export default function Home() {
                 </div>
             </motion.section>
 
-            {/* ── Trust Indicators ── */}
             <motion.section
                 initial="hidden"
                 whileInView="visible"
@@ -332,7 +342,6 @@ export default function Home() {
                 </div>
             </motion.section>
 
-            {/* ── CTA Section ── */}
             <motion.section
                 initial="hidden"
                 whileInView="visible"
@@ -340,8 +349,7 @@ export default function Home() {
                 variants={fadeUp}
                 className="mb-8"
             >
-                <div className="bg-gradient-to-r from-clinical-primary to-clinical-primary-hover rounded-clinical-2xl p-10 md:p-14 text-center shadow-clinical-lg relative overflow-hidden">
-                    {/* Abstract shapes for CTA */}
+                <div className="bg-linear-to-r from-clinical-primary to-clinical-primary-hover rounded-clinical-2xl p-10 md:p-14 text-center shadow-clinical-lg relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
                     <div className="absolute bottom-0 left-0 w-48 h-48 bg-clinical-accent/20 rounded-full blur-2xl translate-y-1/3 -translate-x-1/4" />
 
