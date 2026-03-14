@@ -23,7 +23,6 @@ export default function AIPromptCard({
         stop,
     } = useSpeechRecognition({ lang: "id-ID" });
 
-    
     useEffect(() => {
         if (contextPath.length > 0 && !symptomDesc) {
             const ctx = `Saya sebelumnya menjawab: ${contextPath.join(" → ")}. `;
@@ -87,7 +86,7 @@ export default function AIPromptCard({
                     >
                         <div className="relative">
                             <textarea
-                                className="w-full min-h-[140px] pl-4 pr-12 py-4 border border-clinical-border rounded-clinical-md font-body text-sm resize-y focus:outline-none focus:border-clinical-primary focus:ring-2 focus:ring-clinical-primary/20 transition-all"
+                                className="w-full min-h-35 pl-4 pr-12 py-4 border border-clinical-border rounded-clinical-md font-body text-sm resize-y focus:outline-none focus:border-clinical-primary focus:ring-2 focus:ring-clinical-primary/20 transition-all"
                                 placeholder="Contoh: Saya merasa sakit kepala sebelah kiri berdenyut sejak kemarin sore..."
                                 value={symptomDesc}
                                 onChange={(e) => setSymptomDesc(e.target.value)}

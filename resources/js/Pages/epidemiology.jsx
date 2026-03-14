@@ -21,7 +21,6 @@ import {
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-
 import L from "leaflet";
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -85,10 +84,10 @@ export default function AdminEpidemiology() {
     const activeCities = data.cityStats.length;
 
     const getUrgencyColor = (urgency) => {
-        if (urgency === "emergency") return "#ef4444"; 
-        if (urgency === "high") return "#f59e0b"; 
-        if (urgency === "moderate") return "#fbbf24"; 
-        return "#10b981"; 
+        if (urgency === "emergency") return "#ef4444";
+        if (urgency === "high") return "#f59e0b";
+        if (urgency === "moderate") return "#fbbf24";
+        return "#10b981";
     };
 
     return (
@@ -147,14 +146,14 @@ export default function AdminEpidemiology() {
                             </h2>
                         </div>
                     </div>
-                    <div className="h-[500px] w-full bg-slate-100 relative">
+                    <div className="h-125 w-full bg-slate-100 relative">
                         {isLoading ? (
                             <div className="absolute inset-0 flex items-center justify-center">
                                 <Activity className="w-10 h-10 text-clinical-primary animate-pulse" />
                             </div>
                         ) : (
                             <MapContainer
-                                center={[-2.5489, 118.0149]} 
+                                center={[-2.5489, 118.0149]}
                                 zoom={5}
                                 scrollWheelZoom={false}
                                 style={{ height: "100%", width: "100%" }}
@@ -208,11 +207,11 @@ export default function AdminEpidemiology() {
                             Agregasi laporan per wilayah.
                         </p>
                     </div>
-                    <div className="p-5 flex-1 min-h-[300px]">
+                    <div className="p-5 flex-1 min-h-75">
                         {!isLoading && data.cityStats.length > 0 ? (
                             <ResponsiveContainer width="100%" height={350}>
                                 <BarChart
-                                    data={data.cityStats.slice(0, 7)} 
+                                    data={data.cityStats.slice(0, 7)}
                                     layout="vertical"
                                     margin={{ left: 10, right: 20 }}
                                 >
