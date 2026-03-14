@@ -101,7 +101,10 @@ export default function AdminEpidemiology() {
                 </div>
                 <div>
                     <h1 className="font-display text-3xl font-black text-clinical-text tracking-tight uppercase">
-                        Radar <span className="text-clinical-primary">Epidemiologi</span>
+                        Radar{" "}
+                        <span className="text-clinical-primary">
+                            Epidemiologi
+                        </span>
                     </h1>
                     <p className="text-clinical-text-secondary mt-1">
                         Pemantauan Sebaran Penyakit & Gejala Secara Real-Time
@@ -128,7 +131,7 @@ export default function AdminEpidemiology() {
                     title="KOTA TERDAMPAK"
                     value={isLoading ? "..." : activeCities}
                     icon={MapPin}
-                    colorClass="bg-clinical-secondary shadow-lg shadow-clinical-secondary/40"
+                    colorClass="bg-clinical-warning shadow-lg shadow-clinical-secondary/40"
                 />
             </div>
 
@@ -168,7 +171,9 @@ export default function AdminEpidemiology() {
                                         key={idx}
                                         center={[stat.latitude, stat.longitude]}
                                         radius={
-                                            stat.urgency === "emergency" ? 12 : 8
+                                            stat.urgency === "emergency"
+                                                ? 12
+                                                : 8
                                         }
                                         fillColor={getUrgencyColor(
                                             stat.urgency,

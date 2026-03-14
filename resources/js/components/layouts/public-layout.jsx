@@ -14,6 +14,7 @@ import {
     PhoneCall,
     Info,
     Phone,
+    Users,
 } from "lucide-react";
 
 // ─── Panic Mode ──────────────────────────────────────────────
@@ -180,6 +181,12 @@ const NAV_LINKS = [
         label: "Faskes",
         icon: MapPin,
         emoji: "📍",
+    },
+    {
+        href: "/epidemiology",
+        label: "Epidemiology",
+        icon: Users,
+        emoji: "🦠",
     },
 ];
 
