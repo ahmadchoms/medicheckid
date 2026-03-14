@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import {
     Activity,
     AlertTriangle,
@@ -8,6 +8,7 @@ import {
     Users,
     TrendingUp,
     ShieldAlert,
+    ArrowLeft,
 } from "lucide-react";
 import {
     BarChart,
@@ -20,7 +21,6 @@ import {
 } from "recharts";
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-
 
 import L from "leaflet";
 delete L.Icon.Default.prototype._getIconUrl;
@@ -85,32 +85,43 @@ export default function AdminEpidemiology() {
     const activeCities = data.cityStats.length;
 
     const getUrgencyColor = (urgency) => {
-        if (urgency === "emergency") return "#ef4444"; 
-        if (urgency === "high") return "#f59e0b"; 
-        if (urgency === "moderate") return "#fbbf24"; 
-        return "#10b981"; 
+        if (urgency === "emergency") return "#ef4444";
+        if (urgency === "high") return "#f59e0b";
+        if (urgency === "moderate") return "#fbbf24";
+        return "#10b981";
     };
 
     return (
         <div className="min-h-screen bg-clinical-bg font-body p-4 md:p-8">
-            <Head title="Peta Epidemiologi - Admin" />
+            <Head title="Peta Epidemiologi" />
 
-            <header className="mb-8 flex items-center gap-3">
-                <div className="w-12 h-12 bg-clinical-primary text-white rounded-xl flex items-center justify-center shadow-clinical-md shadow-clinical-primary/30">
-                    <Activity size={28} />
-                </div>
-                <div>
-                    <h1 className="font-display text-3xl font-black text-clinical-text tracking-tight uppercase">
-                        Radar{" "}
-                        <span className="text-clinical-primary">
-                            Epidemiologi
-                        </span>
-                    </h1>
-                    <p className="text-clinical-text-secondary mt-1">
-                        Pemantauan Sebaran Penyakit & Gejala Secara Real-Time
-                    </p>
-                </div>
-            </header>
+            <div className="mb-8 flex flex-col gap-4">
+                <Link
+                    href="/" // Ubah tujuan route ini jika ingin kembali ke dashboard (misal: href="/dashboard")
+                    className="inline-flex items-center gap-2 text-clinical-text-secondary hover:text-clinical-primary transition-colors w-fit bg-white px-4 py-2 rounded-lg shadow-sm border border-clinical-border"
+                >
+                    <ArrowLeft size={20} />
+                    <span className="font-medium font-body">Kembali</span>
+                </Link>
+
+                <header className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-clinical-primary text-white rounded-xl flex items-center justify-center shadow-clinical-md shadow-clinical-primary/30">
+                        <Activity size={28} />
+                    </div>
+                    <div>
+                        <h1 className="font-display text-3xl font-black text-clinical-text tracking-tight uppercase">
+                            Radar{" "}
+                            <span className="text-clinical-primary">
+                                Epidemiologi
+                            </span>
+                        </h1>
+                        <p className="text-clinical-text-secondary mt-1">
+                            Pemantauan Sebaran Penyakit & Gejala Secara
+                            Real-Time
+                        </p>
+                    </div>
+                </header>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <StatCard
@@ -154,7 +165,7 @@ export default function AdminEpidemiology() {
                             </div>
                         ) : (
                             <MapContainer
-                                center={[-2.5489, 118.0149]} 
+                                center={[-2.5489, 118.0149]}
                                 zoom={5}
                                 scrollWheelZoom={false}
                                 style={{ height: "100%", width: "100%" }}
@@ -212,7 +223,7 @@ export default function AdminEpidemiology() {
                         {!isLoading && data.cityStats.length > 0 ? (
                             <ResponsiveContainer width="100%" height={350}>
                                 <BarChart
-                                    data={data.cityStats.slice(0, 7)} 
+                                    data={data.cityStats.slice(0, 7)}
                                     layout="vertical"
                                     margin={{ left: 10, right: 20 }}
                                 >
