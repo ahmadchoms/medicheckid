@@ -44,15 +44,27 @@ const MODES = [
 ];
 
 const HighlightedText = ({ text, terms, onTermClick }) => {
-    if (!terms || terms.length === 0 || !text) return <span>{text}</span>;
-    const regex = new RegExp(`(${terms.join("|")})`, "gi");
+    // 1. Saring (filter) terms agar hanya berisi string yang valid (mengamankan dari null/undefined)
+    const validTerms = terms?.filter((t) => t && typeof t === "string") || [];
+
+    // 2. Jika tidak ada term yang valid atau tidak ada teks, kembalikan teks biasa
+    if (validTerms.length === 0 || !text) return <span>{text}</span>;
+
+    // 3. Buat regex berdasarkan term yang sudah divalidasi
+    const regex = new RegExp(`(${validTerms.join("|")})`, "gi");
     const parts = text.split(regex);
+
     return (
         <span>
             {parts.map((part, i) => {
-                const isTerm = terms.find(
+                // Amankan part yang mungkin kosong
+                if (!part) return null;
+
+                // Lakukan pengecekan dengan aman
+                const isTerm = validTerms.find(
                     (t) => t.toLowerCase() === part.toLowerCase(),
                 );
+
                 if (isTerm) {
                     return (
                         <span
@@ -461,7 +473,6 @@ function HealthInsightFeature({ mode }) {
                         </Button>
                     </form>
                 ) : (
-                    
                     <form
                         onSubmit={handleDocSubmit}
                         className="space-y-4 animate-in fade-in"

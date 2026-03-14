@@ -107,8 +107,8 @@ class HealthInsightController extends Controller
 
         if ($file) {
             $parts[] = [
-                'inline_data' => [
-                    'mime_type' => $file->getMimeType(),
+                'inlineData' => [
+                    'mimeType' => $file->getMimeType(),
                     'data' => base64_encode(file_get_contents($file->getPathname()))
                 ]
             ];
