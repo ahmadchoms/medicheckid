@@ -19,9 +19,8 @@ export default function HealthScoreResult({ result, onRetake }) {
     const grade = getScoreGrade(result.aggregate);
     const weakest = getWeakestDimensions(result.dimensions, 2);
 
-    
     const [habits, setHabits] = useState(() => {
-        const dateKey = new Date().toISOString().split("T")[0]; 
+        const dateKey = new Date().toISOString().split("T")[0];
         const saved = storage.get(`medicheck_habits_${dateKey}`);
         if (saved) return saved;
         return generateDailyHabits(weakest);
@@ -29,7 +28,6 @@ export default function HealthScoreResult({ result, onRetake }) {
 
     const [animatingHabitId, setAnimatingHabitId] = useState(null);
 
-    
     const toggleHabit = (id) => {
         const habitToToggle = habits.find((h) => h.id === id);
         const willBeDone = !habitToToggle.done;
@@ -45,7 +43,7 @@ export default function HealthScoreResult({ result, onRetake }) {
         if (willBeDone) {
             setAnimatingHabitId(id);
             toast.success("Misi selesai! 🎉");
-            setTimeout(() => setAnimatingHabitId(null), 1000); 
+            setTimeout(() => setAnimatingHabitId(null), 1000);
         } else {
             toast.info("Misi dibatalkan.");
         }
@@ -70,9 +68,6 @@ export default function HealthScoreResult({ result, onRetake }) {
             toast.success("Disalin ke clipboard!");
         }
     };
-
-    
-    
 
     return (
         <div className="space-y-6 animate-slide-up">
@@ -212,7 +207,7 @@ export default function HealthScoreResult({ result, onRetake }) {
                 </CardContent>
             </Card>
 
-            <Card className="border border-clinical-border rounded-clinical-xl shadow-clinical-sm bg-gradient-to-br from-white to-clinical-success-light/30 relative overflow-hidden">
+            <Card className="border border-clinical-border rounded-clinical-xl shadow-clinical-sm bg-linear-to-br from-white to-clinical-success-light/30 relative overflow-hidden">
                 <CardHeader className="pb-3 border-b border-clinical-border relative z-10">
                     <div className="flex justify-between items-center">
                         <h3 className="font-display text-lg font-bold text-clinical-text flex items-center gap-2">

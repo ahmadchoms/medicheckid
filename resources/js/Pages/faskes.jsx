@@ -14,7 +14,7 @@ import {
     ChevronRight,
     Building2,
     ChevronDown,
-    Mail, 
+    Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PublicLayout from "@/components/layouts/public-layout";
@@ -23,15 +23,12 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/feedback";
 
-
 const FASKES_TYPES = {
     rumah_sakit: { label: "Rumah Sakit", emoji: "🏥", color: "blue" },
     puskesmas: { label: "Puskesmas", emoji: "🩺", color: "green" },
 };
 
-
 function FaskesCard({ item }) {
-    
     const cityName = item.regency?.nama_wilayah || `Kode Kab: ${item.kode_kab}`;
 
     const typeInfo = FASKES_TYPES[item.type] || {
@@ -40,7 +37,6 @@ function FaskesCard({ item }) {
         color: "gray",
     };
 
-    
     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
         item.unit_kerja + " " + cityName,
     )}`;
@@ -75,7 +71,7 @@ function FaskesCard({ item }) {
                 )}
             </div>
 
-            <div className="space-y-1.5 mb-4 flex-grow">
+            <div className="space-y-1.5 mb-4 grow">
                 <div className="flex items-start gap-2">
                     <MapPin
                         size={14}
@@ -122,7 +118,6 @@ function FaskesCard({ item }) {
 
             <div className="flex gap-2 mt-auto">
                 <a
-                    
                     href={`tel:${item.telp || "119"}`}
                     className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-clinical-success text-white font-body font-semibold text-xs rounded-clinical-md shadow-clinical-sm hover:shadow-clinical-md transition-all"
                 >
@@ -140,7 +135,6 @@ function FaskesCard({ item }) {
         </div>
     );
 }
-
 
 export default function Faskes({ facilities, filters, cities }) {
     const [search, setSearch] = useState(filters?.search || "");
@@ -275,7 +269,7 @@ export default function Faskes({ facilities, filters, cities }) {
                         </button>
 
                         {isCityOpen && (
-                            <div className="absolute top-full left-0 mt-2 w-72 bg-white border border-clinical-border rounded-clinical-lg shadow-clinical-lg z-[50]">
+                            <div className="absolute top-full left-0 mt-2 w-72 bg-white border border-clinical-border rounded-clinical-lg shadow-clinical-lg z-50">
                                 <div className="p-2 border-b border-clinical-border">
                                     <div className="relative">
                                         <Search

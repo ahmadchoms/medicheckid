@@ -202,7 +202,7 @@ const AnalysisResult = ({ result, handleTermClick }) => {
                                 key={idx}
                                 className="flex gap-3 font-body text-base text-clinical-text-secondary bg-white p-4 rounded-clinical-md border border-clinical-border"
                             >
-                                <span className="text-clinical-primary font-bold text-xl mt-[-2px]">
+                                <span className="text-clinical-primary font-bold text-xl -mt-0.5">
                                     •
                                 </span>
                                 <span>
@@ -577,7 +577,7 @@ function HealthInsightFeature({ mode }) {
                 )}
             </div>
 
-            <div className="bg-clinical-bg p-6 md:p-8 rounded-clinical-xl border border-clinical-border relative min-h-[300px] flex flex-col">
+            <div className="bg-clinical-bg p-6 md:p-8 rounded-clinical-xl border border-clinical-border relative min-h-75 flex flex-col">
                 {isLoading ? (
                     <div className="m-auto flex flex-col items-center justify-center text-clinical-muted py-12">
                         <Loader2

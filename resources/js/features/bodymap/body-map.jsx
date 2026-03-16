@@ -38,7 +38,7 @@ export default function BodyMap({ onAreaSelect, selectedArea }) {
 
     return (
         <div className="flex flex-col items-center gap-6">
-            <div className="relative w-full max-w-[280px]">
+            <div className="relative w-full max-w-70">
                 <svg
                     viewBox="0 0 300 520"
                     className="w-full h-auto"

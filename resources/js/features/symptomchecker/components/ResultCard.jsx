@@ -13,7 +13,6 @@ export default function ResultCard({ result, userQuery, onReset, pathArr }) {
 
     const isEmergency = result?.urgency === "emergency";
 
-    
     useEffect(() => {
         if (isEmergency) {
             setShowEmergencyModal(true);
@@ -248,14 +247,14 @@ export default function ResultCard({ result, userQuery, onReset, pathArr }) {
                         {pathArr.map((p, i) => (
                             <span
                                 key={i}
-                                className="text-xs bg-clinical-bg border border-clinical-border rounded-full px-2.5 py-0.5 font-body text-clinical-text-secondary break-words max-w-full"
+                                className="text-xs bg-clinical-bg border border-clinical-border rounded-full px-2.5 py-0.5 font-body text-clinical-text-secondary wrap-break-words max-w-full"
                             >
                                 {i + 1}. {p}
                             </span>
                         ))}
                     </div>
                 ) : (
-                    <p className="text-sm font-body italic text-clinical-text-secondary break-words">
+                    <p className="text-sm font-body italic text-clinical-text-secondary wrap-break-words">
                         "{userQuery}"
                     </p>
                 )}
@@ -287,27 +286,27 @@ export default function ResultCard({ result, userQuery, onReset, pathArr }) {
                         📞 Nomor Darurat Penting
                     </p>
                     <div className="grid grid-cols-3 gap-2">
-                        <div className="text-center bg-white border border-clinical-border rounded-clinical-md py-2 px-1 flex flex-col items-center justify-center min-h-[70px]">
+                        <div className="text-center bg-white border border-clinical-border rounded-clinical-md py-2 px-1 flex flex-col items-center justify-center min-h-17.5">
                             <span className="inline-flex items-center px-1.5 py-0.5 bg-clinical-danger-light font-body text-sm font-bold text-clinical-danger rounded-full break-all">
                                 119
                             </span>
-                            <p className="text-[10px] sm:text-xs font-body text-clinical-muted mt-1.5 break-words">
+                            <p className="text-[10px] sm:text-xs font-body text-clinical-muted mt-1.5 wrap-break-words">
                                 Ambulans
                             </p>
                         </div>
-                        <div className="text-center bg-white border border-clinical-border rounded-clinical-md py-2 px-1 flex flex-col items-center justify-center min-h-[70px]">
+                        <div className="text-center bg-white border border-clinical-border rounded-clinical-md py-2 px-1 flex flex-col items-center justify-center min-h-17.5">
                             <span className="inline-flex items-center px-1.5 py-0.5 bg-clinical-primary-light font-body text-[13px] font-bold text-clinical-primary rounded-full break-all">
                                 1500-567
                             </span>
-                            <p className="text-[10px] sm:text-xs font-body text-clinical-muted mt-1.5 break-words">
+                            <p className="text-[10px] sm:text-xs font-body text-clinical-muted mt-1.5 wrap-break-words">
                                 Hotline
                             </p>
                         </div>
-                        <div className="text-center bg-white border border-clinical-border rounded-clinical-md py-2 px-1 flex flex-col items-center justify-center min-h-[70px]">
+                        <div className="text-center bg-white border border-clinical-border rounded-clinical-md py-2 px-1 flex flex-col items-center justify-center min-h-17.5">
                             <span className="inline-flex items-center px-1.5 py-0.5 bg-clinical-success-light font-body text-[13px] font-bold text-clinical-success rounded-full break-all">
                                 ext 8
                             </span>
-                            <p className="text-[10px] sm:text-xs font-body text-clinical-muted mt-1.5 break-words">
+                            <p className="text-[10px] sm:text-xs font-body text-clinical-muted mt-1.5 wrap-break-words">
                                 Mental
                             </p>
                         </div>

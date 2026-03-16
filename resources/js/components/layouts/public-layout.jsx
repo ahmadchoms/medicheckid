@@ -17,7 +17,6 @@ import {
     Users,
 } from "lucide-react";
 
-
 function PanicMode() {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -44,7 +43,7 @@ function PanicMode() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[9999] bg-clinical-danger flex flex-col items-center justify-center p-6 text-white overflow-y-auto"
+                        className="fixed inset-0 z-9999 bg-clinical-danger flex flex-col items-center justify-center p-6 text-white overflow-y-auto"
                     >
                         <button
                             onClick={() => setIsOpen(false)}
@@ -157,7 +156,6 @@ function PanicMode() {
     );
 }
 
-
 const NAV_LINKS = [
     { href: "/", label: "Beranda", icon: Home, emoji: "🏠" },
     { href: "/cek-gejala", label: "Cek Gejala", icon: Activity, emoji: "🩺" },
@@ -188,7 +186,6 @@ const NAV_LINKS = [
     },
 ];
 
-
 function EmergencyBanner() {
     return (
         <div className="bg-clinical-danger relative overflow-hidden">
@@ -213,13 +210,11 @@ function EmergencyBanner() {
     );
 }
 
-
 function Header() {
     const { url } = usePage();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
-    
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
         window.addEventListener("scroll", handleScroll);
@@ -393,11 +388,10 @@ function Header() {
     );
 }
 
-
 function Footer() {
     return (
         <footer className="bg-white border-t border-clinical-border mt-auto relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-clinical-primary-light/20 pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-b from-transparent to-clinical-primary-light/20 pointer-events-none" />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-10 mb-10">
@@ -495,7 +489,6 @@ function Footer() {
     );
 }
 
-
 function BottomNav() {
     const { url } = usePage();
 
@@ -551,7 +544,6 @@ function BottomNav() {
         </nav>
     );
 }
-
 
 export default function PublicLayout({ children, fullWidth = false }) {
     return (
