@@ -6,14 +6,14 @@ echo "====================================================="
 echo "🚀 Memulai Setup & Deployment MedicheckID"
 echo "====================================================="
 
-# echo "📦 1. Build Aset Frontend (React/Vite)..."
-# npm install && npm run build
+echo "📦 1. Build Aset Frontend (React/Vite)..."
+npm install && npm run build
 
 echo "🐳 Membangun dan menyalakan Docker Container..."
 docker-compose up -d --build
 
 echo "⏳ Menunggu PostgreSQL siap menerima koneksi (10 detik)..."
-sleep 300
+sleep 10
 
 echo "🐘 Menginstal Dependency Laravel (Vendor)..."
 docker-compose exec app composer install --optimize-autoloader --no-dev
