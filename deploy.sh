@@ -6,23 +6,26 @@ echo "====================================================="
 echo "🚀 Memulai Setup & Deployment MedicheckID"
 echo "====================================================="
 
-echo "🐳 2. Membangun dan menyalakan Docker Container..."
+# echo "📦 1. Build Aset Frontend (React/Vite)..."
+# npm install && npm run build
+
+echo "🐳 Membangun dan menyalakan Docker Container..."
 docker-compose up -d --build
 
 echo "⏳ Menunggu PostgreSQL siap menerima koneksi (10 detik)..."
 sleep 300
 
-echo "🐘 3. Menginstal Dependency Laravel (Vendor)..."
+echo "🐘 Menginstal Dependency Laravel (Vendor)..."
 docker-compose exec app composer install --optimize-autoloader --no-dev
 
-echo "🗄️ 4. Menjalankan Migrasi & Seeder Database..."
+echo "🗄️ Menjalankan Migrasi & Seeder Database..."
 docker-compose exec app php artisan migrate --force
 docker-compose exec app php artisan db:seed --force
 
-echo "🔗 5. Menautkan Folder Storage (Storage Link)..."
+echo "🔗 Menautkan Folder Storage (Storage Link)..."
 docker-compose exec app php artisan storage:link
 
-echo "⚡ 6. Membersihkan & Mengoptimasi Cache Laravel..."
+echo "⚡ Membersihkan & Mengoptimasi Cache Laravel..."
 docker-compose exec app php artisan optimize:clear
 docker-compose exec app php artisan optimize
 
