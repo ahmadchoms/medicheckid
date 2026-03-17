@@ -11,7 +11,6 @@ class SymptomLogFactory extends Factory
 
     public function definition(): array
     {
-        // Daftar kota yang diperluas mencakup seluruh pulau besar di Indonesia
         $cities = [
             // Jawa & Bali
             ['name' => 'Jakarta', 'lat' => -6.2088, 'lng' => 106.8456],
@@ -54,16 +53,15 @@ class SymptomLogFactory extends Factory
             ['name' => 'Sorong', 'lat' => -0.8761, 'lng' => 131.2556],
         ];
 
-        $city = $this->faker->randomElement($cities);
+        // Memilih kota acak menggunakan native PHP
+        $city = $cities[array_rand($cities)];
 
-        // Menambahkan radius random yang sedikit lebih besar agar penyebarannya lebih natural di sekitar kota
-        $latitude = $city['lat'] + $this->faker->randomFloat(5, -0.15, 0.15);
-        $longitude = $city['lng'] + $this->faker->randomFloat(5, -0.15, 0.15);
+        // Menghasilkan koordinat acak
+        $latitude = $city['lat'] + (mt_rand(-15000, 15000) / 100000);
+        $longitude = $city['lng'] + (mt_rand(-15000, 15000) / 100000);
 
-        // Urgensi sesuai dengan indikator warna di React UI
         $urgencies = ['low', 'moderate', 'high', 'emergency'];
 
-        // Daftar kondisi penyakit yang diperluas
         $conditionsList = [
             'Demam tinggi (DBD), Trombosit menurun, Nyeri sendi',
             'Gejala mirip COVID-19, Batuk kering, Anosmia, Kelelahan',
@@ -80,15 +78,23 @@ class SymptomLogFactory extends Factory
             'Gatal hebat di malam hari, Ruam sela jari (Scabies/Kudis)'
         ];
 
+        // Daftar kata acak untuk ringkasan gejala
+        $symptomsWords = ['demam', 'pusing', 'mual', 'batuk kering', 'sesak napas', 'nyeri sendi', 'lemas', 'kedinginan', 'sakit tenggorokan', 'hilang penciuman'];
+        $randomKeys = array_rand($symptomsWords, mt_rand(3, 6));
+        $selectedSymptoms = array_intersect_key($symptomsWords, array_flip((array) $randomKeys));
+        $symptomsSummary = ucfirst(implode(', ', $selectedSymptoms)) . '.';
+
+        // Random waktu untuk 3 bulan terakhir (sekitar 90 hari)
+        $randomTimestamp = mt_rand(strtotime('-3 months'), time());
+
         return [
             'city' => $city['name'],
             'latitude' => $latitude,
             'longitude' => $longitude,
-            'symptoms_summary' => $this->faker->sentence(rand(4, 8)),
-            'conditions' => $this->faker->randomElement($conditionsList),
-            'urgency' => $this->faker->randomElement($urgencies),
-            // Mengatur waktu pembuatan log acak dalam 3 bulan terakhir agar grafik tren lebih dinamis
-            'created_at' => $this->faker->dateTimeBetween('-3 months', 'now'),
+            'symptoms_summary' => $symptomsSummary,
+            'conditions' => $conditionsList[array_rand($conditionsList)],
+            'urgency' => $urgencies[array_rand($urgencies)],
+            'created_at' => date('Y-m-d H:i:s', $randomTimestamp),
             'updated_at' => now(),
         ];
     }
