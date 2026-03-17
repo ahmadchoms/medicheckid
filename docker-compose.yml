@@ -20,6 +20,7 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+      # - "443:443"
     volumes:
       - ./:/var/www
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
@@ -29,16 +30,18 @@ services:
       - app
 
   db:
-    image: mysql:8.0
+    image: postgres:15-alpine
     container_name: medicheck_db
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: medicheck_db
-      MYSQL_ROOT_PASSWORD: root
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    command: postgres -c shared_buffers=64MB -c max_connections=50 -c work_mem=4MB
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - dbdata:/var/lib/mysql
+      - dbdata:/var/lib/postgresql/data
     networks:
       - medicheck_network
 
