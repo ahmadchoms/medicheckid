@@ -61,11 +61,24 @@ export default function HealthScoreResult({ result, onRetake }) {
 
     const handleShare = async () => {
         const text = `Health Score saya di MediCheck ID: ${result.aggregate}/100 — Grade ${grade.grade} (${grade.label}) 💪\nCek kesehatan kamu juga di medicheckid.com`;
-        if (navigator.share) {
-            await navigator.share({ title: "Health Score MediCheck ID", text });
-        } else {
+
+        if (navigator.share && window.isSecureContext) {
+            try {
+                await navigator.share({
+                    title: "Health Score MediCheck ID",
+                    text,
+                });
+                return;
+            } catch (error) {
+                if (error.name === "AbortError") return;
+            }
+        }
+
+        try {
             await navigator.clipboard.writeText(text);
             toast.success("Disalin ke clipboard!");
+        } catch (err) {
+            toast.error("Gagal menyalin ke clipboard.");
         }
     };
 

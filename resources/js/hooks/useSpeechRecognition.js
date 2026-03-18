@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
-
 export function useSpeechRecognition({ lang = "id-ID" } = {}) {
     const [text, setText] = useState("");
     const [isListening, setIsListening] = useState(false);
@@ -8,9 +7,13 @@ export function useSpeechRecognition({ lang = "id-ID" } = {}) {
     const recognitionRef = useRef(null);
 
     useEffect(() => {
-        if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+        if (
+            "webkitSpeechRecognition" in window ||
+            "SpeechRecognition" in window
+        ) {
             setIsSupported(true);
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const SpeechRecognition =
+                window.SpeechRecognition || window.webkitSpeechRecognition;
             const recognition = new SpeechRecognition();
             recognition.continuous = true;
             recognition.interimResults = true;
@@ -28,8 +31,7 @@ export function useSpeechRecognition({ lang = "id-ID" } = {}) {
 
     const start = useCallback(() => {
         if (!recognitionRef.current) return;
-        
-        
+
         const currentText = text;
 
         recognitionRef.current.onresult = (event) => {
@@ -51,7 +53,7 @@ export function useSpeechRecognition({ lang = "id-ID" } = {}) {
                 finalTranscript +
                 interimTranscript
             ).trim();
-            
+
             setText(newText);
         };
 
@@ -90,6 +92,6 @@ export function useSpeechRecognition({ lang = "id-ID" } = {}) {
         start,
         stop,
         reset,
-        setText: setManualText
+        setText: setManualText,
     };
 }

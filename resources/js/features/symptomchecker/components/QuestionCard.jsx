@@ -48,15 +48,19 @@ export default function QuestionCard({ node, onAnswer, stepIndex, isLoading }) {
                         {node.question}
                     </h3>
 
-                    <div 
+                    <div
+                        key={`group-${stepIndex}`}
                         className="flex flex-col gap-3"
-                        role="radiogroup" 
+                        role="radiogroup"
                         aria-label="Pilihan jawaban"
                     >
                         {node.options.map((opt, idx) => (
                             <button
-                                key={idx}
-                                onClick={() => onAnswer(opt)}
+                                key={`opt-${stepIndex}-${idx}`}
+                                onClick={(e) => {
+                                    e.currentTarget.blur();
+                                    onAnswer(opt);
+                                }}
                                 disabled={isLoading}
                                 role="radio"
                                 aria-checked="false"
@@ -71,7 +75,7 @@ export default function QuestionCard({ node, onAnswer, stepIndex, isLoading }) {
                                     "flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed",
                                 )}
                             >
-                                <span 
+                                <span
                                     className="w-7 h-7 shrink-0 rounded-full border border-clinical-border bg-clinical-bg group-hover:bg-clinical-primary group-hover:text-white flex items-center justify-center font-display text-xs font-bold transition-all duration-200"
                                     aria-hidden="true"
                                 >

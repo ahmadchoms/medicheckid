@@ -8,17 +8,87 @@ import {
     MapPin,
     AlertTriangle,
     Home,
-    Menu,
     X,
     Heart,
     PhoneCall,
     Info,
     Phone,
     Users,
+    Menu as MenuIcon,
 } from "lucide-react";
+
+// ==========================================
+// 1. DATA REFERENSI (TIDAK ADA HALAMAN BARU)
+// ==========================================
+const NAV_LINKS = [
+    { href: "/", label: "Beranda", icon: Home, emoji: "🏠" },
+    { href: "/cek-gejala", label: "Cek Gejala", icon: Activity, emoji: "🩺" },
+    {
+        href: "/health-score",
+        label: "Health Score",
+        icon: BookOpen,
+        emoji: "📊",
+    },
+    {
+        href: "/health-insight",
+        label: "Health Insight",
+        icon: Info,
+        emoji: "📚",
+    },
+    { href: "/p3k", label: "P3K", icon: AlertTriangle, emoji: "🚨" },
+    {
+        href: "/fasilitas-kesehatan",
+        label: "Faskes",
+        icon: MapPin,
+        emoji: "📍",
+    },
+    { href: "/epidemiology", label: "Epidemiology", icon: Users, emoji: "🦠" },
+];
+
+// Helper untuk mengecek active route
+const checkIsActive = (currentUrl, targetUrl) => {
+    return (
+        currentUrl === targetUrl ||
+        (targetUrl !== "/" && currentUrl.startsWith(targetUrl))
+    );
+};
+
+// ==========================================
+// 2. KOMPONEN EMERGENCY & PANIC
+// ==========================================
+function EmergencyBanner() {
+    return (
+        <div className="bg-clinical-danger relative overflow-hidden">
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-center gap-2 relative z-10"
+            >
+                <Phone size={14} className="text-white animate-pulse" />
+                <span className="font-body text-xs text-white font-medium">
+                    Darurat? Hubungi
+                </span>
+                <span className="inline-flex items-center px-2 py-0.5 bg-white/20 backdrop-blur-sm font-display text-sm text-white font-bold rounded-full">
+                    119
+                </span>
+                <span className="font-body text-xs text-white/80 hidden sm:inline">
+                    (gratis 24 jam)
+                </span>
+            </motion.div>
+        </div>
+    );
+}
 
 function PanicMode() {
     const [isOpen, setIsOpen] = useState(false);
+
+    // Mengunci scroll body saat panic mode aktif
+    useEffect(() => {
+        document.body.style.overflow = isOpen ? "hidden" : "unset";
+        return () => {
+            document.body.style.overflow = "unset";
+        };
+    }, [isOpen]);
 
     return (
         <>
@@ -43,7 +113,7 @@ function PanicMode() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-9999 bg-clinical-danger flex flex-col items-center justify-center p-6 text-white overflow-y-auto"
+                        className="fixed inset-0 z-[9999] bg-clinical-danger flex flex-col items-center justify-center p-6 text-white overflow-y-auto"
                     >
                         <button
                             onClick={() => setIsOpen(false)}
@@ -51,7 +121,6 @@ function PanicMode() {
                         >
                             <X size={28} />
                         </button>
-
                         <div className="text-center mb-8 mt-12 w-full max-w-xl">
                             <h2 className="font-display text-2xl md:text-3xl font-bold mb-2 uppercase tracking-widest text-white/90">
                                 DARURAT MEDIS
@@ -59,7 +128,6 @@ function PanicMode() {
                             <p className="font-body text-base md:text-lg opacity-90 mb-6">
                                 Segera hubungi ambulans / layanan gawat darurat:
                             </p>
-
                             <a
                                 href="tel:119"
                                 className="inline-flex items-center justify-center gap-4 bg-white text-clinical-danger w-full py-6 rounded-clinical-2xl shadow-clinical-xl hover:scale-[1.02] active:scale-[0.98] transition-all mb-8"
@@ -69,81 +137,34 @@ function PanicMode() {
                                     119
                                 </span>
                             </a>
-
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
                                 <div className="bg-black/20 backdrop-blur-sm p-5 rounded-clinical-xl border border-white/20">
                                     <h3 className="font-display text-lg font-bold flex items-center gap-2 mb-3 text-white">
-                                        <Activity size={18} /> Panduan CPR RJP
+                                        <Activity size={18} /> Panduan CPR
                                     </h3>
                                     <ul className="space-y-2 font-body text-xs md:text-sm text-white/90">
-                                        <li className="flex gap-2">
-                                            <span>1.</span>
-                                            <span>
-                                                Pastikan lingkungan aman, cek
-                                                respon korban.
-                                            </span>
+                                        <li>
+                                            1. Pastikan area aman, cek respon.
                                         </li>
-                                        <li className="flex gap-2">
-                                            <span>2.</span>
-                                            <span>
-                                                Minta orang lain menelepon 119.
-                                            </span>
+                                        <li>
+                                            2. Minta orang lain telepon 119.
                                         </li>
-                                        <li className="flex gap-2">
-                                            <span>3.</span>
-                                            <span>
-                                                Letakkan pangkal telapak tangan
-                                                di tengah dada.
-                                            </span>
-                                        </li>
-                                        <li className="flex gap-2">
-                                            <span>4.</span>
-                                            <span>
-                                                Tekan keras dan cepat
-                                                (100-120x/menit, kedalaman 5cm).
-                                            </span>
-                                        </li>
-                                        <li className="flex gap-2">
-                                            <span>5.</span>
-                                            <span>
-                                                Jangan berhenti sampai bantuan
-                                                datang.
-                                            </span>
+                                        <li>
+                                            3. Tekan dada cepat & keras
+                                            (100-120x/mnt).
                                         </li>
                                     </ul>
                                 </div>
                                 <div className="bg-black/20 backdrop-blur-sm p-5 rounded-clinical-xl border border-white/20">
                                     <h3 className="font-display text-lg font-bold flex items-center gap-2 mb-3 text-white">
-                                        <Info size={18} /> Tersedak (Heimlich)
+                                        <Info size={18} /> Tersedak
                                     </h3>
                                     <ul className="space-y-2 font-body text-xs md:text-sm text-white/90">
-                                        <li className="flex gap-2">
-                                            <span>1.</span>
-                                            <span>
-                                                Berdirilah di belakang korban
-                                                yang tersedak.
-                                            </span>
-                                        </li>
-                                        <li className="flex gap-2">
-                                            <span>2.</span>
-                                            <span>
-                                                Lingkarkan tangan ke perut
-                                                koban.
-                                            </span>
-                                        </li>
-                                        <li className="flex gap-2">
-                                            <span>3.</span>
-                                            <span>
-                                                Kepalkan satu tangan di atas
-                                                pusar.
-                                            </span>
-                                        </li>
-                                        <li className="flex gap-2">
-                                            <span>4.</span>
-                                            <span>
-                                                Tarik kepalan tangan ke dalam
-                                                dan ke atas dengan kuat.
-                                            </span>
+                                        <li>1. Berdiri di belakang korban.</li>
+                                        <li>2. Lingkarkan tangan ke perut.</li>
+                                        <li>
+                                            3. Tarik kepalan kuat ke atas
+                                            (Heimlich).
                                         </li>
                                     </ul>
                                 </div>
@@ -156,63 +177,11 @@ function PanicMode() {
     );
 }
 
-const NAV_LINKS = [
-    { href: "/", label: "Beranda", icon: Home, emoji: "🏠" },
-    { href: "/cek-gejala", label: "Cek Gejala", icon: Activity, emoji: "🩺" },
-    {
-        href: "/health-score",
-        label: "Health Score",
-        icon: BookOpen,
-        emoji: "📊",
-    },
-    {
-        href: "/health-insight",
-        label: "Health Insight",
-        icon: Info,
-        emoji: "📚",
-    },
-    { href: "/p3k", label: "P3K", icon: AlertTriangle, emoji: "🚨" },
-    {
-        href: "/fasilitas-kesehatan",
-        label: "Faskes",
-        icon: MapPin,
-        emoji: "📍",
-    },
-    {
-        href: "/epidemiology",
-        label: "Epidemiology",
-        icon: Users,
-        emoji: "🦠",
-    },
-];
-
-function EmergencyBanner() {
-    return (
-        <div className="bg-clinical-danger relative overflow-hidden">
-            <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-center gap-2 relative z-10"
-            >
-                <Phone size={14} className="text-white animate-pulse" />
-                <span className="font-body text-xs text-white font-medium">
-                    Darurat? Hubungi
-                </span>
-                <span className="inline-flex items-center px-2 py-0.5 bg-white/20 backdrop-blur-sm font-display text-sm text-white font-bold rounded-full shadow-sm">
-                    119
-                </span>
-                <span className="font-body text-xs text-white/80 hidden sm:inline">
-                    (gratis 24 jam)
-                </span>
-            </motion.div>
-        </div>
-    );
-}
-
-function Header() {
+// ==========================================
+// 3. DESKTOP HEADER (Clean Header)
+// ==========================================
+function DesktopHeader() {
     const { url } = usePage();
-    const [mobileOpen, setMobileOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
@@ -224,40 +193,37 @@ function Header() {
     return (
         <header
             className={cn(
-                "sticky top-0 z-40 transition-all duration-300",
+                "sticky top-0 z-40 transition-all duration-300 hidden lg:block",
                 scrolled
                     ? "bg-white/90 backdrop-blur-md border-b border-clinical-border shadow-clinical-sm"
-                    : "bg-white/50 backdrop-blur-sm border-b border-transparent",
+                    : "bg-white/50 backdrop-blur-sm border-transparent",
             )}
         >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                <div className="flex items-center justify-between h-16 md:h-20">
+            <div className="max-w-7xl mx-auto px-6">
+                <div className="flex items-center justify-between h-20">
                     <Link href="/" className="flex items-center gap-2.5 group">
                         <motion.div
                             whileHover={{ rotate: 10, scale: 1.05 }}
-                            className="w-10 h-10 bg-clinical-primary rounded-clinical-lg flex items-center justify-center shadow-clinical-sm group-hover:shadow-clinical-md transition-all"
+                            className="w-10 h-10 bg-clinical-primary rounded-clinical-lg flex items-center justify-center shadow-clinical-sm transition-all"
                         >
                             <span className="font-display text-lg text-white font-bold">
                                 M
                             </span>
                         </motion.div>
-                        <div className="hidden sm:block">
-                            <span className="font-display text-xl font-bold text-clinical-text leading-none tracking-tight">
+                        <div>
+                            <span className="font-display text-xl font-bold text-clinical-text">
                                 MediCheck
                             </span>
-                            <span className="font-display text-xl font-bold text-clinical-primary leading-none tracking-tight">
+                            <span className="font-display text-xl font-bold text-clinical-primary">
                                 {" "}
                                 ID
                             </span>
                         </div>
                     </Link>
 
-                    <nav className="hidden lg:flex items-center gap-1.5 bg-clinical-bg/50 p-1 rounded-clinical-lg border border-clinical-border/50">
+                    <nav className="flex items-center gap-1.5 bg-clinical-bg/50 p-1 rounded-clinical-lg border border-clinical-border/50">
                         {NAV_LINKS.map((link) => {
-                            const isActive =
-                                url === link.href ||
-                                (link.href !== "/" &&
-                                    url.startsWith(link.href));
+                            const isActive = checkIsActive(url, link.href);
                             return (
                                 <Link
                                     key={link.href}
@@ -286,113 +252,212 @@ function Header() {
                         })}
                     </nav>
 
-                    <div className="flex items-center gap-3">
-                        <Link
-                            href="/cek-gejala"
-                            className={cn(
-                                "hidden sm:inline-flex items-center gap-2 px-5 py-2.5 bg-clinical-primary text-white",
-                                "font-body font-semibold text-sm rounded-clinical-lg transition-all duration-300",
-                                "shadow-clinical-sm hover:bg-clinical-primary-hover hover:shadow-clinical-md hover:-translate-y-0.5",
-                            )}
-                        >
-                            <Activity size={16} />
-                            Mulai Cek
-                        </Link>
-
-                        <button
-                            onClick={() => setMobileOpen(!mobileOpen)}
-                            className="lg:hidden w-10 h-10 rounded-clinical-lg flex items-center justify-center bg-white border border-clinical-border shadow-clinical-xs hover:bg-clinical-bg transition-colors"
-                            aria-label="Toggle menu"
-                        >
-                            <motion.div
-                                animate={{ rotate: mobileOpen ? 90 : 0 }}
-                                transition={{ duration: 0.2 }}
-                            >
-                                {mobileOpen ? (
-                                    <X
-                                        size={20}
-                                        className="text-clinical-text"
-                                    />
-                                ) : (
-                                    <Menu
-                                        size={20}
-                                        className="text-clinical-text"
-                                    />
-                                )}
-                            </motion.div>
-                        </button>
-                    </div>
+                    <Link
+                        href="/cek-gejala"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-clinical-primary text-white font-body font-semibold text-sm rounded-clinical-lg shadow-clinical-sm hover:bg-clinical-primary-hover hover:-translate-y-0.5 transition-all"
+                    >
+                        <Activity size={16} /> Mulai Cek
+                    </Link>
                 </div>
-
-                <AnimatePresence>
-                    {mobileOpen && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="lg:hidden overflow-hidden border-t border-clinical-border"
-                        >
-                            <div className="py-4 flex flex-col gap-2">
-                                {NAV_LINKS.map((link, i) => {
-                                    const isActive =
-                                        url === link.href ||
-                                        (link.href !== "/" &&
-                                            url.startsWith(link.href));
-                                    return (
-                                        <motion.div
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: i * 0.05 }}
-                                            key={link.href}
-                                        >
-                                            <Link
-                                                href={link.href}
-                                                onClick={() =>
-                                                    setMobileOpen(false)
-                                                }
-                                                className={cn(
-                                                    "flex items-center gap-3 px-4 py-3 font-body text-sm rounded-clinical-lg transition-all",
-                                                    isActive
-                                                        ? "bg-clinical-primary-light text-clinical-primary font-bold shadow-clinical-xs"
-                                                        : "text-clinical-text-secondary hover:bg-clinical-bg font-medium",
-                                                )}
-                                            >
-                                                <span className="text-xl">
-                                                    {link.emoji}
-                                                </span>
-                                                {link.label}
-                                            </Link>
-                                        </motion.div>
-                                    );
-                                })}
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.3 }}
-                                    className="mt-2"
-                                >
-                                    <div className="flex items-center justify-center gap-2 px-4 py-3.5 bg-clinical-danger/10 border border-clinical-danger/20 text-clinical-danger rounded-clinical-lg font-body font-bold text-sm">
-                                        <Phone size={16} />
-                                        Darurat Nasional:
-                                        <span className="bg-clinical-danger text-white px-3 py-1 font-display text-sm rounded-full shadow-sm">
-                                            119
-                                        </span>
-                                    </div>
-                                </motion.div>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
             </div>
         </header>
     );
 }
 
+// ==========================================
+// 4. MOBILE HEADER & NAVIGATION (Hub & Spoke Drawer)
+// ==========================================
+function MobileNavigation() {
+    const { url } = usePage();
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => setScrolled(window.scrollY > 20);
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    useEffect(() => {
+        document.body.style.overflow = isDrawerOpen ? "hidden" : "unset";
+        return () => {
+            document.body.style.overflow = "unset";
+        };
+    }, [isDrawerOpen]);
+
+    // Memisahkan Navigasi tanpa merubah jumlah rute (3 Utama, Sisanya di Drawer)
+    const primaryNav = [NAV_LINKS[0], NAV_LINKS[1], NAV_LINKS[5]]; // Home, Cek Gejala, Faskes
+    const secondaryNav = [
+        NAV_LINKS[2],
+        NAV_LINKS[3],
+        NAV_LINKS[4],
+        NAV_LINKS[6],
+    ]; // Health Score, Insight, P3K, Epidemiology
+
+    return (
+        <div className="lg:hidden">
+            {/* Mobile Header - Sangat Bersih */}
+            <header
+                className={cn(
+                    "sticky top-0 z-40 transition-all duration-300",
+                    scrolled
+                        ? "bg-white/90 backdrop-blur-md border-b border-clinical-border shadow-clinical-sm"
+                        : "bg-white/90 backdrop-blur-sm",
+                )}
+            >
+                <div className="px-4 flex items-center justify-between h-16">
+                    <Link href="/" className="flex items-center gap-2 group">
+                        <div className="w-8 h-8 bg-clinical-primary rounded-lg flex items-center justify-center shadow-clinical-sm">
+                            <span className="font-display text-sm text-white font-bold">
+                                M
+                            </span>
+                        </div>
+                        <span className="font-display text-lg font-bold text-clinical-text">
+                            MediCheck
+                            <span className="text-clinical-primary"> ID</span>
+                        </span>
+                    </Link>
+                </div>
+            </header>
+
+            {/* Bottom Navigation */}
+            <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-clinical-border pb-safe">
+                <div className="flex items-center justify-around h-16 px-2">
+                    {primaryNav.map((link) => {
+                        const Icon = link.icon;
+                        const isActive = checkIsActive(url, link.href);
+                        return (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className="relative flex flex-col items-center justify-center w-full h-full gap-1"
+                            >
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="bottom-nav-mobile"
+                                        className="absolute inset-x-4 inset-y-1 bg-clinical-primary-light rounded-clinical-lg -z-10"
+                                    />
+                                )}
+                                <Icon
+                                    size={20}
+                                    className={cn(
+                                        "transition-colors",
+                                        isActive
+                                            ? "text-clinical-primary"
+                                            : "text-clinical-muted",
+                                    )}
+                                    strokeWidth={isActive ? 2.5 : 2}
+                                />
+                                <span
+                                    className={cn(
+                                        "font-body text-[10px] leading-none transition-colors",
+                                        isActive
+                                            ? "font-bold text-clinical-primary"
+                                            : "font-medium text-clinical-muted",
+                                    )}
+                                >
+                                    {link.label}
+                                </span>
+                            </Link>
+                        );
+                    })}
+                    {/* Trigger Menu Drawer */}
+                    <button
+                        onClick={() => setIsDrawerOpen(true)}
+                        className="relative flex flex-col items-center justify-center w-full h-full gap-1 group"
+                    >
+                        <MenuIcon
+                            size={20}
+                            className="text-clinical-muted group-hover:text-clinical-primary transition-colors"
+                        />
+                        <span className="font-body text-[10px] leading-none font-medium text-clinical-muted group-hover:text-clinical-primary transition-colors">
+                            Menu
+                        </span>
+                    </button>
+                </div>
+            </nav>
+
+            {/* Mobile Bottom Drawer / Sheet */}
+            <div
+                className={cn(
+                    "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity duration-300",
+                    isDrawerOpen
+                        ? "opacity-100"
+                        : "opacity-0 pointer-events-none",
+                )}
+                onClick={() => setIsDrawerOpen(false)}
+            >
+                <div
+                    className={cn(
+                        "absolute bottom-0 left-0 w-full bg-clinical-bg rounded-t-3xl transition-transform duration-300 ease-out flex flex-col max-h-[85vh]",
+                        isDrawerOpen ? "translate-y-0" : "translate-y-full",
+                    )}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="flex items-center justify-between p-5 border-b border-clinical-border bg-white rounded-t-3xl">
+                        <h2 className="font-display font-bold text-lg text-clinical-text">
+                            Eksplorasi Fitur
+                        </h2>
+                        <button
+                            onClick={() => setIsDrawerOpen(false)}
+                            className="p-2 bg-clinical-bg hover:bg-clinical-border rounded-full text-clinical-text transition-colors"
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
+
+                    <div className="p-5 overflow-y-auto space-y-3 pb-safe">
+                        {secondaryNav.map((link) => {
+                            const isActive = checkIsActive(url, link.href);
+                            return (
+                                <Link
+                                    key={link.href}
+                                    href={link.href}
+                                    onClick={() => setIsDrawerOpen(false)}
+                                    className={cn(
+                                        "flex items-center p-4 rounded-xl border transition-all",
+                                        isActive
+                                            ? "bg-clinical-primary-light/50 border-clinical-primary"
+                                            : "bg-white border-clinical-border shadow-clinical-xs hover:border-clinical-primary",
+                                    )}
+                                >
+                                    <div className="w-10 h-10 rounded-lg bg-clinical-primary-light flex items-center justify-center mr-4 shrink-0 text-xl">
+                                        {link.emoji}
+                                    </div>
+                                    <span
+                                        className={cn(
+                                            "font-body text-sm",
+                                            isActive
+                                                ? "font-bold text-clinical-primary"
+                                                : "font-semibold text-clinical-text",
+                                        )}
+                                    >
+                                        {link.label}
+                                    </span>
+                                </Link>
+                            );
+                        })}
+
+                        <div className="mt-6 pt-4 border-t border-clinical-border flex items-center justify-center gap-2 p-3 bg-clinical-danger/10 border border-clinical-danger/20 text-clinical-danger rounded-xl font-body font-bold text-sm">
+                            <Phone size={16} /> Darurat Nasional:{" "}
+                            <span className="bg-clinical-danger text-white px-3 py-1 font-display rounded-full shadow-sm">
+                                119
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ==========================================
+// 5. FOOTER
+// ==========================================
 function Footer() {
     return (
-        <footer className="bg-white border-t border-clinical-border mt-auto relative overflow-hidden">
+        <footer className="bg-white border-t border-clinical-border mt-auto relative overflow-hidden pb-16 lg:pb-0">
             <div className="absolute inset-0 bg-linear-to-b from-transparent to-clinical-primary-light/20 pointer-events-none" />
-
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-10 mb-10">
                     <div className="md:col-span-5">
@@ -425,7 +490,7 @@ function Footer() {
                                 <Link
                                     key={link.href}
                                     href={link.href}
-                                    className="font-body text-sm text-clinical-text-secondary hover:text-clinical-primary hover:translate-x-1 transition-all flex items-center gap-2 w-fit"
+                                    className="font-body text-sm text-clinical-text-secondary hover:text-clinical-primary transition-all flex items-center gap-2 w-fit"
                                 >
                                     <span>{link.emoji}</span> {link.label}
                                 </Link>
@@ -435,40 +500,23 @@ function Footer() {
 
                     <div className="md:col-span-4">
                         <h4 className="font-display text-sm text-clinical-text font-bold mb-4 uppercase tracking-wider">
-                            Berdasarkan Referensi
+                            Referensi
                         </h4>
                         <div className="flex flex-col gap-2.5 font-body text-sm text-clinical-text-secondary">
                             <span className="flex items-center gap-2">
-                                📋 World Health Organization (WHO)
+                                📋 World Health Organization
                             </span>
                             <span className="flex items-center gap-2">
                                 🏥 Kementerian Kesehatan RI
                             </span>
                             <span className="flex items-center gap-2">
-                                🩺 Palang Merah Indonesia (PMI)
-                            </span>
-                            <span className="flex items-center gap-2">
-                                📖 Pedoman IDAI & Permenkes
+                                🩺 Palang Merah Indonesia
                             </span>
                         </div>
                     </div>
                 </div>
 
                 <div className="border-t border-clinical-border pt-8">
-                    <div className="flex items-start gap-3 bg-clinical-warning-light/50 border border-clinical-warning/20 rounded-clinical-xl p-4 mb-6">
-                        <AlertTriangle
-                            size={20}
-                            className="text-clinical-warning shrink-0"
-                        />
-                        <p className="font-body text-xs md:text-sm text-clinical-text-secondary leading-relaxed">
-                            <strong className="text-clinical-warning font-bold">
-                                Disclaimer:
-                            </strong>{" "}
-                            MediCheck ID adalah platform edukasi pendukung dan{" "}
-                            <strong>TIDAK</strong> menggantikan diagnosis,
-                            saran, atau perawatan dari tenaga medis profesional.
-                        </p>
-                    </div>
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                         <p className="font-body text-sm text-clinical-muted font-medium">
                             © {new Date().getFullYear()} MediCheck ID. All
@@ -489,71 +537,19 @@ function Footer() {
     );
 }
 
-function BottomNav() {
-    const { url } = usePage();
-
-    return (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 backdrop-blur-xl border-t border-clinical-border pb-safe">
-            <div className="flex items-center justify-around h-16 px-2">
-                {NAV_LINKS.map((link) => {
-                    const Icon = link.icon;
-                    const isActive =
-                        url === link.href ||
-                        (link.href !== "/" && url.startsWith(link.href));
-                    return (
-                        <Link
-                            key={link.href}
-                            href={link.href}
-                            className="relative flex flex-col items-center justify-center w-full h-full gap-1"
-                        >
-                            {isActive && (
-                                <motion.div
-                                    layoutId="bottom-nav-indicator"
-                                    className="absolute inset-x-4 inset-y-1 bg-clinical-primary-light rounded-clinical-lg -z-10"
-                                    transition={{
-                                        type: "spring",
-                                        stiffness: 400,
-                                        damping: 25,
-                                    }}
-                                />
-                            )}
-                            <Icon
-                                size={20}
-                                className={cn(
-                                    "transition-colors duration-200",
-                                    isActive
-                                        ? "text-clinical-primary"
-                                        : "text-clinical-muted",
-                                )}
-                                strokeWidth={isActive ? 2.5 : 2}
-                            />
-                            <span
-                                className={cn(
-                                    "font-body text-[10px] leading-none transition-colors duration-200",
-                                    isActive
-                                        ? "font-bold text-clinical-primary"
-                                        : "font-medium text-clinical-muted",
-                                )}
-                            >
-                                {link.label}
-                            </span>
-                        </Link>
-                    );
-                })}
-            </div>
-        </nav>
-    );
-}
-
+// ==========================================
+// 6. MAIN LAYOUT WRAPPER
+// ==========================================
 export default function PublicLayout({ children, fullWidth = false }) {
     return (
         <div className="min-h-screen flex flex-col bg-clinical-bg selection:bg-clinical-primary-light selection:text-clinical-primary">
             <EmergencyBanner />
-            <Header />
+            <DesktopHeader />
+            <MobileNavigation />
 
             <main
                 className={cn(
-                    "flex-1 w-full pb-20 lg:pb-10",
+                    "flex-1 w-full",
                     !fullWidth &&
                         "max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12",
                 )}
@@ -569,7 +565,6 @@ export default function PublicLayout({ children, fullWidth = false }) {
 
             <PanicMode />
             <Footer />
-            <BottomNav />
         </div>
     );
 }
