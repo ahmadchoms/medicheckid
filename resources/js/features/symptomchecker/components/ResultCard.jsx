@@ -1,14 +1,30 @@
-import { useRef, useState, useEffect } from "react";
-import { AlertTriangle, Phone, RefreshCw, Printer, Share2 } from "lucide-react";
+import { useRef, useState, useEffect, forwardRef } from "react";
+import {
+    AlertTriangle,
+    Phone,
+    RefreshCw,
+    Share2,
+    Download,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import html2pdf from "html2pdf.js";
 import EmergencyModal from "./EmergencyModal";
+import PDFReportTemplate from "./PDFReportTemplate";
 
 export default function ResultCard({ result, userQuery, onReset, pathArr }) {
+    const pdfRef = useRef(null);
     const [showEmergencyModal, setShowEmergencyModal] = useState(false);
+    const [isGenerating, setIsGenerating] = useState(false);
+
+    const [refNumber] = useState(
+        `MC-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
+    );
+    const [printDate] = useState(new Date());
+
     const isEmergency = result?.urgency === "emergency";
 
     useEffect(() => {
@@ -23,32 +39,61 @@ export default function ResultCard({ result, userQuery, onReset, pathArr }) {
             text: "text-white",
             icon: "🚨",
             title: "DARURAT — Cari Bantuan Segera",
+            pdfLabel: "DARURAT",
         },
         high: {
             bg: "bg-clinical-warning",
             text: "text-white",
             icon: "⚠️",
             title: "PERLU PERHATIAN SEGERA",
+            pdfLabel: "TINGGI",
         },
         moderate: {
             bg: "bg-clinical-warning-light",
             text: "text-clinical-text",
             icon: "⏰",
             title: "PERLU PERHATIAN",
+            pdfLabel: "SEDANG",
         },
         low: {
             bg: "bg-clinical-success",
             text: "text-white",
             icon: "✅",
             title: "BISA DITANGANI MANDIRI",
+            pdfLabel: "RENDAH",
         },
     };
 
     const urg = urgencyConfig[result.urgency] || urgencyConfig.low;
 
-    const handlePrint = () => {
-        window.print();
-        toast.success("Membuka dialog cetak dokumen...");
+    const handlePrint = async () => {
+        if (isGenerating) return;
+
+        setIsGenerating(true);
+        toast.info("Menyusun dokumen PDF...");
+
+        try {
+            const element = pdfRef.current;
+            const opt = {
+                margin: [10, 0, 10, 0],
+                filename: `Laporan_Analisis_${refNumber}.pdf`,
+                image: { type: "jpeg", quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true,
+                    backgroundColor: "#ffffff",
+                },
+                jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+            };
+
+            await html2pdf().set(opt).from(element).save();
+            toast.success("Dokumen PDF berhasil diunduh!");
+        } catch (err) {
+            toast.error("Gagal membuat dokumen PDF.");
+        } finally {
+            setIsGenerating(false);
+        }
     };
 
     const handleExportWA = () => {
@@ -71,9 +116,20 @@ export default function ResultCard({ result, userQuery, onReset, pathArr }) {
         );
     };
 
+    const formatDateTime = (date) => {
+        return new Intl.DateTimeFormat("id-ID", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        }).format(date);
+    };
+
     return (
-        <>
-            <div className="animate-slide-up space-y-4 print:hidden">
+        <div className="relative">
+            <div className="animate-slide-up space-y-4">
                 <EmergencyModal
                     isOpen={showEmergencyModal}
                     onOpenChange={setShowEmergencyModal}
@@ -258,15 +314,24 @@ export default function ResultCard({ result, userQuery, onReset, pathArr }) {
                         variant="outline"
                         onClick={onReset}
                         className="w-full"
+                        disabled={isGenerating}
                     >
                         <RefreshCw size={14} className="mr-2" /> Cek Ulang
                     </Button>
                     <Button
                         variant="default"
                         onClick={handlePrint}
-                        className="w-full"
+                        className="w-full bg-clinical-primary hover:bg-clinical-primary-hover"
+                        disabled={isGenerating}
                     >
-                        <Printer size={14} className="mr-2" /> Cetak Hasil
+                        <Download
+                            size={14}
+                            className={cn(
+                                "mr-2",
+                                isGenerating && "animate-bounce",
+                            )}
+                        />
+                        {isGenerating ? "Memproses..." : "Unduh PDF"}
                     </Button>
                 </div>
                 <Button
@@ -276,135 +341,18 @@ export default function ResultCard({ result, userQuery, onReset, pathArr }) {
                 >
                     <Share2 size={14} className="mr-2" /> Beri Tahu Keluarga
                 </Button>
-
-                {!isEmergency && (
-                    <div className="bg-clinical-bg border border-clinical-border rounded-clinical-lg p-4">
-                        <p className="font-body text-xs font-semibold mb-3 text-clinical-text">
-                            📞 Nomor Darurat Penting
-                        </p>
-                        <div className="grid grid-cols-3 gap-2">
-                            <div className="text-center bg-white border border-clinical-border rounded-clinical-md py-2 px-1 flex flex-col items-center justify-center min-h-17.5">
-                                <span className="inline-flex items-center px-1.5 py-0.5 bg-clinical-danger-light font-body text-sm font-bold text-clinical-danger rounded-full break-all">
-                                    119
-                                </span>
-                                <p className="text-[10px] sm:text-xs font-body text-clinical-muted mt-1.5 wrap-break-words">
-                                    Ambulans
-                                </p>
-                            </div>
-                            <div className="text-center bg-white border border-clinical-border rounded-clinical-md py-2 px-1 flex flex-col items-center justify-center min-h-17.5">
-                                <span className="inline-flex items-center px-1.5 py-0.5 bg-clinical-primary-light font-body text-[13px] font-bold text-clinical-primary rounded-full break-all">
-                                    1500-567
-                                </span>
-                                <p className="text-[10px] sm:text-xs font-body text-clinical-muted mt-1.5 wrap-break-words">
-                                    Hotline
-                                </p>
-                            </div>
-                            <div className="text-center bg-white border border-clinical-border rounded-clinical-md py-2 px-1 flex flex-col items-center justify-center min-h-17.5">
-                                <span className="inline-flex items-center px-1.5 py-0.5 bg-clinical-success-light font-body text-[13px] font-bold text-clinical-success rounded-full break-all">
-                                    ext 8
-                                </span>
-                                <p className="text-[10px] sm:text-xs font-body text-clinical-muted mt-1.5 wrap-break-words">
-                                    Mental
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
 
-            <div className="hidden print:block print:p-8 print:bg-white print:text-black">
-                <div className="border-b-2 border-black pb-4 mb-6 flex justify-between items-end">
-                    <div>
-                        <h1 className="text-3xl font-bold font-display text-black">
-                            MediCheck ID
-                        </h1>
-                        <p className="text-sm text-gray-600 font-body">
-                            Laporan Hasil Analisis Gejala AI
-                        </p>
-                    </div>
-                    <div className="text-right text-sm font-body">
-                        <p>Tanggal: {new Date().toLocaleDateString("id-ID")}</p>
-                        <p>
-                            Tingkat Urgensi:{" "}
-                            <span className="font-bold text-black uppercase">
-                                {result.urgency || "Rendah"}
-                            </span>
-                        </p>
-                    </div>
-                </div>
-
-                <div className="space-y-6 font-body">
-                    <section>
-                        <h2 className="text-lg font-bold border-b border-gray-300 mb-2 pb-1 text-black">
-                            Keluhan Pasien
-                        </h2>
-                        <p className="text-sm text-black">
-                            {pathArr?.length > 0
-                                ? pathArr.join(" → ")
-                                : userQuery}
-                        </p>
-                    </section>
-
-                    <section>
-                        <h2 className="text-lg font-bold border-b border-gray-300 mb-2 pb-1 text-black">
-                            Kemungkinan Kondisi
-                        </h2>
-                        <ul className="list-disc pl-5 text-sm text-black space-y-1">
-                            {result.conditions?.map((c, i) => (
-                                <li key={i}>{c}</li>
-                            ))}
-                        </ul>
-                    </section>
-
-                    {result.homeCare && result.homeCare.length > 0 && (
-                        <section>
-                            <h2 className="text-lg font-bold border-b border-gray-300 mb-2 pb-1 text-black">
-                                Rekomendasi Tindakan Mandiri
-                            </h2>
-                            <ul className="list-decimal pl-5 text-sm text-black space-y-1">
-                                {result.homeCare.map((step, i) => (
-                                    <li key={i}>{step}</li>
-                                ))}
-                            </ul>
-                        </section>
-                    )}
-
-                    {result.redFlags && result.redFlags.length > 0 && (
-                        <section>
-                            <h2 className="text-lg font-bold border-b border-gray-300 mb-2 pb-1 text-black">
-                                Tanda Bahaya (Segera ke Dokter)
-                            </h2>
-                            <ul className="list-disc pl-5 text-sm text-black space-y-1">
-                                {result.redFlags.map((flag, i) => (
-                                    <li key={i}>{flag}</li>
-                                ))}
-                            </ul>
-                        </section>
-                    )}
-
-                    {result.explanation && (
-                        <section>
-                            <h2 className="text-lg font-bold border-b border-gray-300 mb-2 pb-1 text-black">
-                                Keterangan Tambahan
-                            </h2>
-                            <p className="text-sm text-black text-justify">
-                                {result.explanation}
-                            </p>
-                        </section>
-                    )}
-
-                    <div className="mt-12 pt-4 border-t border-gray-400 text-xs text-gray-600 text-justify leading-relaxed">
-                        *Disclaimer: Dokumen ini dihasilkan oleh Artificial
-                        Intelligence (AI) untuk tujuan edukasi dan referensi
-                        awal berdasarkan keluhan yang dimasukkan. Dokumen ini
-                        BUKAN rekam medis resmi dan BUKAN pengganti diagnosis
-                        dari dokter atau profesional kesehatan berlisensi. Harap
-                        selalu konsultasikan kondisi kesehatan Anda kepada
-                        fasilitas kesehatan terdekat jika gejala memburuk atau
-                        tidak membaik.
-                    </div>
-                </div>
-            </div>
-        </>
+            <PDFReportTemplate
+                ref={pdfRef}
+                refNumber={refNumber}
+                printDate={printDate}
+                result={result}
+                userQuery={userQuery}
+                pathArr={pathArr}
+                formatDateTime={formatDateTime}
+                urgLabel={urg.pdfLabel}
+            />
+        </div>
     );
 }
