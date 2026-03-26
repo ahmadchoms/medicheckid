@@ -30,4 +30,4 @@ Kesehatan
 
 ## Link Website
 
-http://143.198.196.244:7373/
+https://152.42.248.92/
